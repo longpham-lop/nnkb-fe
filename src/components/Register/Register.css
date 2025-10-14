@@ -1,0 +1,117 @@
+/* Toàn bộ layout chia 2 nửa */
+.register-container {
+  display: flex;
+  height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Nửa trái – màu xanh */
+.register-left {
+  flex: 1;
+  background-color: #6edb6e;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: black;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.register-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  border-bottom: 2px solid black;
+  width: 100px;
+}
+
+/* Form input */
+.register-form input {
+  width: 80%;
+  margin: 10px 0;
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 4px;
+  outline: none;
+  font-size: 15px;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Nửa phải */
+.register-right {
+  flex: 1;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Nút đăng ký */
+.btn-register {
+  width: 200px;
+  background-color: #6edb6e;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 15px 0;
+  cursor: pointer;
+}
+
+.btn-register:hover {
+  background-color: #5ac85a;
+}
+
+/* Đăng nhập */
+.text-account {
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.btn-login {
+  width: 200px;
+  background-color: #6edb6e;
+  color: black;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.btn-login:hover {
+  background-color: #5ac85a;
+}
+
+/* Hiệu ứng hình “vé” */
+.ticket-shape {
+  position: absolute;
+  width: 50px;
+  height: 80px;
+  border: 2px solid black;
+  border-radius: 15px;
+}
+
+.ticket-shape.top {
+  top: 120px;
+  left: -25px;
+  border-right: 2px dotted black;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  background-color: white;
+}
+
+.ticket-shape.bottom {
+  bottom: 120px;
+  left: -25px;
+  border-right: 2px dotted black;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  background-color: white;
+}
