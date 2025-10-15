@@ -1,5 +1,6 @@
 import React from 'react';
 import './Home.css';
+// import { useNavigate } from "react-router-dom";
 import Banner1 from "../../assets/banner1.png";
 import Banner2 from "../../assets/banner2.png";
 import Banner3 from "../../assets/banner3.png";
@@ -10,31 +11,18 @@ import Banner7 from "../../assets/banner7.png";
 import Banner8 from "../../assets/banner8.png";
 import Banner9 from "../../assets/banner9.png";
 import Banner10 from "../../assets/banner10.png";
+import Gg from "../../assets/gg.png";
+import Fb from "../../assets/fb.png";
+import Tiktok from "../../assets/tiktok.png";
+import Thread from "../../assets/thread.png";
+import Ig from "../../assets/ig.png";
 
 const Home = () => {
+    // const navigate = useNavigate();
   return (
     <div className="home-container">
       {/* Header Section */}
-      <header className="header">
-        <div className="logo">Topticket</div>
- 
-        <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap" rel="stylesheet"></link>
-        <div className="search-bar">
-          <input type="text" placeholder="Tìm tên sự kiện hay nghệ sĩ" />
-          <button>Tìm kiếm</button>
-        </div>
-        <div className="header-nav">
-          <a href="#">Tạo sự kiện</a>
-          <a href="#">Vé của tôi</a>
-          <a href="#">Tài khoản</a>
-        </div>
-      </header>
-      <nav className="main-nav">
-        <a href="#">Nhạc sống</a>
-        <a href="#">Sân khấu & Nghệ thuật</a>
-        <a href="#">Thể thao</a>
-        <a href="#">Khác</a>
-      </nav>
+      
 
       {/* Main Content */}
       <main>
@@ -94,6 +82,12 @@ const Home = () => {
                     <p className="date"> 27 tháng 11, 2025</p>
                 </div>
                  <div className="event-card">
+                    <img src={Banner6} alt="Event 4" />
+                    <h3>EVERLASTING SYMPHONY - KIM JAEJOONG 2025 FAN MEETING IN HO CHI MINH CITY</h3>
+                    <p className="price">Từ 2,600,000₫</p>
+                    <p className="date">25 tháng 10, 2025</p>
+                </div>
+                <div className="event-card">
                     <img src={Banner6} alt="Event 4" />
                     <h3>EVERLASTING SYMPHONY - KIM JAEJOONG 2025 FAN MEETING IN HO CHI MINH CITY</h3>
                     <p className="price">Từ 2,600,000₫</p>
@@ -161,43 +155,6 @@ const Home = () => {
       </main>
 
       {/* Footer Section */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-column">
-            <h4>Hỗ trợ khách hàng</h4>
-            <p>Hotline: 1900.6408</p>
-            <p>Email: support@ticketbox.vn</p>
-          </div>
-          <div className="footer-column">
-            <h4>Về Ticketbox</h4>
-            <a href="#">Giới thiệu</a>
-            <a href="#">Điều khoản sử dụng</a>
-            <a href="#">Chính sách bảo mật</a>
-          </div>
-          <div className="footer-column">
-            <h4>Dành cho nhà tổ chức</h4>
-            <a href="#">Hợp tác với chúng tôi</a>
-            <a href="#">Câu hỏi thường gặp</a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-            <div className="app-links">
-                <p>Tải ứng dụng Ticketbox</p>
-                <img src="https://via.placeholder.com/120x40.png?text=Google+Play" alt="Google Play" />
-                <img src="https://via.placeholder.com/120x40.png?text=App+Store" alt="App Store" />
-            </div>
-            <div className="social-links">
-                 <p>Theo dõi chúng tôi</p>
-                 {/* Add social icons here */}
-            </div>
-        </div>
-        <div className="copyright">
-            <p>ticketbox</p>
-            <p>CÔNG TY TNHH TICKETBOX</p>
-            <p>Địa chỉ: Tầng 6, Tòa nhà Circo, 222 Điện Biên Phủ, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh, Việt Nam</p>
-            <p>Giấy chứng nhận đăng ký doanh nghiệp số: 0313605444, cấp lần đầu ngày 01/01/2016, sửa đổi lần thứ 6 ngày 18/07/2023 bởi Sở Kế hoạch và Đầu tư TPHCM</p>
-        </div>
-      </footer>
     </div>
   );
 };

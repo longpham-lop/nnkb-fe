@@ -1,11 +1,23 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion"; 
-import { motion as Motion } from "framer-motion";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { AnimatePresence, motion as Motion } from "framer-motion";
+
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Home from "./pages/Home/Home";
- 
+import Account from "./components/Account/Account";
+
+// Import ảnh icon mạng xã hội
+import Fb from "./assets/fb.png";
+import Ig from "./assets/ig.png";
+import Tiktok from "./assets/tiktok.png";
+import Thread from "./assets/thread.png";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -52,15 +64,174 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
+        <Route
+          path="/account"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Account />
+            </Motion.div>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
 }
 
+function Layout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Ẩn Header/Footer ở trang login và register
+  const hideHeaderFooter =
+    location.pathname === "/" || location.pathname === "/register";
+
+  return (
+    <>
+      {!hideHeaderFooter && (
+        <div className="home-container">
+          {/* Header Section */}
+          <header className="header">
+            <div className="logo">Topticket</div>
+
+            <link
+              href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
+              rel="stylesheet"
+            />
+
+            <div className="search-bar">
+              <input type="text" placeholder="Tìm tên sự kiện hay nghệ sĩ" />
+              <button>Tìm kiếm</button>
+            </div>
+
+            <div className="header-nav">
+              <a href="#">Tạo sự kiện</a>
+              <button
+                className="btn-myticket"
+                onClick={() => navigate("/account")}
+              >
+                Vé của tôi
+              </button>
+              <button
+                className="btn-account"
+                onClick={() => navigate("/account")}
+              >
+                Tài khoản
+              </button>
+            </div>
+          </header>
+
+          <nav className="main-nav">
+            <a href="#">Nhạc sống</a>
+            <a href="#">Sân khấu & Nghệ thuật</a>
+            <a href="#">Thể thao</a>
+            <a href="#">Khác</a>
+          </nav>
+        </div>
+      )}
+
+      {/* Nội dung chính của từng trang */}
+      <AnimatedRoutes />
+
+      {!hideHeaderFooter && (
+        <footer className="footer">
+          <div className="footer-content">
+            <div className="footer-column">
+              <h4>Hỗ trợ khách hàng</h4>
+              <p>Hotline: 1900.6868</p>
+              <p>Email: topticket@support.vn</p>
+            </div>
+
+            <div className="footer-column">
+              <h4>Về Ticketbox</h4>
+              <a href="#">Giới thiệu</a>
+              <a href="#">Điều khoản sử dụng</a>
+              <a href="#">Chính sách bảo mật</a>
+            </div>
+
+            <div className="footer-column">
+              <h4>Dành cho nhà tổ chức</h4>
+              <a href="#">Hợp tác với chúng tôi</a>
+              <a href="#">Câu hỏi thường gặp</a>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <div className="app-links">
+              <p>Tải ứng dụng Ticketbox</p>
+              <img
+                src="https://via.placeholder.com/120x40.png?text=Google+Play"
+                alt="Google Play"
+              />
+              <img
+                src="https://via.placeholder.com/120x40.png?text=App+Store"
+                alt="App Store"
+              />
+            </div>
+
+            <div className="social-section">
+              <h3 className="follow-title">Theo dõi chúng tôi</h3>
+              <div className="social-icons-container">
+                <a
+                  href="https://www.facebook.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src={Fb} alt="Facebook" />
+                </a>
+                <a
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src={Ig} alt="Instagram" />
+                </a>
+                <a
+                  href="https://www.tiktok.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src={Tiktok} alt="TikTok" />
+                </a>
+                <a
+                  href="https://www.threads.net/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src={Thread} alt="Threads" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="copyright">
+            <p>Topticket</p>
+            <p>CÔNG TY TNHH TOPTICKET</p>
+            <p>
+              Địa chỉ: Tầng 6, Tòa Electric Power, 234 Hoàng Quốc Việt, Cổ
+              Nhuế, Bắc Từ Liêm, Hà Nội, Việt Nam
+            </p>
+            <p>
+              Giấy chứng nhận đăng ký doanh nghiệp số: 0313605444, cấp lần đầu
+              ngày 01/01/2016, sửa đổi lần thứ 6 ngày 18/07/2023 bởi Sở Kế hoạch
+              và Đầu tư Hà Nội
+            </p>
+          </div>
+        </footer>
+      )}
+    </>
+  );
+}
+
 function App() {
   return (
-    <BrowserRouter><AnimatedRoutes /></BrowserRouter>
-      
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
   );
 }
 
