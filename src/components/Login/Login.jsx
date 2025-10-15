@@ -11,7 +11,9 @@ function Login() {
         <h2>Đăng nhập</h2>
         <input type="email" placeholder="Nhập email..." />
         <input type="password" placeholder="Nhập mật khẩu..." />
-        <button className="btn-login">Đăng nhập</button>
+        <button className="btn-login" onClick={() => navigate("/Home")}>
+          Đăng nhập
+        </button>
         <button className="btn-secondary">Tiếp tục</button>
         <a href="#">Quên mật khẩu?</a>
         <button

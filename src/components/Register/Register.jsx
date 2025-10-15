@@ -14,6 +14,7 @@ function Register() {
           <input type="text" placeholder="Tên" />
           <input type="text" placeholder="Số điện thoại" />
           <input type="email" placeholder="Email" />
+          <input type="country" placeholder="Địa chỉ" />
           <input type="password" placeholder="Mật khẩu" />
           <input type="password" placeholder="Xác nhận mật khẩu" />
         </form>
