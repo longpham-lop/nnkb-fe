@@ -11,11 +11,7 @@ import Banner7 from "../../assets/banner7.png";
 import Banner8 from "../../assets/banner8.png";
 import Banner9 from "../../assets/banner9.png";
 import Banner10 from "../../assets/banner10.png";
-import Gg from "../../assets/gg.png";
-import Fb from "../../assets/fb.png";
-import Tiktok from "../../assets/tiktok.png";
-import Thread from "../../assets/thread.png";
-import Ig from "../../assets/ig.png";
+
 
 const Home = () => {
     // const navigate = useNavigate();

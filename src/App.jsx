@@ -1,18 +1,12 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import {BrowserRouter, Routes, Route, useLocation, useNavigate,} from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Home from "./pages/Home/Home";
 import Account from "./components/Account/Account";
-
+import "./App.css";
 // Import ảnh icon mạng xã hội
 import Fb from "./assets/fb.png";
 import Ig from "./assets/ig.png";
@@ -136,7 +130,7 @@ function Layout() {
 
       {/* Nội dung chính của từng trang */}
       <AnimatedRoutes />
-
+        
       {!hideHeaderFooter && (
         <footer className="footer">
           <div className="footer-content">
