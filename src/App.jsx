@@ -6,6 +6,8 @@ import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Home from "./pages/Home/Home";
 import Account from "./components/Account/Account";
+import TicketDetail from "./components/TicketDetail/TicketDetail";
+
 import "./App.css";
 // Import ảnh icon mạng xã hội
 import Fb from "./assets/fb.png";
@@ -68,6 +70,19 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Account />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/ticketdetail"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.5 }}
+            >
+              <TicketDetail />
             </Motion.div>
           }
         />

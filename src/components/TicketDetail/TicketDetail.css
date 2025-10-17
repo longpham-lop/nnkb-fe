@@ -1,0 +1,192 @@
+/* --- Main Container --- */
+.ticket-detail-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    color: #e0e0e0;
+    background-color: #1a1818; /* Nền xám đen cho toàn trang */
+   
+}
+
+.main-detail-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-ads {
+    flex: 0 0 250px; /* Chiều rộng cố định 250px */
+    display: none; /* Ẩn trên màn hình nhỏ */
+}
+/* Hiển thị sidebar trên màn hình lớn hơn */
+@media (min-width: 1024px) {
+    .sidebar-ads {
+        display: block;
+    }
+}
+
+/* --- Breadcrumbs --- */
+.breadcrumbs {
+    font-size: 13px;
+    color: #b3b3b3;
+    margin-bottom: 20px;
+}
+
+/* --- Event Header Section --- */
+.event-main-header {
+    display: flex;
+    flex-direction: column-reverse; /* Đưa ảnh lên đầu trên mobile */
+    gap: 30px;
+    background-color: #1c1c1e;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+}
+@media (min-width: 768px) {
+    .event-main-header {
+        flex-direction: row; /* Bố cục 2 cột trên màn hình lớn */
+    }
+}
+
+.event-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.event-info h1 {
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 16px;
+}
+.event-info p {
+    color: #b3b3b3;
+    font-size: 14px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+.price-box {
+    background-color: #1DB954;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: auto; /* Đẩy xuống dưới cùng */
+    width: fit-content;
+}
+.price-box span {
+    font-size: 14px;
+}
+.price-box p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin: 4px 0 0 0;
+}
+.event-poster {
+    flex: 0 0 40%;
+}
+.event-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* --- Ticket Selection Section --- */
+.ticket-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: #1c1c1e;
+    margin-bottom: 20px;
+    
+    /* Hiệu ứng dính lại khi cuộn */
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+}
+.info-block h4 {
+    color: #fff;
+    margin: 0 0 4px 0;
+}
+.info-block p {
+    color: #b3b3b3;
+    font-size: 14px;
+    margin: 0;
+}
+.buy-ticket-now-btn {
+    background-color: #1DB954;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ticket-item {
+    display: flex;
+    align-items: center;
+    background-color: #2a2a2a;
+    padding: 16px;
+    border-radius: 8px;
+}
+.ticket-type-img {
+    width: 80px;
+    height: auto;
+    margin-right: 16px;
+}
+.ticket-details {
+    flex-grow: 1;
+}
+.ticket-details h4 {
+    font-size: 16px;
+    color: #fff;
+    margin: 0 0 4px 0;
+}
+.ticket-details p {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin: 0;
+}
+.ticket-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1DB954;
+}
+
+/* --- Sidebar Ads --- */
+.ad-card {
+    background-color: #1c1c1e;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.ad-card h4 {
+    color: #fff;
+    margin-bottom: 12px;
+}
+.ad-card img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.ad-card p {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin: 0;
+}
+.ad-card .ad-price {
+    font-weight: bold;
+    color: #fff;
+    margin-top: 5px;
+}
