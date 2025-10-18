@@ -1,12 +1,14 @@
 import React from "react";
 import {BrowserRouter, Routes, Route, useLocation, useNavigate,} from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
-
+import { Link } from "react-router-dom";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Home from "./pages/Home/Home";
 import Account from "./components/Account/Account";
 import TicketDetail from "./components/TicketDetail/TicketDetail";
+import Filter from "./components/Filter/Filter";
+
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -86,6 +88,19 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
+        <Route
+          path="/filter"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Filter />
+            </Motion.div>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
@@ -135,10 +150,10 @@ function Layout() {
           </header>
 
           <nav className="main-nav">
-            <a href="#">Nhạc sống</a>
-            <a href="#">Sân khấu & Nghệ thuật</a>
-            <a href="#">Thể thao</a>
-            <a href="#">Khác</a>
+            <Link to="/filter">Nhạc sống</Link>
+            <Link to="/filter">Sân khấu & Nghệ thuật</Link>
+            <Link to="/filter">Thể thao</Link>
+            <Link to="/filter">Khác</Link>
           </nav>
         </div>
       )}

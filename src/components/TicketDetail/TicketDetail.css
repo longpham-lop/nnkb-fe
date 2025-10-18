@@ -7,7 +7,7 @@
     margin: 30px auto;
     padding: 0 20px;
     color: #e0e0e0;
-    background-color: #1a1818; /* Nền xám đen cho toàn trang */
+    background-color: rgb(204, 198, 198); /* Nền xám đen cho toàn trang */
    
 }
 
@@ -92,7 +92,40 @@
     object-fit: cover;
     border-radius: 8px;
 }
+.ticket-header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Khoảng cách giữa chữ và mũi tên */
+    cursor: pointer; /* Biến con trỏ thành hình bàn tay */
+    user-select: none; /* Ngăn bôi đen chữ khi click */
+}
+.ticket-header-left .arrow-icon {
+    color: #eeecec;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+    margin-top: 25px;
+}
 
+/* --- CSS cho Hiệu ứng Thu gọn Danh sách Vé --- */
+.ticket-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    /* Hiệu ứng chuyển động mượt mà */
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, margin-top 0.4s ease-out;
+    overflow: hidden;
+    max-height: 1000px; /* Chiều cao tối đa (số ảo đủ lớn) */
+    opacity: 1;
+    margin-top: 20px; /* Giữ khoảng cách với header */
+}
+
+.ticket-list.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    gap: 0; /* Xóa khoảng cách khi bị ẩn */
+}
 /* --- Ticket Selection Section --- */
 .ticket-list-header {
     display: flex;
@@ -101,7 +134,7 @@
     padding: 16px;
     border-radius: 8px;
     background-color: #1c1c1e;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     
     /* Hiệu ứng dính lại khi cuộn */
     position: sticky;
@@ -189,4 +222,142 @@
     font-weight: bold;
     color: #fff;
     margin-top: 5px;
+}
+
+/* --- CSS cho Phần Mô tả (Giới thiệu) --- */
+.event-description {
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.event-description h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #121212;
+    margin-bottom: 20px;
+}
+
+.description-banner {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.description-content {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.7;
+    /* Hiệu ứng chuyển động mượt mà khi thay đổi chiều cao */
+    transition: max-height 0.4s ease-out;
+    overflow: hidden;
+}
+
+.description-content p {
+    margin-bottom: 15px;
+}
+
+/* Trạng thái bị thu gọn */
+.description-content.collapsed {
+    max-height: 100px; /* Chiều cao tối đa khi bị thu gọn, bạn có thể thay đổi số này */
+    position: relative;
+}
+
+/* Tạo hiệu ứng mờ dần ở cuối văn bản khi bị thu gọn */
+.description-content.collapsed::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to bottom, transparent, #ffffff);
+}
+.description-text {
+    max-width: 800px;
+    margin: 0;
+    color: black;
+}
+
+/* Nút "Xem thêm" / "Thu gọn" */
+.toggle-expand-btn {
+    background-color: transparent;
+    border: 1px solid #000000;
+    border-radius: 50px;
+    padding: 8px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px auto 0 auto; /* Căn giữa nút */
+}
+
+.toggle-expand-btn:hover {
+    background-color: #1DB954;
+}
+
+.arrow-icon {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+/* --- CSS cho Phần Ban tổ chức --- */
+
+/* Áp dụng style lề và tạo khoảng cách với phần vé ở trên */
+.event-organizer {
+    margin-top: 40px; /* Tạo khoảng cách với phần thông tin vé */
+    
+    border: 1px solid #181818;
+}
+
+/* Style cho tiêu đề (giống hệt h3 của Giới thiệu) */
+.event-organizer h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #121212;
+    margin-bottom: 20px;
+    padding-bottom: 0; 
+   
+}
+
+/* Style cho nội dung (giống hệt .description-content) */
+.organizer-layout {
+    display: flex;
+    align-items: flex-start; /* Căn logo và text ở trên cùng */
+    gap: 25px; /* Khoảng cách giữa logo và text */
+}
+
+.organizer-logo {
+    width: 150px;
+    height: auto;
+    flex-shrink: 0; /* Ngăn logo bị co lại */
+    object-fit: contain; /* Giữ tỷ lệ logo */
+}
+
+.organizer-text h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #121212;
+    margin: 0 0 10px 0;
+}
+
+.organizer-text p {
+    font-size: 15px;
+    color: #1a1919;
+    line-height: 1.7;
+    margin: 0 0 15px 0;
+}
+
+/* Làm nổi bật tên công ty */
+.organizer-content p:first-of-type {
+    font-weight: bold; 
+}
+.faint-divider {
+    border: none;
+    height: 1px;
+    background-color: #e0e0e0; /* Màu kẻ mờ */
+    margin: 20px 0;
 }
