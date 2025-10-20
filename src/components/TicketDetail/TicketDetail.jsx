@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './TicketDetail.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 // Import ảnh (thay thế bằng ảnh thật của bạn)
 import eventPoster from '../../assets/banner1.png';
 import ticketGa from '../../assets/banner2.png';
@@ -11,6 +11,14 @@ import Banner1 from '../../assets/banner1.png';
 const TicketDetail = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isTicketSectionExpanded, setIsTicketSectionExpanded] = useState(true);
+    
+    // --- BẮT ĐẦU PHẦN THÊM MỚI ---
+    const navigate = useNavigate(); // Hook để điều hướng
+
+    const handleBuyTicket = () => {
+        // Điều hướng đến trang chọn vé khi ấn nút
+        navigate('/OrderTicket');
+    };
     // Dữ liệu vé giả để render
     const tickets = [
         { id: 1, type: 'GA', name: 'Gói Dậy Sớm + GA 1', desc: 'Full Day Access + GA 1', price: '499.000₫', image: ticketGa },
@@ -34,10 +42,9 @@ const TicketDetail = () => {
                             <h1>GS25 MUSIC FESTIVAL 2025</h1>
                             <p className="event-time">🕒 15:00 - 22:00 | 23 Tháng 11, 2025</p>
                             <p className="event-location">📍 Đường Nguyễn Thiện Thành, Phường Thủ Thiêm, Quận 2, Thành phố Hồ Chí Minh</p>
-                            <div className="price-box">
-                                <span>Giá từ</span>
-                                <p>499.000 ₫</p>
-                            </div>
+                            <button className="price-box" onClick={handleBuyTicket}>
+                                <span>Giá từ 499.000 ₫</span>
+                            </button>
                         </div>
                         <div className="event-poster">
                             <img src={eventPoster} alt="Event Poster" />
@@ -97,7 +104,7 @@ const TicketDetail = () => {
                                     ▼
                                 </span>
                             </div>
-                            <button className="buy-ticket-now-btn">Mua vé ngay</button>
+                            <button className="buy-ticket-now-btn" onClick={handleBuyTicket}>Mua vé ngay</button>
                         </div>
                         
                         {/* Thêm class 'collapsed' vào danh sách vé */}

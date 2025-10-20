@@ -8,7 +8,9 @@ import Home from "./pages/Home/Home";
 import Account from "./components/Account/Account";
 import TicketDetail from "./components/TicketDetail/TicketDetail";
 import Filter from "./components/Filter/Filter";
-
+import OrderTicket from "./components/OrderTicket/OrderTicket";
+import Order from "./components/Order/Order";
+import PayTicket from "./components/PayTicket/PayTicket";
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -98,6 +100,45 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Filter />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/orderticket"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.5 }}
+            >
+              <OrderTicket />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/order"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Order />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/payticket"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.5 }}
+            >
+              <PayTicket />
             </Motion.div>
           }
         />
