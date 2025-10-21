@@ -24,11 +24,15 @@ body {
 }
 
 .logo {
-    font-size: 28px;
-    font-weight: bold;
+    background: none;
+    border: none;
     color: #ffffff;
+    font-size: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
     font-family: 'Baloo 2', sans-serif;
-    
+    margin-left: 20px;  
 }
 
 .search-bar {
@@ -123,6 +127,8 @@ body {
     display: flex;
     padding: 10px 0 20px 0;
     border-bottom: 1px solid #2a2a2a;
+    margin-left: 30px;
+    font-size: 40px;
 }
 
 .main-nav a {

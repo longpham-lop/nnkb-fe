@@ -1,49 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // <-- Thêm useMemo
 import { useLocation, useNavigate } from 'react-router-dom';
 import './PayTicket.css'; 
+import Voucher from "../Voucher/Voucher.jsx"; // <-- 1. IMPORT MODAL
 
 // --- BẠN SẼ CẦN IMPORT CÁC LOGO NÀY ---
-// import logoVnPay from './path/to/vnpay.png';
-// import logoVietQR from './path/to/vietqr.png';
-// import logoShopeePay from './path/to/shopeepay.png';
-// import logoZaloPay from './path/to/zalopay.png';
-// import logoVisa from './path/to/visa.png';
-// import logoMastercard from './path/to/mastercard.png';
-// import logoJCB from './path/to/jcb.png';
+import VnPay from "../../assets/vnpay.png";
+import ShopeePay from "../../assets/shoppe.png";
+import ZaloPay from "../../assets/zalopay.png";
+import Card from "../../assets/card.png";
 
-// Hàm format tiền tệ
+// Hàm format tiền tệ (cập nhật để xử lý số âm)
 const formatCurrency = (amount) => {
+    if (amount < 0) {
+       return '-' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.abs(amount));
+    }
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-// Component Header (giống hệt trang trước)
-function PageHeader() {
-  return (
-    <header className="page-header">
-      <div className="logo">ticketbox</div>
-      <nav className="nav-links">
-        <a href="#">Về Của tôi</a>
-        <a href="#">Tài khoản</a>
-      </nav>
-    </header>
-  );
-}
 
-// Component Hẹn giờ (giống hệt trang trước)
+function PageHeader() { /* ... */ }
+
 function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState(15* 60 ); 
-
+  const [timeLeft, setTimeLeft] = useState(15 * 60);
   useEffect(() => {
     if (timeLeft <= 0) return;
-    const intervalId = setInterval(() => {
-      setTimeLeft(timeLeft - 1);
-    }, 1000);
+    const intervalId = setInterval(() => setTimeLeft(timeLeft - 1), 1000);
     return () => clearInterval(intervalId);
   }, [timeLeft]);
-
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
-
   return (
     <div className="countdown-timer">
       Hoàn tất đặt vé trong
@@ -54,35 +39,66 @@ function CountdownTimer() {
   );
 }
 
-// Component chính của trang
+// Component chính
 function PaymentPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Lấy dữ liệu từ 2 trang trước
   const { summary, formData } = location.state || {};
-
-  // State cho phương thức thanh toán
   const [paymentMethod, setPaymentMethod] = useState('vnpay');
+  
+  // --- 2. THÊM STATE CHO MODAL VÀ VOUCHER ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  
+  // Tính toán lại tổng tiền
+  const { discountAmount, finalTotalPrice } = useMemo(() => {
+    const basePrice = summary?.totalPrice || 0;
+    const discount = appliedVoucher?.discount || 0;
+    
+    return {
+      discountAmount: discount,
+      finalTotalPrice: basePrice - discount,
+    };
+  }, [summary, appliedVoucher]);
+  // --- KẾT THÚC THÊM STATE ---
 
-  // Nếu không có dữ liệu, quay về trang chủ
   useEffect(() => {
     if (!summary || !formData) {
       navigate('/');
     }
   }, [summary, formData, navigate]);
 
+  // Cập nhật hàm thanh toán để gửi đi giá cuối cùng
+  const handlePayment = () => {
+    if (paymentMethod === 'vnpay' || paymentMethod === 'zalopay' || paymentMethod === 'shopeepay') {
+      navigate('/pay', { 
+        state: { 
+          summary: {
+            ...summary,
+            totalPrice: finalTotalPrice, // Gửi giá đã giảm
+            discount: discountAmount,
+          }, 
+          formData, 
+          paymentMethod 
+        } 
+      });
+    } else if (paymentMethod === 'card') {
+      alert("Chuyển đến trang nhập thông tin thẻ...");
+    }
+  };
+
   if (!summary || !formData) {
-    return null; // Render rỗng trong khi chờ redirect
+    return null; 
   }
 
-  const { eventDetails, ticketsInCart, totalPrice } = summary;
+  const { eventDetails, ticketsInCart } = summary;
+  const originalTotalPrice = summary.totalPrice;
 
   return (
     <div className="payment-page">
       <PageHeader />
       
-      {/* Banner thông tin sự kiện */}
       <section className="event-banner">
         <div className="event-banner-info">
           <h3>{eventDetails.title}</h3>
@@ -92,9 +108,7 @@ function PaymentPage() {
         <CountdownTimer />
       </section>
 
-      {/* Nội dung chính */}
       <div className="payment-page-container">
-        {/* Cột Form (Bên trái) */}
         <main className="main-payment-content">
           <h3>THANH TOÁN</h3>
           
@@ -105,18 +119,33 @@ function PaymentPage() {
             </p>
           </div>
 
+          {/* --- 3. CẬP NHẬT PHẦN KHUYẾN MÃI --- */}
           <div className="info-section">
             <div className="section-header">
               <h4>Mã khuyến mãi</h4>
-              <button className="voucher-btn">Chọn voucher</button>
+              <button className="voucher-btn" onClick={() => setIsModalOpen(true)}>
+                Chọn voucher
+              </button>
             </div>
-            <p className="voucher-text">+ Thêm khuyến mãi</p>
+            
+            {appliedVoucher ? (
+              <div className="applied-voucher">
+                <span className="voucher-name">{appliedVoucher.name}</span>
+                <span className="voucher-discount">-{formatCurrency(appliedVoucher.discount)}</span>
+                <button className="remove-voucher-btn" onClick={() => setAppliedVoucher(null)}>×</button>
+              </div>
+            ) : (
+              <p className="voucher-text" onClick={() => setIsModalOpen(true)}>
+                + Thêm khuyến mãi
+              </p>
+            )}
           </div>
+          {/* --- KẾT THÚC CẬP NHẬT --- */}
 
           <div className="info-section">
             <h4>Phương thức thanh toán</h4>
             <div className="payment-options">
-              {/* Option 1 */}
+              {/* ... (Các lựa chọn thanh toán giữ nguyên) ... */}
               <label className="payment-option">
                 <input 
                   type="radio" 
@@ -127,11 +156,9 @@ function PaymentPage() {
                 />
                 <span>VNPAY/Ứng dụng ngân hàng</span>
                 <div className="logos">
-                  {/* <img src={logoVnPay} alt="VNPAY" /> */}
-                  {/* <img src={logoVietQR} alt="VietQR" /> */}
+                  <img src={VnPay} alt="VNPAY" />
                 </div>
               </label>
-              {/* Option 2 */}
               <label className="payment-option">
                 <input 
                   type="radio" 
@@ -142,10 +169,9 @@ function PaymentPage() {
                 />
                 <span>ShopeePay</span>
                 <div className="logos">
-                  {/* <img src={logoShopeePay} alt="ShopeePay" /> */}
+                  <img src={ShopeePay} alt="ShopeePay" />
                 </div>
               </label>
-              {/* Option 3 */}
               <label className="payment-option">
                 <input 
                   type="radio" 
@@ -156,10 +182,9 @@ function PaymentPage() {
                 />
                 <span>ZaloPay</span>
                 <div className="logos">
-                  {/* <img src={logoZaloPay} alt="ZaloPay" /> */}
+                  <img src={ZaloPay} alt="ZaloPay" />
                 </div>
               </label>
-              {/* Option 4 */}
               <label className="payment-option">
                 <input 
                   type="radio" 
@@ -170,16 +195,14 @@ function PaymentPage() {
                 />
                 <span>Thẻ ghi nợ/Thẻ tín dụng</span>
                 <div className="logos">
-                  {/* <img src={logoVisa} alt="Visa" /> */}
-                  {/* <img src={logoMastercard} alt="Mastercard" /> */}
-                  {/* <img src={logoJCB} alt="JCB" /> */}
+                  <img src={Card} alt="Card" />
                 </div>
               </label>
             </div>
           </div>
         </main>
 
-        {/* Cột Sidebar (Bên phải) */}
+        {/* --- 4. CẬP NHẬT SIDEBAR TÓM TẮT --- */}
         <aside className="payment-sidebar">
           <div className="payment-summary-card">
             <div className="summary-header">
@@ -204,11 +227,20 @@ function PaymentPage() {
               <h4>Thông tin đơn hàng</h4>
               <div className="order-row">
                 <span>Tạm tính</span>
-                <span>{formatCurrency(totalPrice)}</span>
+                <span>{formatCurrency(originalTotalPrice)}</span>
               </div>
+              
+              {/* Hiển thị giảm giá nếu có */}
+              {discountAmount > 0 && (
+                <div className="order-row discount">
+                  <span>Khuyến mãi</span>
+                  <span className="discount-amount">{formatCurrency(-discountAmount)}</span>
+                </div>
+              )}
+
               <div className="order-row total">
                 <span>Tổng tiền</span>
-                <span>{formatCurrency(totalPrice)}</span>
+                <span>{formatCurrency(finalTotalPrice)}</span>
               </div>
             </div>
             
@@ -216,12 +248,24 @@ function PaymentPage() {
               Bằng việc tiếp tục thanh toán, bạn đã đọc và đồng ý với các <a href="#">Điều khoản Dịch vụ</a>
             </p>
 
-            <button className="pay-btn">
+            <button className="pay-btn" onClick={handlePayment}>
               Thanh toán
             </button>
           </div>
         </aside>
       </div>
+
+      {/* --- 5. RENDER MODAL (NẾU MỞ) --- */}
+      {isModalOpen && (
+        <Voucher 
+          onClose={() => setIsModalOpen(false)}
+          onApply={(voucher) => {
+            setAppliedVoucher(voucher);
+            setIsModalOpen(false);
+          }}
+          currentOrderTotal={originalTotalPrice}
+        />
+      )}
     </div>
   );
 }

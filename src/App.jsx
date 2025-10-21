@@ -11,6 +11,9 @@ import Filter from "./components/Filter/Filter";
 import OrderTicket from "./components/OrderTicket/OrderTicket";
 import Order from "./components/Order/Order";
 import PayTicket from "./components/PayTicket/PayTicket";
+import Pay from "./components/Pay/Pay";
+import TermsPage from "./components/TermsPage/TermsPage";
+
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -142,6 +145,32 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
+        <Route
+          path="/pay"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Pay />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/termspage"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <TermsPage />
+            </Motion.div>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
@@ -161,7 +190,9 @@ function Layout() {
         <div className="home-container">
           {/* Header Section */}
           <header className="header">
-            <div className="logo">Topticket</div>
+             <button className="logo" onClick={() => navigate("home")}>
+                Topticket
+              </button>
 
             <link
               href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
@@ -213,9 +244,9 @@ function Layout() {
 
             <div className="footer-column">
               <h4>Về Ticketbox</h4>
-              <a href="#">Giới thiệu</a>
-              <a href="#">Điều khoản sử dụng</a>
-              <a href="#">Chính sách bảo mật</a>
+              <Link to = "/termspage">Giới thiệu</Link>
+              <Link to = "/termspage">Điều khoản sử dụng</Link>
+              <Link to ="/termspage">Chính sách bảo mật</Link>
             </div>
 
             <div className="footer-column">

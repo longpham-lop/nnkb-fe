@@ -1,0 +1,131 @@
+/* --- Header (Giữ nguyên) --- */
+.page-header-terms {
+  background-color: #2b9c6a;
+  padding: 12px 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.logo-terms { font-size: 24px; font-weight: bold; }
+.nav-links-terms a { color: white; text-decoration: none; margin-left: 20px; font-size: 14px; }
+
+/* --- Layout chính của trang --- */
+.terms-page-wrapper {
+  background-color: #f4f7f6; /* Nền xám rất nhạt, dễ chịu */
+  color: #333;
+  min-height: 100vh;
+
+}
+
+/* --- Container layout 2 cột --- */
+.terms-container-layout {
+  display: flex;
+  max-width: 1200px; /* Rộng hơn để chứa 2 cột */
+  margin: 30px auto;
+  padding: 0 15px;
+  gap: 30px; /* Khoảng cách giữa sidebar và nội dung */
+}
+
+/* === Sidebar (Cột trái) === */
+.terms-sidebar {
+  flex: 0 0 260px; /* Chiều rộng cố định 260px */
+  position: sticky; /* Dính lại khi cuộn */
+  top: 30px; /* Cách top 30px */
+  align-self: flex-start; /* Giữ nó ở trên cùng */
+}
+
+.back-btn-terms {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 20px;
+  padding: 5px;
+  transition: color 0.2s;
+}
+.back-btn-terms:hover {
+  color: #2b9c6a;
+}
+
+/* === Menu điều hướng trong Sidebar === */
+.terms-nav {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+}
+.terms-nav h4 {
+  font-size: 18px;
+  color: #111;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.terms-nav a {
+  display: block;
+  font-size: 15px;
+  text-decoration: none;
+  color: #555;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.terms-nav a:hover {
+  background-color: #f9f9f9;
+  color: #111;
+}
+
+/* === Styling cho tab đang được chọn === */
+.terms-nav a.active {
+  background-color: #2b9c6a;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* === Khung nội dung chính (Cột phải) === */
+.terms-main-content {
+  flex: 1; /* Chiếm phần còn lại */
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 30px 40px;
+  margin-top: 48px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* === Styling cho nội dung văn bản === */
+.terms-main-content h1 {
+  font-size: 30px;
+  color: #111;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.last-updated {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+.terms-main-content h2 {
+  font-size: 22px;
+  color: #2b9c6a; /* Màu nhấn */
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+.terms-main-content p {
+  font-size: 16px;
+  line-height: 1.7; /* Dãn dòng */
+  color: #333;
+  margin-bottom: 15px;
+}

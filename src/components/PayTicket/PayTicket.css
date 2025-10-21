@@ -235,3 +235,40 @@
   background-color: #aaa;
   cursor: not-allowed;
 }
+
+/* Hiển thị voucher đã áp dụng */
+.applied-voucher {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1a1a1a;
+  border: 1px dashed #2b9c6a; /* Viền xanh lá */
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+.applied-voucher .voucher-name {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 500;
+}
+.applied-voucher .voucher-discount {
+  font-size: 14px;
+  color: #d9534f; /* Màu đỏ */
+  font-weight: bold;
+}
+.remove-voucher-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+
+/* Thêm vào tóm tắt đơn hàng */
+.order-row.discount .discount-amount {
+  color: #d9534f; /* Màu đỏ */
+  font-weight: 500;
+}

@@ -72,15 +72,7 @@ function TicketItem({ ticket, quantity, onQuantityChange }) {
 
 // Component Header
 function PageHeader() {
-  return (
-    <header className="page-header">
-      <div className="logo">ticketbox</div>
-      <nav className="nav-links">
-        <a href="#">Về Của tôi</a>
-        <a href="#">Tài khoản</a>
-      </nav>
-    </header>
-  );
+  
 }
 
 // Component chính của trang
