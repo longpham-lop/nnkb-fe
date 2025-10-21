@@ -74,8 +74,11 @@
     margin-top: auto; /* Đẩy xuống dưới cùng */
     width: fit-content;
 }
+.price-box :hover {
+    background-color: #17a74a;
+}
 .price-box span {
-    font-size: 14px;
+    font-size: 15px;
 }
 .price-box p {
     font-size: 20px;

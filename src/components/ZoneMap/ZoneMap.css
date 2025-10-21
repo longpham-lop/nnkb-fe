@@ -1,0 +1,75 @@
+.zonemap-container {
+  font-family: Arial, sans-serif;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  background: #f4f4f4;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.zonemap-stage {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.zonemap-layout {
+  display: grid;
+  grid-template-areas:
+    "a a a a"
+    "b b c c"
+    "d d d d";
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.zone-area {
+  padding: 30px 20px;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 3px solid transparent;
+}
+
+.zone-area:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.zone-area.selected {
+  border-color: #fff;
+  box-shadow: 0 0 20px yellow;
+}
+
+/* Gán các khu vực vào grid areas */
+.zone-zoneA { grid-area: a; }
+.zone-zoneB { grid-area: b; }
+.zone-zoneC { grid-area: c; }
+.zone-zoneD { grid-area: d; }
+
+
+.zonemap-info {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+  min-height: 100px;
+}
+
+.zonemap-info h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.zonemap-info p {
+  color: #555;
+}

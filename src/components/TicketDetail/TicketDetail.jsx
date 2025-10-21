@@ -13,10 +13,10 @@ const TicketDetail = () => {
     const [isTicketSectionExpanded, setIsTicketSectionExpanded] = useState(true);
     
     // --- BẮT ĐẦU PHẦN THÊM MỚI ---
-    const navigate = useNavigate(); // Hook để điều hướng
+    const navigate = useNavigate(); 
 
     const handleBuyTicket = () => {
-        // Điều hướng đến trang chọn vé khi ấn nút
+        
         navigate('/OrderTicket');
     };
     // Dữ liệu vé giả để render
@@ -128,7 +128,7 @@ const TicketDetail = () => {
                         <div className="organizer-content">
                             <div class ="description-text">
                             <p><strong>CÔNG TY TNHH TOPTICKET</strong></p>
-                            <p>Topticket là nền tảng phân phối vé sự kiện hàng đầu Việt Nam, mang đến giải pháp toàn diện cho cả nhà tổ chức và người tham dự. Chúng tôi cam kết mang lại trải nghiệm mua vé dễ dàng, an toàn và tiện lợi.</p>
+                            <p>TOPTICKET là nền tảng phân phối vé sự kiện hàng đầu Việt Nam, mang đến giải pháp toàn diện cho cả nhà tổ chức và người tham dự. Chúng tôi cam kết mang lại trải nghiệm mua vé dễ dàng, an toàn và tiện lợi.</p>
                             <p>Với sự kiện GS25 MUSIC FESTIVAL, chúng tôi tự hào là đối tác đồng hành, góp phần tạo nên một lễ hội âm nhạc thành công và đáng nhớ.</p>
                         </div>
                         </div>

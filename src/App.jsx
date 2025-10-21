@@ -13,7 +13,7 @@ import Order from "./components/Order/Order";
 import PayTicket from "./components/PayTicket/PayTicket";
 import Pay from "./components/Pay/Pay";
 import TermsPage from "./components/TermsPage/TermsPage";
-
+import EventPage from "./pages/Home/EventPage";
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -21,6 +21,8 @@ import Fb from "./assets/fb.png";
 import Ig from "./assets/ig.png";
 import Tiktok from "./assets/tiktok.png";
 import Thread from "./assets/thread.png";
+import Gg from "./assets/gg.png";
+import Appstore from "./assets/appstore.png";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -171,6 +173,19 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
+        <Route
+          path="/eventpage"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <EventPage />
+            </Motion.div>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
@@ -259,14 +274,24 @@ function Layout() {
           <div className="footer-bottom">
             <div className="app-links">
               <p>Tải ứng dụng Ticketbox</p>
-              <img
-                src="https://via.placeholder.com/120x40.png?text=Google+Play"
+              <a href ="https://play.google.com/store/apps/details?id=ticketbox.event.user&referrer=utm_source%3Dtkbvn-website%26utm_medium%3Dreferral%26utm_campaign%3Dapp-landing-page"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                src={Gg}
                 alt="Google Play"
               />
-              <img
-                src="https://via.placeholder.com/120x40.png?text=App+Store"
+              </a>
+              <a href = "https://apps.apple.com/us/app/ticketbox/id1041900498"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                src={Appstore}
                 alt="App Store"
               />
+              </a>
             </div>
 
             <div className="social-section">
