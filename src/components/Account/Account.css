@@ -301,7 +301,7 @@
     color: #fff;
     border: none;
     padding: 12px 40px;
-    border-radius: 50px; /* Bo tròn hoàn toàn */
+    border-radius: 50px; 
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
@@ -335,14 +335,14 @@
 }
 
 .reco-card:hover {
-    transform: translateY(-5px); /* Hiệu ứng nhấc lên khi hover */
+    transform: translateY(-5px); 
 }
 
 .reco-card img {
     width: 100%;
-    border-radius: 8px; /* Bo tròn góc ảnh */
+    border-radius: 8px; 
     margin-bottom: 10px;
-    aspect-ratio: 16 / 9; /* Giữ tỉ lệ ảnh 16:9 */
+    aspect-ratio: 16 / 9; 
     object-fit: cover;
 }
 
@@ -351,7 +351,7 @@
     font-size: 15px;
     font-weight: 500;
     margin: 0 0 8px 0;
-    /* Ngăn tiêu đề dài bị xuống dòng */
+    
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -371,25 +371,25 @@
 
 /* --- CSS cho Nút "Xem thêm sự kiện" --- */
 .see-more-container {
-    text-align: center; /* Căn giữa nút */
+    text-align: center; 
     margin-top: 40px;
     padding-bottom: 20px;
 }
 
 .see-more-btn {
-    display: inline-block; /* Để có thể style padding, margin */
+    display: inline-block; 
     background-color: transparent;
     color: #fff;
-    border: 1px solid #fff; /* Viền trắng */
+    border: 1px solid #fff; 
     padding: 12px 30px;
-    border-radius: 50px; /* Bo tròn hoàn toàn */
+    border-radius: 50px; 
     font-size: 14px;
     font-weight: bold;
-    text-decoration: none; /* Bỏ gạch chân của thẻ Link */
+    text-decoration: none; 
     transition: background-color 0.2s, color 0.2s;
 }
 
 .see-more-btn:hover {
-    background-color: #1DB954; /* Đổi nền thành trắng khi hover */
-    color: #121212; /* Đổi chữ thành đen */
+    background-color: #1DB954;
+    color: #121212; 
 }

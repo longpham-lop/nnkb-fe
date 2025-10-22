@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OrderTicket.css';
 
-// Dữ liệu mock cho các loại vé (Giống trong ảnh)
+// Dữ liệu mock
 const availableTickets = [
   {
     id: 't1',
@@ -10,10 +10,10 @@ const availableTickets = [
     price: 840000,
     benefits: 'Benefits: Album, Fansign, Photo 1:1, Keychain, Hi-touch, Áo, Nón, Khăn Bandana, Nước Suối.',
   },
-  // Bạn có thể thêm các loại vé khác ở đây
+  //thêm các loại vé khác 
 ];
 
-// Dữ liệu mock cho sự kiện (Giống trong ảnh)
+// Dữ liệu mock 
 const eventDetails = {
   title: 'Phạm Quỳnh Anh Fan Meeting',
   date: '14:00, 2 tháng 11, 2025',
@@ -40,7 +40,7 @@ function QuantitySelector({ quantity, onIncrement, onDecrement }) {
   );
 }
 
-// Component cho một mục vé
+
 function TicketItem({ ticket, quantity, onQuantityChange }) {
   const handleIncrement = () => {
     onQuantityChange(ticket.id, quantity + 1);

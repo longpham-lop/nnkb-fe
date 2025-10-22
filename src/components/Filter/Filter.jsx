@@ -7,20 +7,19 @@ import { useEffect } from 'react';
 const CalendarMonth = ({ year, month, selectedDates, onDateClick }) => {
     const monthNames = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Chuẩn hóa ngày hôm nay
+    today.setHours(0, 0, 0, 0); 
 
-    // Hàm tạo ra các ngày trong lưới
+    
     const generateDays = () => {
         const days = [];
         const date = new Date(year, month, 1);
         
-        // 0=Chủ Nhật, 1=Thứ 2. Chuyển 0 (CN) thành 6.
+       
         const firstDayOfWeek = (date.getDay() === 0) ? 6 : date.getDay() - 1;
         
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-        // 1. Lấy các ngày của tháng trước (màu mờ)
         for (let i = 0; i < firstDayOfWeek; i++) {
             days.push(
                 <span key={`prev-${i}`} className="day-cell muted">
@@ -29,7 +28,6 @@ const CalendarMonth = ({ year, month, selectedDates, onDateClick }) => {
             );
         }
 
-        // 2. Lấy các ngày của tháng hiện tại
         for (let i = 1; i <= daysInMonth; i++) {
             const fullDate = new Date(year, month, i);
             const time = fullDate.getTime();
@@ -51,7 +49,7 @@ const CalendarMonth = ({ year, month, selectedDates, onDateClick }) => {
 
         // 3. Lấy các ngày của tháng sau (màu mờ)
         const totalCells = days.length;
-        const remainingCells = totalCells > 35 ? 42 - totalCells : 35 - totalCells; // Luôn lấp đầy 5 hoặc 6 hàng
+        const remainingCells = totalCells > 35 ? 42 - totalCells : 35 - totalCells; 
         
         for (let i = 1; i <= remainingCells; i++) {
             days.push(
@@ -65,7 +63,6 @@ const CalendarMonth = ({ year, month, selectedDates, onDateClick }) => {
 
     return (
         <div className="calendar-month">
-            {/* Tiêu đề động */}
             <div className="calendar-header">{`${monthNames[month]}, ${year}`}</div>
             <div className="calendar-grid days">
                 <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>

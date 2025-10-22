@@ -1,5 +1,6 @@
 import React from 'react';
 import './Home.css';
+import Slider from "react-slick";
 // import { useNavigate } from "react-router-dom";
 import Banner1 from "../../assets/banner1.png";
 import Banner2 from "../../assets/banner2.png";
@@ -11,25 +12,31 @@ import Banner7 from "../../assets/banner7.png";
 import Banner8 from "../../assets/banner8.png";
 import Banner9 from "../../assets/banner9.png";
 import Banner10 from "../../assets/banner10.png";
+import Banner11 from "../../assets/banner11.png";
+import Banner12 from "../../assets/banner12.png";
 
 
 const Home = () => {
     // const navigate = useNavigate();
+    const banners = [Banner1, Banner2, Banner11, Banner12];
+    
   return (
     <div className="home-container">
       {/* Header Section */}
-      
-
-      {/* Main Content */}
       <main>
-        {/* Hero Banner Section */}
         <section className="hero-section">
-          {/* Add your banner images here */}
-          <div className="hero-banner">
-            <img src={Banner1} alt="Event Banner 1" />
-          </div>
-          <div className="hero-banner">
-            <img src={Banner2} alt="Event Banner 2" />
+          <div className="hero-slider">
+            {banners.map((banner, index) => (
+              <div key ={index} classname ="hero-banner">
+            <a
+              href ="/ticketdetail"
+              target ="_blank"
+              rel ="noopener noreferrer">
+                <img src ={banner} 
+                 alt ={'Event Banner ${index +1}'}/>
+              </a>
+              </div>
+            ))}
           </div>
         </section>
 

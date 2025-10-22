@@ -2,19 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Order.css'; 
 
-// Hàm format tiền tệ (có thể import từ file utils)
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-// Component Header (giống hệt trang trước)
-function PageHeader() {
-  
-}
+function PageHeader() {}
 
-// Component Hẹn giờ
 function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState(13 * 60 + 30); // 13:30
+  const [timeLeft, setTimeLeft] = useState(15 * 60); 
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -39,15 +34,10 @@ function CountdownTimer() {
   );
 }
 
-// Component chính của trang
 function OrderFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Lấy dữ liệu tóm tắt từ trang trước
   const { summary } = location.state || {};
-
-  // State cho form
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -55,24 +45,23 @@ function OrderFormPage() {
   });
   const [agreed, setAgreed] = useState(false);
 
-  // Nếu không có dữ liệu (ví dụ: gõ URL trực tiếp), quay về trang chọn vé
   useEffect(() => {
     if (!summary) {
       navigate('/OrderTicket');
     }
   }, [summary, navigate]);
 
-  // Xử lý thay đổi input
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Kiểm tra form hợp lệ
+ 
   const isFormValid = formData.name && formData.phone && formData.email && agreed;
 
   const handleContinueToPayment = () => {
-    // Gửi cả summary (từ bước 1) và formData (từ bước 2)
+
     navigate('/payticket', { 
       state: { 
         summary: summary, 
@@ -81,7 +70,6 @@ function OrderFormPage() {
     });
   };
 
-  // Nếu không có summary thì render rỗng để đợi redirect
   if (!summary) {
     return null; 
   }
@@ -91,7 +79,7 @@ function OrderFormPage() {
   return (
     <div className="form-page">
       <PageHeader />
-      
+      <button className="back-btn" onClick={() => navigate(-1)}> ← Trở về</button>
       {/* Banner thông tin sự kiện */}
       <section className="event-banner">
         <div className="event-banner-info">

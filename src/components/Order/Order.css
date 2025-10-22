@@ -137,7 +137,7 @@
   flex: 1;
 }
 .form-summary-card {
-  background-color: #f0f0f0; /* Nền sáng như trong ảnh */
+  background-color: #f0f0f0; 
   color: #111;
   padding: 20px;
   border-radius: 8px;
@@ -186,7 +186,7 @@
 
 .form-note {
   font-size: 13px;
-  color: #d9534f; /* Màu đỏ */
+  color: #d9534f; 
   text-align: center;
   margin-top: 15px;
 }
@@ -206,4 +206,12 @@
 .continue-btn-form:disabled {
   background-color: #aaa;
   cursor: not-allowed;
+}
+.back-btn{  
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 65px
 }

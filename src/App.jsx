@@ -13,7 +13,7 @@ import Order from "./components/Order/Order";
 import PayTicket from "./components/PayTicket/PayTicket";
 import Pay from "./components/Pay/Pay";
 import TermsPage from "./components/TermsPage/TermsPage";
-import EventPage from "./pages/Home/EventPage";
+
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -23,6 +23,7 @@ import Tiktok from "./assets/tiktok.png";
 import Thread from "./assets/thread.png";
 import Gg from "./assets/gg.png";
 import Appstore from "./assets/appstore.png";
+// import Banquyen from "./assets/banquyen.png";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -173,19 +174,6 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
-        <Route
-          path="/eventpage"
-          element={
-            <Motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <EventPage />
-            </Motion.div>
-          }
-        />
       </Routes>
     </AnimatePresence>
   );
@@ -330,17 +318,24 @@ function Layout() {
           </div>
 
           <div className="copyright">
-            <p>Topticket</p>
+            <p>TOPTICKET</p>
             <p>CÔNG TY TNHH TOPTICKET</p>
             <p>
               Địa chỉ: Tầng 6, Tòa Electric Power, 234 Hoàng Quốc Việt, Cổ
               Nhuế, Bắc Từ Liêm, Hà Nội, Việt Nam
             </p>
             <p>
-              Giấy chứng nhận đăng ký doanh nghiệp số: 0313605444, cấp lần đầu
+              Giấy chứng nhận đăng ký doanh nghiệp số: 0924686868, cấp lần đầu
               ngày 01/01/2016, sửa đổi lần thứ 6 ngày 18/07/2023 bởi Sở Kế hoạch
               và Đầu tư Hà Nội
             </p>
+          </div>
+          <div className="footer-space">
+            <a href ='http://online.gov.vn/'
+               target="_blank"
+               rel = 'noopener noreferrer'>
+                
+               </a>
           </div>
         </footer>
       )}

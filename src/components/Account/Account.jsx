@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import './Account.css';
 import { Link } from 'react-router-dom';
 
-// Giả sử bạn có các ảnh này
+
 import avatar from '../../assets/longavt.png';
-import emptyTicketIcon from '../../assets/longavt.png'; // Thêm ảnh này
+import emptyTicketIcon from '../../assets/longavt.png';
 
 // --- COMPONENT CON CHO GIAO DIỆN "THÔNG TIN TÀI KHOẢN" ---
 const AccountInfo = () => (
@@ -61,7 +61,7 @@ const AccountInfo = () => (
 
 // --- COMPONENT CON CHO GIAO DIỆN "VÉ CỦA TÔI" ---
 const MyTickets = () => {
-    // Tạo một mảng dữ liệu giả cho các sự kiện gợi ý
+    // Tạo một mảng dữ liệu giả
     const recommendedEvents = [
         {
             id: 1,
@@ -131,11 +131,11 @@ const MyTickets = () => {
                     ))}
                 </div>
                 <div className="see-more-container">
-                    {/* Sử dụng component <Link> để điều hướng */}
+                 
                     <Link to="/home" className="see-more-btn">Xem thêm sự kiện</Link>
                 </div>
             </div>
-            {/* KẾT THÚC PHẦN MỚI */}
+           
         </>
     );
 };
@@ -143,8 +143,8 @@ const MyTickets = () => {
 
 // --- COMPONENT CHÍNH ---
 const Account = () => {
-    // Sử dụng state để theo dõi xem view nào đang được hiển thị
-    const [activeView, setActiveView] = useState('tickets'); // Mặc định hiển thị "Vé của tôi"
+
+    const [activeView, setActiveView] = useState('tickets');
 
     return (
         <div className="account-page-container">
@@ -155,7 +155,7 @@ const Account = () => {
                     <div className="user-name">Tuấn Long Phạm</div>
                 </div>
                 <nav className="account-nav">
-                    {/* Sử dụng div và onClick để thay đổi state thay vì thẻ <a> */}
+                
           
                     <div 
                         className={`nav-item ${activeView === 'info' ? 'active' : ''}`}
@@ -178,12 +178,11 @@ const Account = () => {
                 </nav>
             </aside>
 
-            {/* Phần nội dung chính bên phải */}
+        
             <main className="account-content">
-                {/* Dựa vào state `activeView` để hiển thị component tương ứng */}
                 {activeView === 'info' && <AccountInfo />}
                 {activeView === 'tickets' && <MyTickets />}
-                {/* Thêm các view khác ở đây nếu cần */}
+           
             </main>
         </div>
     );

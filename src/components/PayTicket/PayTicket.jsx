@@ -96,9 +96,12 @@ function PaymentPage() {
   const originalTotalPrice = summary.totalPrice;
 
   return (
+    
     <div className="payment-page">
       <PageHeader />
-      
+      <button className="back-btn" onClick={() => navigate(-1)}>
+              ← Trở về
+      </button>
       <section className="event-banner">
         <div className="event-banner-info">
           <h3>{eventDetails.title}</h3>
