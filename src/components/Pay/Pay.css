@@ -144,4 +144,11 @@
   margin-top: 0;
   margin-bottom: 15px;
 }
-/* Bạn sẽ cần thêm CSS cho lưới ảnh logo ngân hàng */
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 16px;
+  cursor: pointer;
+}

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Pay.css'; 
 
-// --- BẠN SẼ CẦN IMPORT CÁC LOGO NÀY ---
+
 import Vnpay from '../../assets/vnpay.png';
 import Qrcode from '../../assets/qrcode.png';
 // import bankLogos from './path/to/bank-logos.png';
 
-// Placeholder (sử dụng ảnh từ internet cho demo)
+
 // const logoVnpay = 'https://vnpay.vn/s1/statics.vnpay.vn/logo-vnpay-s1.png';
 // const qrCodeImage = 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Commons_QR_code.png';
 
@@ -35,7 +35,7 @@ function Pay() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  // Bảo vệ route: Nếu không có dữ liệu, quay về trang chủ
+
   useEffect(() => {
     if (!summary || !formData) {
       navigate('/');
@@ -43,24 +43,29 @@ function Pay() {
   }, [summary, formData, navigate]);
 
   if (!summary) {
-    return null; // Đang chờ redirect
+    return null; 
   }
 
-  // Dữ liệu giả cho các trường không có
+  // Dữ liệu giả 
   const orderId = 'A6LTJC0PIM';
   const orderContent = 'PQR7807494661_06071151';
 
   return (
+    
     <div className="gateway-wrapper">
+      <button className="back-btn" onClick={() => navigate(-1)}>
+              ← Trở về
+            </button>
       <div className="gateway-container">
         {/* Header */}
+        
         <header className="gateway-header">
           <img src={Vnpay} alt="VNPAY" className="vnpay-logo" />
           <div className="timer-gw">
             <span>{String(minutes).padStart(2, '0')}</span>:
             <span>{String(seconds).padStart(2, '0')}</span>
           </div>
-          {/* Bạn có thể thêm component đổi ngôn ngữ ở đây */}
+         
         </header>
 
         {/* Warning */}

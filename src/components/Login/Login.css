@@ -1,13 +1,13 @@
-/* Toàn bộ màn hình */
+
 .login-container {
   display: flex;
-  justify-content: center;   /* căn giữa ngang */
-  align-items: center;       /* căn giữa dọc */
-  height: 100vh;             /* chiếm toàn màn hình */
-  background-color: #f2f4f7; /* nền sáng */
+  justify-content: center;   
+  align-items: center;       
+  height: 100vh;             
+  background-color: #f2f4f7; 
 }
 
-/* Khung đăng nhập */
+
 .login-box {
   width: 380px;
   padding: 30px;
@@ -16,15 +16,11 @@
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
-
-/* Tiêu đề */
 .login-box h2 {
   margin-bottom: 25px;
   color: #222;
   font-weight: bold;
 }
-
-/* Ô nhập liệu */
 .login-box input[type="email"],
 .login-box input[type="password"] {
   width: 100%;
@@ -35,7 +31,6 @@
   font-size: 15px;
 }
 
-/* Nút chính */
 .login-box button {
   width: 100%;
   padding: 12px;
@@ -56,8 +51,6 @@
 .login-box .btn-login:hover {
   background-color: #2fb74a;
 }
-
-/* Nút phụ (Đăng ký, Quên mật khẩu) */
 .login-box .btn-secondary {
   background-color: #ffffff;
   border: 1px solid #3cd458;
@@ -68,8 +61,6 @@
   background-color: #3cd458;
   color: white;
 }
-
-/* Link quên mật khẩu */
 .login-box a {
   color: #3cd458;
   text-decoration: none;

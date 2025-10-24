@@ -1,41 +1,66 @@
-
-/*span CSS*/
-/* --- Styling for Event Numbers --- */
-
-/* 1. Thiết lập container làm gốc tọa độ */
-/* --- FIX: Allow numbers to overflow their container --- */
-
-/* 1. Đảm bảo thẻ cha trực tiếp KHÔNG có overflow: hidden */
-/* --- SỬA LỖI DỨT ĐIỂM CHO SỐ BỊ TRÀN --- */
-
-/* 1. Đảm bảo cả section và list đều cho phép hiển thị phần tử con tràn ra ngoài */
 .event-section, .event-list {
-    overflow: visible  /* QUAN TRỌNG: Ghi đè lên mọi thứ để cho phép hiển thị */
+    overflow: visible  
+}
+.hero-section {
+    width: 100%;
+    overflow: auto;
+    scroll-behavior: auto;
+    white-space: nowrap;
+    position: relative;
+    padding: 10px 0;
 }
 
-/* 2. Đặt thẻ card làm gốc tham chiếu tọa độ */
+.hero-slider{
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    /* height: 700px;   */
+    animation: slide 15s linear infinite;
+    align-items: center;
+}
+.hero-banner{
+    flex: 0 0 auto;
+    width: 350px;
+    max-width: 800px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.hero-banner img{
+    width: 100px;
+    height: 200px;
+    display: block;
+    object-fit: cover;
+    border-radius: 12px;
+}
+@keyframes slide {
+    0% {
+        transform: translate(0%);
+    }
+    100%{
+        transform: translate(-50%);
+    }
+}
+
+.hero-section::-webkit-scrollbar{
+    display: none;
+}
 .event-card-large {
     position: relative;
-    /* Thêm một khoảng lề âm bên trái để "tạo không gian" cho con số */
     margin-left: 40px; 
 }
 
-/* 3. Định vị cho con số */
+
 .event-number {
     position: absolute; 
     z-index: 2;
     top: 50%;
     transform: translateY(-50%);
-
-    /* Đẩy con số ra xa về bên trái để nó nằm bên ngoài thẻ card */
     left: -65px; 
-
     color: #1DB954; 
     font-size: 120px; 
     font-weight: 900; 
     line-height: 1; 
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-    
-    /* Thuộc tính này ngăn người dùng vô tình bôi đen chọn văn bản của con số */
     user-select: none;
 }
