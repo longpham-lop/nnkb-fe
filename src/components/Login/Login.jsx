@@ -1,28 +1,62 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Login.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock } from "react-icons/fa";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="login-container">
-      <div className="login-box">
+    <div className="login-page">
+      <div className="login-card">
         <h2>Đăng nhập</h2>
-        <input type="email" placeholder="Nhập email..." />
-        <input type="password" placeholder="Nhập mật khẩu..." />
-        <button className="btn-login" onClick={() => navigate("/Home")}>
+
+        <div className="input-group">
+          <FaEnvelope className="icon" />
+          <input type="email" placeholder="Nhập địa chỉ email" />
+        </div>
+
+        <div className="input-group">
+          <FaLock className="icon" />
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Nhập mật khẩu"
+          />
+          <span
+            className="toggle-pass"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "🙈" : "👁️"}
+          </span>
+        </div>
+
+        <div className="options">
+          <label>
+            <input type="checkbox" /> Tự động đăng nhập
+          </label>
+          <a href="#">Quên mật khẩu?</a>
+        </div>
+
+        <button className="btn-login" onClick={() => navigate("/home")}>
           Đăng nhập
         </button>
-        <button className="btn-secondary">Tiếp tục</button>
-        <a href="#">Quên mật khẩu?</a>
-        <button
-          className="btn-login"
-          style={{ marginTop: '15px' }}
-          onClick={() => navigate('/register')}
-        >
-          Đăng ký
+
+        <div className="divider">
+          <span>Hoặc đăng nhập với</span>
+        </div>
+
+        <button className="btn-google">
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+          />
         </button>
+
+        <p className="signup-text">
+          Bạn chưa có tài khoản?{" "}
+          <span onClick={() => navigate("/register")}>Đăng ký ngay</span>
+        </p>
       </div>
     </div>
   );

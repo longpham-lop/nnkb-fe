@@ -191,34 +191,29 @@ function Layout() {
     <>
       {!hideHeaderFooter && (
         <div className="home-container">
-          {/* Header Section */}
           <header className="header">
-             <button className="logo" onClick={() => navigate("home")}>
-                Topticket
-              </button>
+            {/* Logo */}
+            <button className="logo" onClick={() => navigate("/home")}>
+              <span className="logo-highlight">Top</span>ticket
+            </button>
 
-            <link
-              href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap"
-              rel="stylesheet"
-            />
-
-            <div className="search-bar">
-              <input type="text" placeholder="Tìm tên sự kiện hay nghệ sĩ" />
-              <button>Tìm kiếm</button>
+            {/* Thanh tìm kiếm */}
+            <div className="search-wrapper">
+              <div className="search-bar">
+                <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ..." />
+                <button className="search-btn">🔍</button>
+              </div>
             </div>
 
+            {/* Các nút bên phải */}
             <div className="header-nav">
-              <a href="#">Tạo sự kiện</a>
-              <button
-                className="btn-myticket"
-                onClick={() => navigate("/account")}
-              >
+              <button className="btn-myticket" onClick={() => navigate("/tickets")}>
+                Tạo sự kiện
+              </button>
+              <button className="btn-myticket" onClick={() => navigate("/tickets")}>
                 Vé của tôi
               </button>
-              <button
-                className="btn-account"
-                onClick={() => navigate("/account")}
-              >
+              <button className="btn-account" onClick={() => navigate("/account")}>
                 Tài khoản
               </button>
             </div>

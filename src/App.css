@@ -7,120 +7,159 @@ body {
 }
 
 .home-container {
-    width: 100%;
-    /* max-width: none; */
-    margin: 0;
-    padding: 40px 20px;
-    box-sizing: border-box;
+  padding-top: 80px; /* tạo khoảng trống dưới header */
+  width: 100%;
+  margin: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
 }
 
-/* --- Header Styles --- */
+
+/* ===== HEADER ===== */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    background-color: #1DB954;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 40px;
+  background: #00c853;
+  font-family: "Baloo 2", sans-serif;
 }
 
+/* ===== LOGO ===== */
 .logo {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    font-family: 'Baloo 2', sans-serif;
-    margin-left: 20px;  
+  background: none;
+  border: none;
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: "Baloo 2", sans-serif;
+  transform: translate(-6px);
+  position: relative;
+  top: -1px;
+}
+
+
+.logo-highlight {
+  color: #0b132b;
+}
+
+/* ===== THANH TÌM KIẾM ===== */
+.search-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .search-bar {
-    display: flex;
-    flex-grow: 1; /* Cho phép thanh tìm kiếm co giãn */
-    margin: 0 40px;
-    max-width: 500px;
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 50px;
+  padding: 6px 12px;
+  width: 100%;
+  max-width: 550px;
 }
 
 .search-bar input {
-    width: 100%;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px 0 0 8px;
-    background-color: #2a2a2a;
-    color: #fff;
-    font-size: 14px;
-    outline: none; /* Bỏ viền khi focus */
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #222;
+  outline: none;
 }
 
 .search-bar input::placeholder {
-    color: #888;
+  color: #888;
 }
 
-.search-bar button {
-    padding: 12px 20px;
-    border: none;
-    background-color: #4a4a4a;
-    color: white;
-    border-radius: 0 8px 8px 0;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+.search-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px 10px;
+  color: #333;
+  border-radius: 50%;
+  transition: background-color 0.2s;
 }
 
-.search-bar button:hover {
-    background-color: #5a5a5a;
+.search-btn:hover {
+  background-color: rgba(0, 0, 0, 0.08);
 }
 
+/* ===== MENU PHẢI ===== */
 .header-nav {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Khoảng cách giữa các mục */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transform: translateX(-60px); /* dịch sang trái 20px */
+  transition: transform 0.2s ease;
 }
 
 .header-nav a {
-    color: #fff;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.header-nav a:first-child {
-    background-color: #1ed760; /* Màu xanh lá đặc trưng */
-    font-weight: bold;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: opacity 0.2s;
 }
 
 .header-nav a:hover {
-    background-color: #3b3838;
-}
-.btn-account {
-    background-color: #1ed760; /* Màu xanh lá đặc trưng */
-    color: #fff;
-    border: none;
-    padding: 11px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
-}
-.btn-account:hover {
-    background-color: #3b3838;
+  opacity: 0.9;
 }
 
+/* Nút vé và tài khoản */
+.btn-account,
 .btn-myticket {
-    background-color: #1ed760; /* Màu xanh lá đặc trưng */
-    color: #fff;
-    border: none;
-    padding: 11px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
+  background-color: white;
+  color: #00c853;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
 }
+
+.btn-account:hover,
 .btn-myticket:hover {
-    background-color: #3b3838;
+  background-color: #e8f5e9;
+  transform: translateY(-1px);
 }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
+
+  .search-bar {
+    max-width: 90%;
+  }
+
+  .header-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
 
 /* --- Main Navigation --- */
 .main-nav {

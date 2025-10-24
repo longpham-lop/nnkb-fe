@@ -1,13 +1,29 @@
+/* ====================== */
+/* LOGIN PAGE CSS FIXED   */
+/* ====================== */
 
-.login-container {
+/* Toàn trang nền gradient xanh lá mát */
+.login-page {
+  height: 100vh;
   display: flex;
-  justify-content: center;   
-  align-items: center;       
-  height: 100vh;             
-  background-color: #f2f4f7; 
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #40940f 0%, #00f2fe 100%);
+  font-family: "Inter", sans-serif;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Container bao toàn màn hình */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f2f4f7;
+}
 
+/* Hộp đăng nhập */
 .login-box {
   width: 380px;
   padding: 30px;
@@ -16,11 +32,27 @@
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
-.login-box h2 {
-  margin-bottom: 25px;
-  color: #222;
-  font-weight: bold;
+
+/* Hộp đăng nhập có hiệu ứng đẹp */
+.login-card {
+  width: 420px;
+  padding: 40px 35px;
+  background: #ffffffee;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeInUp 0.6s ease;
+  backdrop-filter: blur(8px);
 }
+
+/* Tiêu đề */
+.login-card h2 {
+  margin-bottom: 25px;
+  color: #087f23;
+  font-weight: 700;
+}
+
+/* Ô nhập email và password */
 .login-box input[type="email"],
 .login-box input[type="password"] {
   width: 100%;
@@ -28,29 +60,159 @@
   margin: 8px 0 15px 0;
   border: 1px solid #ccc;
   border-radius: 8px;
+  outline: none;
+}
+
+/* Nhóm input có icon */
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: #f9fafc;
+  transition: all 0.2s ease;
+}
+
+.input-group:focus-within {
+  border-color: #00c853;
+  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.25);
+}
+
+.input-group input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #333;
+}
+
+.icon {
+  color: #64748b;
+  margin-right: 10px;
   font-size: 15px;
 }
 
-.login-box button {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
+/* Toggle ẩn/hiện mật khẩu */
+.toggle-pass {
   cursor: pointer;
-  transition: 0.2s;
+  font-size: 16px;
 }
 
-.login-box .btn-login {
-  background-color: #3cd458;
-  color: black;
+/* Các tuỳ chọn nhỏ */
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.options a {
+  color: #010f0a;
+  text-decoration: none;
+}
+
+.options a:hover {
+  text-decoration: underline;
+}
+
+/* Nút chính */
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #00c853, #b2ff59);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+/* Dòng chia */
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #23b406;
+  margin: 25px 0;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  background: none;
+  border: none;
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, #011409, #0d1801);
+  margin: 0 12px;
+  border: none;
+}
+
+.divider span {
+  background-color: #f5fff5;
+  padding: 0 8px;
+  z-index: 2;
+  position: relative;
+}
+
+/* Nút đăng nhập Google */
+.btn-google {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #cbd5e1;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 18px;
+  transition: 0.25s ease;
+}
+
+.btn-google:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(0, 200, 83, 0.3);
+}
+
+.btn-google img {
+  width: 22px;
+  height: 22px;
+}
+
+/* Text đăng ký */
+.signup-text {
+  font-size: 14px;
+  color: #334155;
+}
+
+.signup-text span {
+  color: #009e60;
+  cursor: pointer;
   font-weight: 600;
 }
 
-.login-box .btn-login:hover {
-  background-color: #2fb74a;
+.signup-text span:hover {
+  text-decoration: underline;
 }
+
+/* Nút phụ */
 .login-box .btn-secondary {
   background-color: #ffffff;
   border: 1px solid #3cd458;
@@ -61,6 +223,7 @@
   background-color: #3cd458;
   color: white;
 }
+
 .login-box a {
   color: #3cd458;
   text-decoration: none;
@@ -69,4 +232,16 @@
 
 .login-box a:hover {
   text-decoration: underline;
+}
+
+/* Hiệu ứng mở */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
