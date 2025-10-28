@@ -20,7 +20,7 @@ function Login() {
           className="btn-login"
           style={{ marginTop: '15px' }}
           onClick={() => navigate('/register')}
-        >
+        ><div className=""></div>
           Đăng ký
         </button>
       </div>
