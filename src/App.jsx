@@ -2,18 +2,18 @@ import React from "react";
 import {BrowserRouter, Routes, Route, useLocation, useNavigate,} from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import Login from "./components/Login/Login";
-import Register from "./components/Register/Register";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
 import Home from "./pages/Home/Home";
-import Admin from "./pages/Admin/Admin";
-import Account from "./components/Account/Account";
-import TicketDetail from "./components/TicketDetail/TicketDetail";
+import Account from "./pages/Account/Account";
+import TicketDetail from "./pages/TicketDetail/TicketDetail";
 import Filter from "./components/Filter/Filter";
-import OrderTicket from "./components/OrderTicket/OrderTicket";
-import Order from "./components/Order/Order";
-import PayTicket from "./components/PayTicket/PayTicket";
-import Pay from "./components/Pay/Pay";
+import OrderTicket from "./pages/OrderTicket/OrderTicket";
+import Order from "./pages/Order/Order";
+import PayTicket from "./pages/PayTicket/PayTicket";
+import Pay from "./pages/Pay/Pay";
 import TermsPage from "./components/TermsPage/TermsPage";
+import GoogleCallback from "./hook/GoogleCallback";
 
 
 import "./App.css";
@@ -42,6 +42,19 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Login />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/auth/google/callback"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.5 }}
+            >
+              <GoogleCallback />
             </Motion.div>
           }
         />
