@@ -1,26 +1,44 @@
 import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { login } from "../../api/auth";
 import "./Login.css";
 
 function Login() {
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      console.log("Sending:", { email, password });
+      await login({ email, password }); 
+      navigate("/home"); 
+    } catch (err) {
+      setError(err.response?.data?.message || "Sai thông tin đăng nhập");
+    }
+  };
 
   return (
     <div className="login-page">
       <div className="login-card">
         <h2>Đăng nhập</h2>
 
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
         <div className="input-group">
           <FaEnvelope className="icon" />
-          <input type="email" placeholder="Nhập địa chỉ email" />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Nhập địa chỉ email" />
         </div>
 
         <div className="input-group">
           <FaLock className="icon" />
           <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             type={showPassword ? "text" : "password"}
             placeholder="Nhập mật khẩu"
           />
@@ -39,7 +57,7 @@ function Login() {
           <a href="#">Quên mật khẩu?</a>
         </div>
 
-        <button className="btn-login" onClick={() => navigate("/home")}>
+        <button className="btn-login" onClick={handleLogin}>
           Đăng nhập
         </button>
 

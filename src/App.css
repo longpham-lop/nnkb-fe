@@ -29,7 +29,7 @@ body {
   justify-content: space-between;
   padding: 12px 40px;
   background: #00c853;
-  font-family: "Baloo 2", sans-serif;
+  font-family: "Baloo 2, sans-serif";
 }
 
 /* ===== LOGO ===== */
@@ -40,7 +40,7 @@ body {
   font-size: 32px;
   font-weight: 700;
   cursor: pointer;
-  font-family: "Baloo 2", sans-serif;
+  font-family: "Baloo 2, sans-serif";
   transform: translate(-6px);
   position: relative;
   top: -1px;
@@ -312,7 +312,7 @@ main {
 }
 
 .destination-name {
-    position: absolute;
+    position:absolute;
     bottom: 20px;
     left: 20px;
     color: white;
@@ -456,4 +456,16 @@ main {
 /* Dòng thứ hai "CÔNG TY TNHH TOPTICKET" */
 .copyright p:nth-child(2) {
     color: #e0e0e0;
+}
+.dropdown{
+  position: absolute;
+  background: white;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+  z-index: 99;
+  padding: 0
 }

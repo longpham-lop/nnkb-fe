@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import {BrowserRouter, Routes, Route, useLocation, useNavigate,} from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -14,6 +14,8 @@ import PayTicket from "./pages/PayTicket/PayTicket";
 import Pay from "./pages/Pay/Pay";
 import TermsPage from "./components/TermsPage/TermsPage";
 import GoogleCallback from "./hook/GoogleCallback";
+import { searchEvents } from "./api/event";
+
 
 
 import "./App.css";
@@ -188,19 +190,7 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
-        <Route
-          path="/admin"
-          element={
-            <Motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Admin />
-            </Motion.div>
-          }
-        />
+        
       </Routes>
     </AnimatePresence>
   );
@@ -209,6 +199,34 @@ function AnimatedRoutes() {
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [keyword, setKeyword] = useState("");
+  const [results, setResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const debounceRef = useRef(null);
+  //
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setKeyword(value);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(async () => {
+      if (value.trim().length > 0) {
+        const res = await searchEvents(value.trim());
+        setResults(res.data);
+        setShowDropdown(true);
+      } else {
+        setShowDropdown(false);
+      }
+    }, 300);
+  };
+
+  const onSelectEvent = (event) => {
+    navigate(`/events/${event.id}`);
+    setShowDropdown(false);
+    setKeyword("");
+  };
 
   // Ẩn Header/Footer ở trang login và register
   const hideHeaderFooter =
@@ -227,7 +245,28 @@ function Layout() {
             {/* Thanh tìm kiếm */}
             <div className="search-wrapper">
               <div className="search-bar">
-                <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ..." />
+                <input type="text"  value={keyword}
+                        onChange={handleSearch}
+                        onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                        onFocus={() => results.length > 0 && setShowDropdown(true)}
+                         placeholder="Tìm kiếm sự kiện, nghệ sĩ..." />
+                {showDropdown && results.length > 0 && (
+                  <ul
+                    className="dropdown"
+                    
+                  >
+                    {results.map((item) => (
+                      <li
+                        key={item.id}
+                        onClick={() => onSelectEvent(item)}
+                        style={{ padding: "10px", cursor: "pointer" }}
+                      >
+                        {item.name}
+                      </li>
+                    ))}
+                  </ul>
+                )}         
+
                 <button className="search-btn">🔍</button>
               </div>
             </div>
