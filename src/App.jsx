@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Home from "./pages/Home/Home";
+import Admin from "./pages/Admin/Admin";
 import Account from "./components/Account/Account";
 import TicketDetail from "./components/TicketDetail/TicketDetail";
 import Filter from "./components/Filter/Filter";
@@ -171,6 +172,19 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <TermsPage />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Admin />
             </Motion.div>
           }
         />
