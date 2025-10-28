@@ -6,31 +6,39 @@ function Register() {
   const navigate = useNavigate();
 
   return (
-    <div className="register-container">
-      <div className="register-left">
+    <div className="register-page">
+      <div className="register-card">
         <h2 className="register-title">Đăng ký</h2>
+
         <form className="register-form">
           <input type="text" placeholder="Họ" />
           <input type="text" placeholder="Tên" />
           <input type="text" placeholder="Số điện thoại" />
           <input type="email" placeholder="Email" />
-          <input type="country" placeholder="Địa chỉ" />
+          <input type="text" placeholder="Địa chỉ" />
           <input type="password" placeholder="Mật khẩu" />
           <input type="password" placeholder="Xác nhận mật khẩu" />
         </form>
-      </div>
-
-      <div className="register-right">
-        <div className="ticket-shape top"></div>
 
         <button className="btn-register">Đăng ký</button>
 
-        <p className="text-account">Đã có tài khoản?</p>
-        <button className="btn-login" onClick={() => navigate("/")}>
-          Đăng nhập
+        <div className="divider">
+          <span>Hoặc đăng ký với</span>
+        </div>
+
+        <button className="btn-google">
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+          />
         </button>
 
-        <div className="ticket-shape bottom"></div>
+        <p className="text-account">
+          Đã có tài khoản?{" "}
+          <span className="link-login" onClick={() => navigate("/")}>
+            Đăng nhập
+          </span>
+        </p>
       </div>
     </div>
   );
