@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import "./Login.css";
 
 function Login() {
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -46,7 +47,7 @@ function Login() {
           <span>Hoặc đăng nhập với</span>
         </div>
 
-        <button className="btn-google">
+        <button className="btn-google" onClick={() => window.location.href = "http://localhost:5000/auth/google" }>
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"

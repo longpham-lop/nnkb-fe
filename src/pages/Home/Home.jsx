@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import './Home.css';
 import Slider from "react-slick";
 // import { useNavigate } from "react-router-dom";
@@ -17,8 +17,8 @@ import Banner12 from "../../assets/banner12.png";
 
 
 const Home = () => {
-    // const navigate = useNavigate();
-    const banners = [Banner1, Banner2, Banner11, Banner12];
+
+  const banners = [Banner1, Banner2, Banner11, Banner12];
     
   return (
     <div className="home-container">
@@ -30,7 +30,6 @@ const Home = () => {
               <div key ={index} classname ="hero-banner">
             <a
               href ="/ticketdetail"
-              target ="_blank"
               rel ="noopener noreferrer">
                 <img src ={banner} 
                  alt ={'Event Banner ${index +1}'}/>

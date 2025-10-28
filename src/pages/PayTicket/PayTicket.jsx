@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'; // <-- Thêm useMemo
 import { useLocation, useNavigate } from 'react-router-dom';
 import './PayTicket.css'; 
-import Voucher from "../Voucher/Voucher.jsx"; // <-- 1. IMPORT MODAL
+import Voucher from "../../components/Voucher/Voucher.jsx"; // <-- 1. IMPORT MODAL
 
 // --- BẠN SẼ CẦN IMPORT CÁC LOGO NÀY ---
 import VnPay from "../../assets/vnpay.png";
