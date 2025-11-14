@@ -290,7 +290,7 @@ function Layout() {
                 className="btn-myticket"
                 onClick={() => window.open(`${window.location.origin}/admin`, "_blank")}
               >
-                Trang Admin
+               Admin
               </button>
 
               <button className="btn-myticket" onClick={() => navigate("/tickets")}>
