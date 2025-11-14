@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  LayoutDashboard, CalendarDays, Users, Settings, 
-  Plus, Edit2, Trash2, X, Search, ChevronDown, ChevronUp 
-} from 'lucide-react';
+
+import {
+  LayoutDashboard,
+  CalendarDays,
+  Users,
+  Settings,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Search,
+  ChevronDown,
+  ChevronUp
+} from "lucide-react";
 
 // --- DỮ LIỆU GIẢ (MOCK DATA) ---
 // Trong ứng dụng thật, bạn sẽ lấy dữ liệu này từ API/Backend
@@ -74,44 +84,30 @@ const formatDateTime = (isoString) => {
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState('Sự kiện');
   const navItems = [
-    { name: 'Bảng điều khiển', icon: LayoutDashboard },
-    { name: 'Sự kiện', icon: CalendarDays },
-    { name: 'Người dùng', icon: Users },
-    { name: 'Cài đặt', icon: Settings },
+  { name: 'Bảng điều khiển', icon: LayoutDashboard },
+  { name: 'Sự kiện', icon: CalendarDays },
+  { name: 'Người dùng', icon: Users },
+  { name: 'Cài đặt', icon: Settings },
   ];
 
   return (
-    <div className="w-64 bg-gray-900 text-white min-h-screen p-5 flex flex-col">
-      <h2 className="text-2xl font-bold mb-10">Admin Panel</h2>
+      <div className="sidebar">
+      <h2 className="sidebar-title">Admin Panel</h2>
       <nav>
-        <ul>
-          {navItems.map((item) => (
-            <li key={item.name} className="mb-2">
-              <a
-                href="#"
-                className={`flex items-center p-3 rounded-lg transition-colors ${
-                  activeItem === item.name
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                }`}
-                onClick={() => setActiveItem(item.name)}
-              >
-                <item.icon className="w-5 h-5 mr-3" />
-                {item.name}
-              </a>
-            </li>
-          ))}
-        </ul>
+      <ul className="sidebar-nav">
+      {navItems.map(item => (
+        <li key={item.name} className={activeItem === item.name ? 'active' : ''} onClick={() => setActiveItem(item.name)}>
+        <item.icon className="icon" /> {item.name}
+      </li>
+      ))}
+      </ul>
       </nav>
-      <div className="mt-auto">
-        <a href="#" className="flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white">
-          <Settings className="w-5 h-5 mr-3" />
-          Đăng xuất
-        </a>
+      <div className="sidebar-logout">
+        <Settings className="icon" /> Đăng xuất
       </div>
-    </div>
-  );
-};
+      </div>
+    );
+  };
 
 // --- COMPONENT MODAL THÊM/SỬA SỰ KIỆN ---
 const EventFormModal = ({ isOpen, onClose, onSubmit, eventData }) => {
@@ -278,8 +274,8 @@ const EventFormModal = ({ isOpen, onClose, onSubmit, eventData }) => {
 };
 
 
-// --- COMPONENT TRANG CHÍNH ---
-export default function AdminEventsPage() {
+// --- COMPONENT TRANG CHÍNH --
+export default function Admin() {
   const [events, setEvents] = useState(initialEventsData);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null); // Dùng để xác định Sửa hay Thêm
