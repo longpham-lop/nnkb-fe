@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {BrowserRouter, Routes, Route, useLocation, useNavigate,} from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -13,6 +13,7 @@ import Order from "./pages/Order/Order";
 import PayTicket from "./pages/PayTicket/PayTicket";
 import Pay from "./pages/Pay/Pay";
 import TermsPage from "./components/TermsPage/TermsPage";
+import Admin from './pages/Admin/Admin';
 import GoogleCallback from "./hook/GoogleCallback";
 import { searchEvents } from "./api/event";
 
@@ -190,7 +191,19 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
-        
+        <Route
+        path = "admin"
+        element={
+          <Motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }} 
+            transition={{ duration: 0.5 }}
+          >
+            <Admin />
+          </Motion.div>
+        }
+        />
       </Routes>
     </AnimatePresence>
   );
@@ -273,9 +286,13 @@ function Layout() {
 
             {/* Các nút bên phải */}
             <div className="header-nav">
-              <button className="btn-myticket" onClick={() => navigate("/tickets")}>
-                Tạo sự kiện
+               <button
+                className="btn-myticket"
+                onClick={() => window.open(`${window.location.origin}/admin`, "_blank")}
+              >
+               Admin
               </button>
+
               <button className="btn-myticket" onClick={() => navigate("/tickets")}>
                 Vé của tôi
               </button>
