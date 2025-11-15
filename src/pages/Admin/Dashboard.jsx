@@ -1,60 +1,72 @@
-import React from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import React, { useState, useEffect } from 'react';
+import './Dashboard.css';
+// import { FaUsers, FaCalendarAlt, FaTicketAlt } from 'react-icons/fa'; 
 
-export default function Dashboard({ events }) {
-  // Doanh thu mỗi sự kiện
-  const revenueData = events.map((e) => ({
-    name: e.name,
-    revenue: (e.price || 0) * ((5000 - (e.stock || 0))), // giả sử tổng 5000 vé
-  }));
+const Dashboard = () => {
+  const [stats, setStats] = useState({
+    users: 0,
+    events: 0,
+    ticketsSold: 0,
+  });
 
-  // Trạng thái sự kiện
-  const statusCounts = events.reduce((acc, e) => {
-    acc[e.status] = (acc[e.status] || 0) + 1;
-    return acc;
-  }, {});
-
-  const statusData = Object.keys(statusCounts).map((key) => ({
-    name: key,
-    value: statusCounts[key],
-  }));
-
-  const COLORS = ["#4ade80", "#60a5fa", "#9ca3af", "#facc15"];
+  // Giả lập việc fetch dữ liệu khi component được tải
+  useEffect(() => {
+    // Thay thế bằng API call thật
+    const fetchedStats = {
+      users: 120,
+      events: 15,
+      ticketsSold: 850,
+    };
+    setStats(fetchedStats);
+  }, []);
 
   return (
-    <div>
-      <h1>Biểu đồ thống kê</h1>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
-        <div style={{ flex: 1, minWidth: 300, height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={revenueData}>
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="revenue" fill="#2563eb" />
-            </BarChart>
-          </ResponsiveContainer>
+    <div className="dashboard-page">
+      <h2>Bảng điều khiển</h2>
+      
+      <div className="stats-container">
+        <div className="stat-card">
+          {/* <FaUsers size={30} /> */}
+          <div className="stat-info">
+            <p>Tổng người dùng</p>
+            <span>{stats.users}</span>
+          </div>
         </div>
-        <div style={{ flex: 1, minWidth: 300, height: 300 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={statusData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={100}
-                label
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+        
+        <div className="stat-card">
+          {/* <FaCalendarAlt size={30} /> */}
+          <div className="stat-info">
+            <p>Tổng sự kiện</p>
+            <span>{stats.events}</span>
+          </div>
+        </div>
+        
+        <div className="stat-card">
+          {/* <FaTicketAlt size={30} /> */}
+          <div className="stat-info">
+            <p>Vé đã bán</p>
+            <span>{stats.ticketsSold}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="dashboard-widgets">
+        <div className="widget">
+          <h3>Doanh thu (Biểu đồ)</h3>
+          {/* Bạn có thể thêm thư viện biểu đồ như Chart.js hoặc Recharts ở đây */}
+          <p style={{textAlign: 'center', padding: '20px'}}>Nội dung biểu đồ ở đây</p>
+        </div>
+        <div className="widget">
+          <h3>Sự kiện sắp diễn ra</h3>
+          <ul>
+            <li>Sự kiện A - (01/12/2025)</li>
+            <li>Sự kiện B - (15/12/2025)</li>
+            <li>Sự kiện C - (25/12/2025)</li>
+          </ul>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

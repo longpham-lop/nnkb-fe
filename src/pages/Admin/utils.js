@@ -1,15 +1,20 @@
-// src/pages/Admin/utils.js
-export const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+// src/pages/Admin/Utils.js
+
+/**
+ * Định dạng ngày tháng (VD: '2025-12-01' -> '01/12/2025')
+ */
+export const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
 };
 
-export const formatDateTime = (isoString) => {
-  if (!isoString) return "";
-  return new Date(isoString).toLocaleString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+/**
+ * Định dạng tiền tệ (VD: 100000 -> '100.000 VND')
+ */
+export const formatCurrency = (amount, currency = 'VND') => {
+  return new Intl.NumberFormat('vi-VN', { 
+    style: 'currency', 
+    currency: currency 
+  }).format(amount);
 };

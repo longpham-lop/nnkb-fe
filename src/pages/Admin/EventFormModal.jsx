@@ -1,99 +1,124 @@
-import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import React, { useState,} from 'react';
+import './EventFormModal.css'; 
 
-export default function EventFormModal({ isOpen, onClose, onSubmit, eventData }) {
-  const [formData, setFormData] = useState({});
-  const [previewImage, setPreviewImage] = useState("");
-
-  useEffect(() => {
-    if (eventData) {
-      const localDateTime = eventData.date
-        ? new Date(new Date(eventData.date).getTime() - (new Date().getTimezoneOffset() * 60000))
-            .toISOString()
-            .slice(0, 16)
-        : "";
-      setFormData({ ...eventData, date: localDateTime });
-      setPreviewImage(eventData.imageUrl || "");
-    } else {
-      setFormData({ name: "", date: "", location: "", price: 0, stock: 0, status: "Sắp diễn ra", imageFile: null });
-      setPreviewImage("");
-    }
-  }, [eventData, isOpen]);
-
-  if (!isOpen) return null;
+const EventFormModal = ({ event, onClose, onSave }) => {
+ 
+  const [formData, setFormData] = useState({
+    id: event?.id || null,
+    name: event?.name || '',
+    date: event?.date || '',
+    location: event?.location || '',
+    description: event?.description || '',
+    status: event?.status || 'Sắp diễn ra',
+  });
 
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    if (name === "image") {
-      const file = files[0];
-      setFormData(prev => ({ ...prev, imageFile: file }));
-      setPreviewImage(URL.createObjectURL(file));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: type === "number" ? parseFloat(value) : value }));
-    }
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const submissionData = {
-      ...formData,
-      date: new Date(formData.date).toISOString(),
-      imageUrl: previewImage
-    };
-    onSubmit(submissionData);
-    onClose();
+    // Thêm một số kiểm tra (validate) cơ bản
+    if (!formData.name || !formData.date || !formData.location) {
+      alert('Vui lòng điền các trường bắt buộc (Tên, Ngày, Địa điểm).');
+      return;
+    }
+    onSave(formData);
+  };
+
+  // Ngăn chặn việc click vào form đóng modal
+  const handleModalContentClick = (e) => {
+    e.stopPropagation();
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="modal-close" onClick={onClose}><X size={24} /></button>
-        <h3 className="modal-title">{eventData ? "Chỉnh sửa Sự kiện" : "Thêm Sự kiện Mới"}</h3>
+    // Lớp phủ toàn màn hình
+    <div className="modal-overlay" onClick={onClose}>
+      {/* Nội dung modal */}
+      <div className="modal-content" onClick={handleModalContentClick}>
+        <div className="modal-header">
+          <h3>{event ? 'Sửa Sự kiện' : 'Tạo Sự kiện Mới'}</h3>
+          <button onClick={onClose} className="modal-close-btn">&times;</button>
+        </div>
+        
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Tên sự kiện</label>
-              <input type="text" name="name" value={formData.name || ""} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>Địa điểm</label>
-              <input type="text" name="location" value={formData.location || ""} onChange={handleChange} required />
-            </div>
-          </div>
           <div className="form-group">
-            <label>Ngày & Giờ</label>
-            <input type="datetime-local" name="date" value={formData.date || ""} onChange={handleChange} required />
+            <label htmlFor="name">Tên sự kiện</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
           </div>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Giá (VND)</label>
-              <input type="number" name="price" value={formData.price || 0} onChange={handleChange} min="0" />
-            </div>
-            <div className="form-group">
-              <label>Số lượng vé</label>
-              <input type="number" name="stock" value={formData.stock || 0} onChange={handleChange} min="0" />
-            </div>
-            <div className="form-group">
-              <label>Trạng thái</label>
-              <select name="status" value={formData.status || "Sắp diễn ra"} onChange={handleChange}>
-                <option>Sắp diễn ra</option>
-                <option>Đang bán</option>
-                <option>Đã kết thúc</option>
-                <option>Nháp</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Ảnh sự kiện</label>
-              <input type="file" name="image" onChange={handleChange} />
-              {previewImage && <img src={previewImage} alt="Preview" style={{ width: "100px", marginTop: "10px" }} />}
-            </div>
+          
+          <div className="form-group">
+            <label htmlFor="date">Ngày diễn ra</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              required
+            />
           </div>
-          <div className="form-actions">
-            <button type="button" onClick={onClose} className="btn-cancel">Hủy</button>
-            <button type="submit" className="btn-submit">{eventData ? "Cập nhật" : "Lưu"}</button>
+          
+          <div className="form-group">
+            <label htmlFor="location">Địa điểm</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="status">Trạng thái</label>
+            <select 
+              id="status" 
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+            >
+              <option value="Sắp diễn ra">Sắp diễn ra</option>
+              <option value="Đang diễn ra">Đang diễn ra</option>
+              <option value="Đã kết thúc">Đã kết thúc</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="description">Mô tả</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="4"
+              value={formData.description}
+              onChange={handleChange}
+            ></textarea>
+          </div>
+          
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="btn btn-secondary">
+              Hủy
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Lưu
+            </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default EventFormModal;

@@ -1,96 +1,149 @@
-import React, { useState, useMemo } from "react";
-import { Plus, Edit2, Trash2, Search, ChevronDown, ChevronUp } from "lucide-react";
-import EventFormModal from "./EventFormModal";
-import { formatCurrency, formatDateTime } from "./utils"; 
+import React, { useState, useEffect } from 'react';
+import EventFormModal from './EventFormModal';
+import './Events.css';
 
-export default function Events({ events, setEvents }) {
+const mockEvents = [
+  { id: 1, name: 'Đại nhạc hội Mùa Hè', date: '2025-12-01', location: 'Mỹ Đình', status: 'Sắp diễn ra' },
+  { id: 2, name: 'TechShow 2025', date: '2025-11-20', location: 'Hội nghị Quốc gia', status: 'Đang diễn ra' },
+  { id: 3, name: 'Workshop React', date: '2025-11-10', location: 'FPT Tower', status: 'Đã kết thúc' },
+];
+
+const Events = () => {
+  const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "date", direction: "desc" });
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [images, setImages] = useState([]); // ⭐ Danh sách ảnh sự kiện upload
 
-  const handleAddNew = () => { setCurrentEvent(null); setIsModalOpen(true); };
-  const handleEdit = (event) => { setCurrentEvent(event); setIsModalOpen(true); };
-  const handleDelete = (id) => { if(window.confirm('Bạn có chắc chắn muốn xóa sự kiện này?')) setEvents(events.filter(e => e.id !== id)); };
+  useEffect(() => {
+    setEvents(mockEvents);
+  }, []);
 
-  const sortedEvents = useMemo(() => {
-    let sortableEvents = [...events];
-    sortableEvents.sort((a, b) => {
-      let aValue = a[sortConfig.key], bValue = b[sortConfig.key];
-      if(sortConfig.key === "date"){ aValue = new Date(aValue).getTime(); bValue = new Date(bValue).getTime(); }
-      if(aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-      if(aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-    return sortableEvents;
-  }, [events, sortConfig]);
+  const handleOpenModal = () => {
+    setSelectedEvent(null);
+    setIsModalOpen(true);
+  };
 
-  const filteredEvents = useMemo(() => sortedEvents.filter(e => e.name.toLowerCase().includes(searchTerm.toLowerCase()) || e.location.toLowerCase().includes(searchTerm.toLowerCase())), [sortedEvents, searchTerm]);
+  const handleEdit = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
 
-  const requestSort = (key) => setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }));
-  const getSortIcon = (key) => sortConfig.key !== key ? null : (sortConfig.direction === "asc" ? <ChevronUp size={14}/> : <ChevronDown size={14}/>);
-
-  const getStatusBadge = (status) => {
-    switch(status){
-      case "Đang bán": return "badge-green";
-      case "Sắp diễn ra": return "badge-blue";
-      case "Đã kết thúc": return "badge-gray";
-      case "Nháp": return "badge-yellow";
-      default: return "badge-gray";
+  const handleDelete = (id) => {
+    if (window.confirm("Xóa sự kiện?")) {
+      setEvents(events.filter(e => e.id !== id));
     }
   };
 
+  // ⭐ DRAG & DROP UPLOAD
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+
+    const imageFiles = files.filter(file =>
+      file.type.startsWith("image/")
+    );
+
+    const imageURLs = imageFiles.map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file)
+    }));
+
+    setImages(prev => [...prev, ...imageURLs]);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  // Upload bằng nút chọn file
+  const handleSelectFiles = (e) => {
+    const files = Array.from(e.target.files);
+
+    const imageFiles = files.filter(file => file.type.startsWith("image/"));
+    const imageURLs = imageFiles.map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file)
+    }));
+
+    setImages(prev => [...prev, ...imageURLs]);
+  };
+
   return (
-    <div>
-      <div className="main-header">
-        <h1>Quản lý Sự kiện</h1>
-        <div className="header-actions">
-          <div className="search-box">
-            <Search size={18} className="search-icon"/>
-            <input placeholder="Tìm kiếm sự kiện..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
+    <div className="admin-page-content">
+      <div className="page-header">
+        <h2>Quản lý Sự kiện</h2>
+        <button onClick={handleOpenModal} className="btn btn-primary">
+          + Thêm Sự kiện
+        </button>
+      </div>
+
+      {/* ⭐ KHUNG KÉO THẢ ẢNH */}
+      <div
+        className="dropzone"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      >
+        <p>Kéo và thả hình ảnh sự kiện vào đây</p>
+        <span>Hoặc</span>
+        <label className="upload-btn">
+          Chọn ảnh
+          <input type="file" multiple hidden onChange={handleSelectFiles} />
+        </label>
+      </div>
+
+      {/* ⭐ Preview ảnh */}
+      <div className="image-preview-container">
+        {images.map((img, i) => (
+          <div key={i} className="image-card">
+            <img src={img.url} alt={img.name} />
+            <p>{img.name}</p>
           </div>
-          <button className="btn-submit" onClick={handleAddNew}><Plus size={18}/> Thêm Mới</button>
-        </div>
+        ))}
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th><button onClick={()=>requestSort('name')}>Tên sự kiện {getSortIcon('name')}</button></th>
-              <th>Trạng thái</th>
-              <th><button onClick={()=>requestSort('date')}>Thời gian {getSortIcon('date')}</button></th>
-              <th>Địa điểm</th>
-              <th><button onClick={()=>requestSort('price')}>Giá vé {getSortIcon('price')}</button></th>
-              <th><button onClick={()=>requestSort('stock')}>Còn lại {getSortIcon('stock')}</button></th>
-              <th>Hành động</th>
+      {/* TABLE SỰ KIỆN */}
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Tên sự kiện</th>
+            <th>Ngày diễn ra</th>
+            <th>Địa điểm</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map(event => (
+            <tr key={event.id}>
+              <td>{event.name}</td>
+              <td>{event.date}</td>
+              <td>{event.location}</td>
+              <td>{event.status}</td>
+              <td className="action-buttons">
+                <button className="btn btn-secondary" onClick={() => handleEdit(event)}>Sửa</button>
+                <button className="btn btn-danger" onClick={() => handleDelete(event.id)}>Xóa</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredEvents.map(e => (
-              <tr key={e.id}>
-                <td>{e.name}</td>
-                <td><span className={`status-badge ${getStatusBadge(e.status)}`}>{e.status}</span></td>
-                <td>{formatDateTime(e.date)}</td>
-                <td>{e.location}</td>
-                <td>{formatCurrency(e.price)}</td>
-                <td>{e.stock>0 ? `${e.stock} vé` : 'Hết vé'}</td>
-                <td>
-                  <button className="btn-edit" onClick={()=>handleEdit(e)}><Edit2 size={18}/></button>
-                  <button className="btn-delete" onClick={()=>handleDelete(e.id)}><Trash2 size={18}/></button>
-                </td>
-              </tr>
-            ))}
-            {filteredEvents.length===0 && <tr><td colSpan="7" className="no-data">Không tìm thấy sự kiện nào.</td></tr>}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
 
-      <EventFormModal isOpen={isModalOpen} onClose={()=>setIsModalOpen(false)} eventData={currentEvent} onSubmit={(data)=>{ 
-        if(currentEvent){ setEvents(events.map(ev=>ev.id===currentEvent.id ? {...ev, ...data} : ev)); } 
-        else{ setEvents([data,...events]); } 
-        setIsModalOpen(false);
-      }} />
+      {isModalOpen && (
+        <EventFormModal
+          event={selectedEvent}
+          onClose={() => setIsModalOpen(false)}
+          onSave={(data) => {
+            if (data.id) {
+              setEvents(events.map(e => (e.id === data.id ? data : e)));
+            } else {
+              setEvents([{ ...data, id: Date.now() }, ...events]);
+            }
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
-}
+};
+
+export default Events;

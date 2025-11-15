@@ -1,65 +1,88 @@
-import React, { useState } from "react";
-import { Search, Edit2, Trash2 } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+// Tái sử dụng CSS của Events.css vì layout tương tự (bảng, header)
+import './Events.css'; 
 
-const initialUsers = [
-  { id: 1, name: "Nguyễn Văn A", email: "a@example.com", role: "Admin" },
-  { id: 2, name: "Trần Thị B", email: "b@example.com", role: "User" },
-  { id: 3, name: "Phạm C", email: "c@example.com", role: "User" },
+// Dữ liệu giả lập
+const mockUsers = [
+  { id: 1, name: 'Alice', email: 'alice@example.com', role: 'Admin', status: 'Hoạt động' },
+  { id: 2, name: 'Bob', email: 'bob@example.com', role: 'User', status: 'Hoạt động' },
+  { id: 3, name: 'Charlie', email: 'charlie@example.com', role: 'User', status: 'Bị cấm' },
 ];
 
-export default function Users() {
-  const [users, setUsers] = useState(initialUsers);
-  const [searchTerm, setSearchTerm] = useState("");
+const Users = () => {
+  const [users, setUsers] = useState([]);
 
-  const handleDelete = (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
-      setUsers(users.filter(u => u.id !== id));
-    }
+  useEffect(() => {
+    // Thay thế bằng API call thật
+    setUsers(mockUsers);
+  }, []);
+
+  const handleToggleBan = (userId) => {
+    // Logic cấm/bỏ cấm người dùng
+    setUsers(users.map(user => {
+      if (user.id === userId) {
+        return { ...user, status: user.status === 'Hoạt động' ? 'Bị cấm' : 'Hoạt động' };
+      }
+      return user;
+    }));
+    console.log('Toggle ban cho user:', userId);
   };
 
-  const filteredUsers = users.filter(u =>
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleChangeRole = (userId, newRole) => {
+    // Logic đổi vai trò
+    setUsers(users.map(user => (user.id === userId ? { ...user, role: newRole } : user)));
+    console.log(`Đổi vai trò user ${userId} thành ${newRole}`);
+  };
+
 
   return (
-    <div>
-      <div className="main-header">
-        <h1>Quản lý Người dùng</h1>
-        <div className="header-actions">
-          <div className="search-box">
-            <Search size={18} className="search-icon" />
-            <input placeholder="Tìm kiếm người dùng..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
-          </div>
-        </div>
+    <div className="admin-page-content">
+      <div className="page-header">
+        <h2>Quản lý Người dùng</h2>
+        {/* Có thể thêm nút "Thêm User" nếu admin có quyền */}
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Tên</th>
-              <th>Email</th>
-              <th>Vai trò</th>
-              <th>Hành động</th>
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Tên người dùng</th>
+            <th>Email</th>
+            <th>Vai trò</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>
+                <select 
+                  value={user.role} 
+                  onChange={(e) => handleChangeRole(user.id, e.target.value)}
+                  disabled={user.role === 'Admin'} // Không cho đổi vai trò Admin
+                >
+                  <option value="Admin">Admin</option>
+                  <option value="User">User</option>
+                </select>
+              </td>
+              <td>{user.status}</td>
+              <td className="action-buttons">
+                <button 
+                  onClick={() => handleToggleBan(user.id)} 
+                  className={`btn ${user.status === 'Hoạt động' ? 'btn-danger' : 'btn-secondary'}`}
+                  disabled={user.role === 'Admin'} // Không cho cấm Admin
+                >
+                  {user.status === 'Hoạt động' ? 'Cấm' : 'Bỏ cấm'}
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map(u => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td>
-                  <button className="btn-edit"><Edit2 size={18}/></button>
-                  <button className="btn-delete" onClick={()=>handleDelete(u.id)}><Trash2 size={18}/></button>
-                </td>
-              </tr>
-            ))}
-            {filteredUsers.length===0 && <tr><td colSpan="4" className="no-data">Không tìm thấy người dùng nào.</td></tr>}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
+
+export default Users;

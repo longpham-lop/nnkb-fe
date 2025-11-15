@@ -194,14 +194,25 @@ function AnimatedRoutes() {
           }
         />
        
-      <Route path="/admin" element={<Admin />}>
-        <Route index element={<Events />} />       {/* /admin mặc định */}
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="events" element={<Events />} />
-        <Route path="users" element={<Users />} />
-        <Route path="setting" element={<Setting />} />
-      </Route>
-    </Routes>
+          <Route
+          path="/admin"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Admin />
+            </Motion.div>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="events" element={<Events />} />
+          <Route path="users" element={<Users />} />
+          <Route path="setting" element={<Setting />} />
+        </Route>
+        </Routes>
     </AnimatePresence>
   );
 }

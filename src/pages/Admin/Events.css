@@ -1,0 +1,131 @@
+/* ===== PAGE HEADER ===== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.page-header h2 {
+  font-size: 26px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: #4e73df;
+  color: white;
+}
+
+.btn-secondary {
+  background: #f6c23e;
+  color: white;
+}
+
+.btn-danger {
+  background: #e74a3b;
+  color: white;
+}
+
+/* ===== DRAG & DROP ===== */
+.dropzone {
+  border: 2px dashed #6c63ff;
+  border-radius: 12px;
+  padding: 35px;
+  text-align: center;
+  color: #555;
+  background: #f8f9ff;
+  margin-bottom: 20px;
+  transition: 0.25s ease;
+}
+
+.dropzone:hover {
+  background: #eef0ff;
+}
+
+.dropzone p {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.upload-btn {
+  background: #6c63ff;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* ===== IMAGE PREVIEW ===== */
+.image-preview-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+.image-card {
+  width: 160px;
+  text-align: center;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  transition: 0.25s;
+}
+
+.image-card:hover {
+  transform: translateY(-4px);
+}
+
+.image-card img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.image-card p {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #555;
+}
+
+/* ===== TABLE STYLE ===== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.data-table th {
+  background: #4e73df;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 15px;
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.action-buttons button {
+  margin-right: 6px;
+}
