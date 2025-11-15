@@ -6,7 +6,7 @@ import {
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer
 } from 'recharts';
-import './admin.css';
+import './Admin.css';
 
 // --- DỮ LIỆU GIẢ (MOCK DATA) ---
 const initialEventsData = [
