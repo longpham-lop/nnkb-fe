@@ -15,7 +15,13 @@ function Login() {
   const handleLogin = async () => {
     try {
       console.log("Sending:", { email, password });
+      const { data } = await login({ email, password });
       await login({ email, password }); 
+      setTimeout(() => {
+        console.log("Chạy sau 3 giây");
+      }, 3000);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/home"); 
     } catch (err) {
       setError(err.response?.data?.message || "Sai thông tin đăng nhập");

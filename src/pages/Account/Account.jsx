@@ -1,62 +1,115 @@
 import React, { useState } from 'react';
 import './Account.css';
 import { Link } from 'react-router-dom';
-
-
-import avatar from '../../assets/longavt.png';
 import emptyTicketIcon from '../../assets/longavt.png';
 
 // --- COMPONENT CON CHO GIAO DIỆN "THÔNG TIN TÀI KHOẢN" ---
-const AccountInfo = () => (
-  <>
-    <h1>Thông tin tài khoản</h1>
-    <hr className="divider" />
+import { uploadImage } from '../../api/upload';
+import { updateUser } from '../../api/auth';
 
-    <div className="profile-picture-section">
-      <div className="avatar-large-wrapper">
-        <img src={avatar} alt="User Avatar" className="user-avatar-large" />
-        <div className="edit-icon">✎</div>
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+const AccountInfo = () => {
+  const [avata, setAvata] = useState(user.avata);
+
+  const [formData, setFormData] = useState({
+    name: user.name || "",
+    phone: user.phone || "",
+    dob: user.dob || "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const res = await uploadImage(file);
+      const imageUrl = res.data.url;
+
+      setAvata(imageUrl);
+
+      const userData = JSON.parse(localStorage.getItem("user") || "{}");
+      userData.avata = imageUrl;
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      console.log("Upload thành công:", imageUrl);
+    } catch (err) {
+      console.error("Upload lỗi:", err);
+    }
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const dataToUpdate = { ...formData, avata };
+      await updateUser(user.id, dataToUpdate);
+
+      // Cập nhật localStorage
+      const userData = { ...user, ...dataToUpdate };
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      alert("Cập nhật thông tin thành công!");
+    } catch (err) {
+      console.error(err);
+      alert("Cập nhật thất bại");
+    }
+  };
+
+  return (
+    <>
+      <div className="avatar-wrapper">
+        <img src={avata} alt="avatar" className="user-avatar-large" />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
       </div>
-      <p>Cung cấp thông tin chính xác sẽ hỗ trợ trong quá trình mua vé, hoặc khi cần xác thực vé.</p>
-    </div>
 
-    <form className="account-form">
-        {/* Giữ nguyên form của bạn ở đây */}
+      <h1>Thông tin tài khoản</h1>
+      <hr className="divider" />
+
+      <form className="account-form" onSubmit={handleSubmit}>
         <div className="form-group">
-            <label htmlFor="fullName">Họ và tên</label>
-            <input type="text" id="fullName" defaultValue="Tuấn Long Phạm" />
+          <label htmlFor="name">Họ và tên</label>
+          <input
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="form-group">
-            <label htmlFor="phone">Số điện thoại</label>
-            <div className="phone-input-group">
-                <select className="country-code"><option>+84</option></select>
-                <input type="text" id="phone" defaultValue="355442523" />
-                <button type="button" className="clear-btn">×</button>
-            </div>
+          <label htmlFor="phone">Số điện thoại</label>
+          <input
+            type="text"
+            id="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <div className="input-with-icon">
-                <input type="email" id="email" defaultValue="tuanlongp070@gmail.com" readOnly />
-                <span className="verified-icon">✓</span>
-            </div>
+          <label htmlFor="dob">Ngày tháng năm sinh</label>
+          <input
+            type="date"
+            id="dob"
+            value={formData.dob}
+            onChange={handleChange}
+          />
         </div>
-        <div className="form-group">
-            <label htmlFor="dob">Ngày tháng năm sinh</label>
-            <input type="text" id="dob" defaultValue="19/12/2004" />
-        </div>
-        <div className="form-group">
-            <label>Giới tính</label>
-            <div className="gender-options">
-                <label><input type="radio" name="gender" value="male" defaultChecked /><span>Nam</span></label>
-                <label><input type="radio" name="gender" value="female" /><span>Nữ</span></label>
-                <label><input type="radio" name="gender" value="other" /><span>Khác</span></label>
-            </div>
-        </div>
+
         <button type="submit" className="save-button">Hoàn thành</button>
-    </form>
-  </>
-);
+      </form>
+    </>
+  );
+};
+
 
 
 // --- COMPONENT CON CHO GIAO DIỆN "VÉ CỦA TÔI" ---
@@ -144,15 +197,15 @@ const MyTickets = () => {
 // --- COMPONENT CHÍNH ---
 const Account = () => {
 
-    const [activeView, setActiveView] = useState('tickets');
+    const [activeView, setActiveView] = useState('info');
 
     return (
         <div className="account-page-container">
             {/* Cột menu bên trái */}
             <aside className="account-sidebar">
                 <div className="user-profile">
-                    <img src={avatar} alt="User Avatar" className="user-avatar-small" />
-                    <div className="user-name">Tuấn Long Phạm</div>
+                    <img src={user.avata} alt="User Avatar" className="user-avatar-small" />
+                    <div className="user-name" value={user.name}>{user.name}</div>
                 </div>
                 <nav className="account-nav">
                 
