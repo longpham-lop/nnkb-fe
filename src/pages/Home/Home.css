@@ -64,3 +64,23 @@
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
     user-select: none;
 }
+.admin-btn {
+  padding: 8px 14px;
+  background: #ff6600;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.admin-btn:hover {
+  background: #e05a00;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 10px;
+}
