@@ -15,9 +15,11 @@ import Pay from "./pages/Pay/Pay";
 import TermsPage from "./components/TermsPage/TermsPage";
 import Admin from './pages/Admin/Admin';
 import GoogleCallback from "./hook/GoogleCallback";
+import Dashboard from './pages/Admin/Dashboard';
+import Events from './pages/Admin/Events';
+import Users from './pages/Admin/Users';
+import Setting from './pages/Admin/Setting';
 import { searchEvents } from "./api/event";
-
-
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -31,7 +33,7 @@ import Appstore from "./assets/appstore.png";
 
 function AnimatedRoutes() {
   const location = useLocation();
-
+  
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -191,20 +193,15 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
-        <Route
-        path = "admin"
-        element={
-          <Motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }} 
-            transition={{ duration: 0.5 }}
-          >
-            <Admin />
-          </Motion.div>
-        }
-        />
-      </Routes>
+       
+      <Route path="/admin" element={<Admin />}>
+        <Route index element={<Events />} />       {/* /admin mặc định */}
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="events" element={<Events />} />
+        <Route path="users" element={<Users />} />
+        <Route path="setting" element={<Setting />} />
+      </Route>
+    </Routes>
     </AnimatePresence>
   );
 }
@@ -212,7 +209,7 @@ function AnimatedRoutes() {
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-
+  
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -244,6 +241,7 @@ function Layout() {
   // Ẩn Header/Footer ở trang login và register
   const hideHeaderFooter =
     location.pathname === "/" || location.pathname === "/register";
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
   return (
     <>
@@ -286,13 +284,11 @@ function Layout() {
 
             {/* Các nút bên phải */}
             <div className="header-nav">
-               <button
-                className="btn-myticket"
-                onClick={() => window.open(`${window.location.origin}/admin`, "_blank")}
-              >
-               Admin
+               {currentUser?.role === "admin" && (
+              <button className="btn-myticket" onClick={() => navigate("/admin")}>
+                Admin
               </button>
-
+            )}
               <button className="btn-myticket" onClick={() => navigate("/tickets")}>
                 Vé của tôi
               </button>
@@ -300,6 +296,9 @@ function Layout() {
                 Tài khoản
               </button>
             </div>
+            <button className='btn-logout'onClick={() => navigate("/")}>
+              Đăng xuất
+            </button>
           </header>
 
           <nav className="main-nav">

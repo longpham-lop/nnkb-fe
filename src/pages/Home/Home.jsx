@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+// import React, { useState, useEffect } from 'react';
 import './Home.css';
 import Slider from "react-slick";
 // import { useNavigate } from "react-router-dom";
+
 import Banner1 from "../../assets/banner1.png";
 import Banner2 from "../../assets/banner2.png";
 import Banner3 from "../../assets/banner3.png";
@@ -17,12 +18,18 @@ import Banner12 from "../../assets/banner12.png";
 
 
 const Home = () => {
-
+    
   const banners = [Banner1, Banner2, Banner11, Banner12];
   
   return (
     <div className="home-container">
       {/* Header Section */}
+      <div className="home-header">
+        <h1>Trang chủ</h1>
+
+        {/* Nếu là admin thì hiện nút Admin */}
+        
+      </div>
       <main>
         <section className="hero-section">
           <div className="hero-slider">

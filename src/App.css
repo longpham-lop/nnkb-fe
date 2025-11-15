@@ -119,6 +119,7 @@ body {
 }
 
 /* Nút vé và tài khoản */
+.btn-logout,
 .btn-account,
 .btn-myticket {
   background-color: white;
@@ -131,7 +132,7 @@ body {
   font-size: 14px;
   transition: all 0.2s;
 }
-
+.btn-logout:hover,
 .btn-account:hover,
 .btn-myticket:hover {
   background-color: #e8f5e9;
