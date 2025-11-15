@@ -1,366 +1,527 @@
+/* ========== LỚP BỌC NGOÀI ========== */
+
+.ticket-page {
+  background: #101114; /* nền đen cho toàn page */
+}
+
+/* Phần đầu (hero) – nền tối + card vé */
+.ticket-hero {
+  background: linear-gradient(#2f3034 0%, #1d1e21 55%, #101114 100%);
+  padding: 32px 0 56px;
+}
+
+/* Phần thân – nền sáng */
+.ticket-body {
+  background: #f3f5fb;
+  padding: 32px 0 64px;
+}
+
 /* --- Main Container --- */
 .ticket-detail-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 20px;
-    color: #e0e0e0;
-    background-color: rgb(204, 198, 198); /* Nền xám đen cho toàn trang */
-   
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  color: #e0e0e0;
+  background: transparent; /* bỏ nền xám cũ */
 }
 
 .main-detail-content {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .sidebar-ads {
-    flex: 0 0 250px; /* Chiều rộng cố định 250px */
-    display: none; /* Ẩn trên màn hình nhỏ */
+  flex: 0 0 250px;
+  display: none;
 }
-/* Hiển thị sidebar trên màn hình lớn hơn */
+
 @media (min-width: 1024px) {
-    .sidebar-ads {
-        display: block;
-    }
+  .sidebar-ads {
+    display: block;
+  }
 }
 
-/* --- Breadcrumbs --- */
+/* --- Breadcrumbs (nếu dùng ở hero) --- */
 .breadcrumbs {
-    font-size: 13px;
-    color: #b3b3b3;
-    margin-bottom: 20px;
+  font-size: 13px;
+  color: #b3b3b3;
+  margin-bottom: 20px;
 }
 
-/* --- Event Header Section --- */
+/* ========== PHẦN CARD VÉ Ở TRÊN ========== */
+
+/* Card đầu trang – giống hình mẫu */
 .event-main-header {
-    display: flex;
-    flex-direction: column-reverse; /* Đưa ảnh lên đầu trên mobile */
-    gap: 30px;
-    background-color: #1c1c1e;
-    padding: 24px;
-    border-radius: 12px;
-    margin-bottom: 40px;
-}
-@media (min-width: 768px) {
-    .event-main-header {
-        flex-direction: row; /* Bố cục 2 cột trên màn hình lớn */
-    }
+  display: flex;
+  background: #333438;         /* nền xám đậm của card */
+  border-radius: 32px;
+  overflow: visible;           /* để thấy nửa vòng tròn thò ra ngoài */
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
+/* Bên trái – thông tin sự kiện */
 .event-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  flex: 1;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  color: #ffffff;
 }
+
 .event-info h1 {
-    font-size: 28px;
-    color: #fff;
-    margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
 }
-.event-info p {
-    color: #b3b3b3;
-    font-size: 14px;
-    margin-bottom: 12px;
-    line-height: 1.5;
+
+.event-time,
+.event-location {
+  font-size: 15px;
+  margin-bottom: 10px;
+  color: #e3e3e3;
 }
+
+/* Nút giá */
 .price-box {
-    background-color: #1DB954;
-    color: #fff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-top: auto; /* Đẩy xuống dưới cùng */
-    width: fit-content;
+  margin-top: 28px;
+  background-color: #1db954;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  width: fit-content;
+  box-shadow: 0 4px 0 #0b7a34;
 }
-.price-box :hover {
-    background-color: #17a74a;
+
+.price-box:hover {
+  background-color: #17a74a;
 }
+
 .price-box span {
-    font-size: 15px;
+  font-size: 16px;
 }
-.price-box p {
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-    margin: 4px 0 0 0;
-}
+
+/* Bên phải – poster */
 .event-poster {
-    flex: 0 0 40%;
+  flex: 1.1;
 }
+
 .event-poster img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-.ticket-header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Khoảng cách giữa chữ và mũi tên */
-    cursor: pointer; /* Biến con trỏ thành hình bàn tay */
-    user-select: none; /* Ngăn bôi đen chữ khi click */
-}
-.ticket-header-left .arrow-icon {
-    color: #eeecec;
-    font-size: 14px;
-    transition: transform 0.3s ease;
-    margin-top: 25px;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 32px 32px 0; /* bo góc phải giống Ticketbox */
 }
 
-/* --- CSS cho Hiệu ứng Thu gọn Danh sách Vé --- */
-.ticket-list {
-    display: flex;
+/* Vạch xé vé giữa card */
+.event-main-divider {
+  width: 26px;
+  background-image: radial-gradient(circle, #ffffff 3px, transparent 3px);
+  background-size: 10px 16px;
+  background-repeat: repeat-y;
+  background-position: center;
+  position: relative;
+}
+
+/* Hai NỬA hình tròn trên/dưới – giống Ticketbox */
+
+/* Ta dùng nửa hình tròn, không phải full tròn, để không bị “viên thuốc” */
+.event-main-divider::before,
+.event-main-divider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
+  background: #1d1e21; 
+  z-index: -1;          /* màu nền ngoài card (nền hero) */
+}
+
+
+/* Nửa trên: bo dưới, dính lên trên vạch */
+.event-main-divider::before {
+  bottom: 100%;
+  border-radius: 0 0 64px 64px;   /* chỉ bo cạnh dưới => nửa vòng tròn */
+}
+
+/* Nửa dưới: bo trên, dính xuống dưới vạch */
+.event-main-divider::after {
+  top: 100%;
+  border-radius: 64px 64px 0 0;   /* chỉ bo cạnh trên => nửa vòng tròn */
+}
+
+/* Responsive: trên mobile ẩn vạch xé + notch cho đỡ rối */
+@media (max-width: 768px) {
+  .event-main-header {
     flex-direction: column;
-    gap: 12px;
-    
-    /* Hiệu ứng chuyển động mượt mà */
-    transition: max-height 0.4s ease-out, opacity 0.3s ease-out, margin-top 0.4s ease-out;
-    overflow: hidden;
-    max-height: 1000px; /* Chiều cao tối đa (số ảo đủ lớn) */
-    opacity: 1;
-    margin-top: 20px; /* Giữ khoảng cách với header */
+    border-radius: 24px;
+  }
+
+  .event-main-divider,
+  .event-main-divider::before,
+  .event-main-divider::after {
+    display: none;
+  }
+
+  .event-poster img {
+    border-radius: 0 0 24px 24px;
+  }
 }
 
-.ticket-list.collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0;
-    gap: 0; /* Xóa khoảng cách khi bị ẩn */
-}
-/* --- Ticket Selection Section --- */
-.ticket-list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border-radius: 8px;
-    background-color: #1c1c1e;
-    margin-bottom: 0;
-    
-    /* Hiệu ứng dính lại khi cuộn */
-    position: sticky;
-    top: 20px;
-    z-index: 10;
-}
-.info-block h4 {
-    color: #fff;
-    margin: 0 0 4px 0;
-}
-.info-block p {
-    color: #b3b3b3;
-    font-size: 14px;
-    margin: 0;
-}
-.buy-ticket-now-btn {
-    background-color: #1DB954;
-    color: #fff;
-    border: none;
-    padding: 10px 24px;
-    border-radius: 50px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.ticket-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-.ticket-item {
-    display: flex;
-    align-items: center;
-    background-color: #2a2a2a;
-    padding: 16px;
-    border-radius: 8px;
-}
-.ticket-type-img {
-    width: 80px;
-    height: auto;
-    margin-right: 16px;
-}
-.ticket-details {
-    flex-grow: 1;
-}
-.ticket-details h4 {
-    font-size: 16px;
-    color: #fff;
-    margin: 0 0 4px 0;
-}
-.ticket-details p {
-    font-size: 14px;
-    color: #b3b3b3;
-    margin: 0;
-}
-.ticket-price {
-    font-size: 16px;
-    font-weight: bold;
-    color: #1DB954;
+/* ========== PHẦN THẤP HƠN – GIỚI THIỆU / VÉ / BAN TỔ CHỨC ========== */
+
+.event-bottom-half {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* --- Sidebar Ads --- */
-.ad-card {
-    background-color: #1c1c1e;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-.ad-card h4 {
-    color: #fff;
-    margin-bottom: 12px;
-}
-.ad-card img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-.ad-card p {
-    font-size: 14px;
-    color: #b3b3b3;
-    margin: 0;
-}
-.ad-card .ad-price {
-    font-weight: bold;
-    color: #fff;
-    margin-top: 5px;
-}
-
-/* --- CSS cho Phần Mô tả (Giới thiệu) --- */
+/* --- Giới thiệu --- */
 .event-description {
-    padding-bottom: 30px;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 20px;
+  background-color: #ffffff;
+  padding: 20px 24px;
+  border-radius: 12px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .event-description h3 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #121212;
-    margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #121212;
+  margin-bottom: 20px;
 }
 
 .description-banner {
-    width: 100%;
-    border-radius: 8px;
-    margin-bottom: 20px;
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .description-content {
-    font-size: 15px;
-    color: #333;
-    line-height: 1.7;
-    /* Hiệu ứng chuyển động mượt mà khi thay đổi chiều cao */
-    transition: max-height 0.4s ease-out;
-    overflow: hidden;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.7;
+  transition: max-height 0.4s ease-out;
+  overflow: hidden;
 }
 
 .description-content p {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 /* Trạng thái bị thu gọn */
 .description-content.collapsed {
-    max-height: 100px; /* Chiều cao tối đa khi bị thu gọn, bạn có thể thay đổi số này */
-    position: relative;
+  max-height: 100px;
+  position: relative;
 }
 
 /* Tạo hiệu ứng mờ dần ở cuối văn bản khi bị thu gọn */
 .description-content.collapsed::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    background: linear-gradient(to bottom, transparent, #ffffff);
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, #ffffff);
 }
+
 .description-text {
-    max-width: 800px;
-    margin: 0;
-    color: black;
+  max-width: 800px;
+  margin: 0;
+  color: black;
 }
 
 /* Nút "Xem thêm" / "Thu gọn" */
 .toggle-expand-btn {
-    background-color: transparent;
-    border: 1px solid #000000;
-    border-radius: 50px;
-    padding: 8px 20px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    color: #000000;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 10px auto 0 auto; /* Căn giữa nút */
+  background-color: transparent;
+  border: 1px solid #000000;
+  border-radius: 50px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px auto 0 auto;
 }
 
 .toggle-expand-btn:hover {
-    background-color: #1DB954;
+  background-color: #1db954;
+  color: #ffffff;
 }
 
 .arrow-icon {
-    font-size: 12px;
-    transition: transform 0.3s ease;
+  font-size: 12px;
+  transition: transform 0.3s ease;
 }
 
-/* --- CSS cho Phần Ban tổ chức --- */
+/* --- Thông tin vé --- */
+.ticket-selection-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e2e2;
+}
 
-/* Áp dụng style lề và tạo khoảng cách với phần vé ở trên */
+.ticket-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px 12px 0 0;
+  background-color: #1c1c1e;
+  margin-bottom: 0;
+  position: sticky;
+  top: 20px;
+  z-index: 10;
+}
+
+.ticket-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ticket-header-left .arrow-icon {
+  color: #eeecec;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  margin-top: 2px;
+}
+
+.info-block h4 {
+  color: #fff;
+  margin: 0 0 4px 0;
+}
+
+.info-block p {
+  color: #b3b3b3;
+  font-size: 14px;
+  margin: 0;
+}
+
+.buy-ticket-now-btn {
+  background-color: #1db954;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Danh sách vé */
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: max-height 0.4s ease-out, opacity 0.3s ease-out, margin-top 0.4s ease-out;
+  overflow: hidden;
+  max-height: 1000px;
+  opacity: 1;
+  margin-top: 20px;
+  padding: 0 16px 16px 16px;
+}
+
+.ticket-list.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  gap: 0;
+}
+
+.ticket-item {
+  display: flex;
+  align-items: center;
+  background-color: #2a2a2a;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.ticket-type-img {
+  width: 80px;
+  height: auto;
+  margin-right: 16px;
+}
+
+.ticket-details {
+  flex-grow: 1;
+}
+
+.ticket-details h4 {
+  font-size: 16px;
+  color: #fff;
+  margin: 0 0 4px 0;
+}
+
+.ticket-details p {
+  font-size: 14px;
+  color: #b3b3b3;
+  margin: 0;
+}
+
+.ticket-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #1db954;
+}
+
+/* --- Sidebar Ads --- */
+.ad-card {
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 30.5px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ad-card h4 {
+  color: #111;
+  margin-bottom: 12px;
+}
+
+.ad-card img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.ad-card p {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+.ad-card .ad-price {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* --- Phần Ban tổ chức --- */
 .event-organizer {
-    margin-top: 40px; /* Tạo khoảng cách với phần thông tin vé */
-    
-    border: 1px solid #181818;
+  margin-top: 8px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
 }
 
-/* Style cho tiêu đề (giống hệt h3 của Giới thiệu) */
 .event-organizer h3 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #121212;
-    margin-bottom: 20px;
-    padding-bottom: 0; 
-   
+  font-size: 18px;
+  font-weight: 700;
+  color: #121212;
+  margin-bottom: 10px;
 }
 
-/* Style cho nội dung (giống hệt .description-content) */
-.organizer-layout {
-    display: flex;
-    align-items: flex-start; /* Căn logo và text ở trên cùng */
-    gap: 25px; /* Khoảng cách giữa logo và text */
+.faint-divider {
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 10px 0 18px 0;
+}
+
+.organizer-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .organizer-logo {
-    width: 150px;
-    height: auto;
-    flex-shrink: 0; /* Ngăn logo bị co lại */
-    object-fit: contain; /* Giữ tỷ lệ logo */
-}
-
-.organizer-text h4 {
-    font-size: 18px;
-    font-weight: 700;
-    color: #121212;
-    margin: 0 0 10px 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .organizer-text p {
-    font-size: 15px;
-    color: #1a1919;
-    line-height: 1.7;
-    margin: 0 0 15px 0;
+  font-size: 15px;
+  color: #1a1919;
+  line-height: 1.6;
+  margin: 0 0 4px 0;
 }
 
-/* Làm nổi bật tên công ty */
-.organizer-content p:first-of-type {
-    font-weight: bold; 
+.organizer-name {
+  font-weight: 700;
+  margin-bottom: 6px;
 }
-.faint-divider {
-    border: none;
-    height: 1px;
-    background-color: #e0e0e0; /* Màu kẻ mờ */
-    margin: 20px 0;
+
+/* --- Gợi ý sự kiện --- */
+.recommendations {
+  margin-top: 8px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.recommendations h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #121212;
+}
+
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.reco-card {
+  background: #f7f7f7;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.reco-card img {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.reco-card h4 {
+  font-size: 14px;
+  margin: 0 0 4px 0;
+  color: #111;
+}
+
+.reco-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1db954;
+}
+
+.see-more-container {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.see-more-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid #111;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none;
+}
+
+.see-more-btn:hover {
+  background: #111;
+  color: #fff;
 }
