@@ -17,3 +17,7 @@ export const logout = () => {
 export const refresh = () => {
   return axios.post(`${API}/api/users/refresh`, {}, { withCredentials: true });
 };
+
+export const updateUser = (userId, data) => {
+  return axios.put(`${API}/api/users/${userId}`, data, { withCredentials: true });
+};
