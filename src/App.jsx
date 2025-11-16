@@ -261,7 +261,7 @@ function Layout() {
           <header className="header">
             {/* Logo */}
             <button className="logo" onClick={() => navigate("/home")}>
-              <span className="logo-highlight">Top</span>ticket
+              <span className="logo-highlight">TOPTICKET</span>
             </button>
 
             {/* Thanh tìm kiếm */}
@@ -334,7 +334,7 @@ function Layout() {
             </div>
 
             <div className="footer-column">
-              <h4>Về Ticketbox</h4>
+              <h4>Về Topticket</h4>
               <Link to = "/termspage">Giới thiệu</Link>
               <Link to = "/termspage">Điều khoản sử dụng</Link>
               <Link to ="/termspage">Chính sách bảo mật</Link>
@@ -342,14 +342,14 @@ function Layout() {
 
             <div className="footer-column">
               <h4>Dành cho nhà tổ chức</h4>
-              <a href="#">Hợp tác với chúng tôi</a>
-              <a href="#">Câu hỏi thường gặp</a>
+              <a href="/termspage">Hợp tác với chúng tôi</a>
+              <a href="/termspage">Câu hỏi thường gặp</a>
             </div>
           </div>
 
           <div className="footer-bottom">
             <div className="app-links">
-              <p>Tải ứng dụng Ticketbox</p>
+              <p>Tải ứng dụng TopTicket</p>
               <a href ="https://play.google.com/store/apps/details?id=ticketbox.event.user&referrer=utm_source%3Dtkbvn-website%26utm_medium%3Dreferral%26utm_campaign%3Dapp-landing-page"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -409,7 +409,7 @@ function Layout() {
             <p>TOPTICKET</p>
             <p>CÔNG TY TNHH TOPTICKET</p>
             <p>
-              Địa chỉ: Tầng 6, Tòa Electric Power, 234 Hoàng Quốc Việt, Cổ
+              Địa chỉ: Tầng 6, Tòa E, 234 Hoàng Quốc Việt, Cổ
               Nhuế, Bắc Từ Liêm, Hà Nội, Việt Nam
             </p>
             <p>

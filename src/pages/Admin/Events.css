@@ -19,11 +19,17 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
+  transition: background 0.3s ease;
 }
 
 .btn-primary {
   background: #4e73df;
   color: white;
+}
+.btn-success {
+  background: #4e73df;
+  color: white;
+  margin-left: 570px;
 }
 
 .btn-secondary {

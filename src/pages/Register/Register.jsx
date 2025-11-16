@@ -12,11 +12,40 @@ function Register() {
     email: "",
     address: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    birthday: "",
+    birthplace: "",
+    gender: ""
   });
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [cccdImage, setCccdImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
+  // Thêm upload CCCD
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCccdImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Gửi OCR (FE) — tạm thời mock data
+  const handleOcr = () => {
+    if (!cccdImage) return;
+    // Mô phỏng kết quả OCR
+    alert("OCR chưa kết nối backend — FE đã sẵn sàng!");
+    setForm((prev) => ({
+      ...prev,
+      firstName: "Nguyễn",
+      lastName: "Văn A",
+      birthday: "01/01/2000",
+      birthplace: "Hà Nội",
+      gender: "Nam",
+    }));
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,11 +63,13 @@ function Register() {
         email: form.email,
         address: form.address,
         password: form.password,
+        birthday: form.birthday,
+        birthplace: form.birthplace,
+        gender: form.gender
       });
 
       setSuccess("Đăng ký thành công!");
       setTimeout(() => navigate("/"), 1000);
-
     } catch (err) {
       setError(err.response?.data?.message || "Đăng ký thất bại");
     }
@@ -52,27 +83,101 @@ function Register() {
         {error && <p style={{ color: "red" }}>{error}</p>}
         {success && <p style={{ color: "green" }}>{success}</p>}
 
+        {/* ===== OCR CCCD Section ===== */}
+        <div className="ocr-section">
+          <label>Upload ảnh CCCD:</label>
+          <input type="file" accept="image/*" onChange={handleImageUpload} />
+          {preview && (
+            <div className="image-preview">
+              <img src={preview} alt="CCCD Preview" />
+            </div>
+          )}
+          <button className="btn-ocr" onClick={handleOcr} disabled={!cccdImage}>
+            🔍 Quét OCR
+          </button>
+        </div>
+
+        {/* ===== Form đăng ký ===== */}
         <form className="register-form" onSubmit={(e) => e.preventDefault()}>
-          <input type="text" name="firstName" placeholder="Họ"
-                 value={form.firstName} onChange={handleChange} />
+          <input
+            type="text"
+            name="firstName"
+            placeholder="Họ"
+            value={form.firstName}
+            onChange={handleChange}
+          />
 
-          <input type="text" name="lastName" placeholder="Tên"
-                 value={form.lastName} onChange={handleChange} />
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Tên"
+            value={form.lastName}
+            onChange={handleChange}
+          />
 
-          <input type="text" name="phone" placeholder="Số điện thoại"
-                 value={form.phone} onChange={handleChange} />
+          <input
+            type="text"
+            name="phone"
+            placeholder="Số điện thoại"
+            value={form.phone}
+            onChange={handleChange}
+          />
 
-          <input type="email" name="email" placeholder="Email"
-                 value={form.email} onChange={handleChange} />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+          />
 
-          <input type="text" name="address" placeholder="Địa chỉ"
-                 value={form.address} onChange={handleChange} />
+          <input
+            type="text"
+            name="address"
+            placeholder="Địa chỉ"
+            value={form.address}
+            onChange={handleChange}
+          />
 
-          <input type="password" name="password" placeholder="Mật khẩu"
-                 value={form.password} onChange={handleChange} />
+          <input
+            type="text"
+            name="birthday"
+            placeholder="Ngày sinh"
+            value={form.birthday}
+            onChange={handleChange}
+          />
 
-          <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu"
-                 value={form.confirmPassword} onChange={handleChange} />
+          <input
+            type="text"
+            name="birthplace"
+            placeholder="Nơi sinh"
+            value={form.birthplace}
+            onChange={handleChange}
+          />
+
+          <input
+            type="text"
+            name="gender"
+            placeholder="Giới tính"
+            value={form.gender}
+            onChange={handleChange}
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Mật khẩu"
+            value={form.password}
+            onChange={handleChange}
+          />
+
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Xác nhận mật khẩu"
+            value={form.confirmPassword}
+            onChange={handleChange}
+          />
         </form>
 
         <button className="btn-register" onClick={handleRegister}>
@@ -83,8 +188,16 @@ function Register() {
           <span>Hoặc đăng ký với</span>
         </div>
 
-        <button className="btn-google" onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`}>
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" />
+        <button
+          className="btn-google"
+          onClick={() =>
+            (window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`)
+          }
+        >
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+          />
         </button>
 
         <p className="text-account">

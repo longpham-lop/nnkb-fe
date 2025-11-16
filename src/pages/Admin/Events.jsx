@@ -22,6 +22,10 @@ const Events = () => {
     setSelectedEvent(null);
     setIsModalOpen(true);
   };
+  const handleSaveToLocal = () => {
+  localStorage.setItem("admin_events", JSON.stringify(events));
+  alert("🎉 Lưu sự kiện thành công!");
+};
 
   const handleEdit = (event) => {
     setSelectedEvent(event);
@@ -72,6 +76,9 @@ const Events = () => {
     <div className="admin-page-content">
       <div className="page-header">
         <h2>Quản lý Sự kiện</h2>
+        <button onClick={handleSaveToLocal} className="btn btn-success">
+          Lưu sư kiện
+        </button>
         <button onClick={handleOpenModal} className="btn btn-primary">
           + Thêm Sự kiện
         </button>

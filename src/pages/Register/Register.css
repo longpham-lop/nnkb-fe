@@ -20,6 +20,8 @@
   text-align: center;
   animation: fadeInUp 0.6s ease;
   backdrop-filter: blur(8px);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Tiêu đề */
@@ -142,3 +144,43 @@
     transform: translateY(0);
   }
 }
+.ocr-section {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #fef4f8;
+  border-radius: 12px;
+  border: 1px dashed #ff6b6b;
+}
+
+.ocr-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.image-preview {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.btn-ocr {
+  width: 100%;
+  padding: 10px;
+  background: #ff6b6b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.btn-ocr:disabled {
+  background: #ccc;
+}
+

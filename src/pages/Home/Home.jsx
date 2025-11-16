@@ -15,17 +15,24 @@ import Banner9 from "../../assets/banner9.png";
 import Banner10 from "../../assets/banner10.png";
 import Banner11 from "../../assets/banner11.png";
 import Banner12 from "../../assets/banner12.png";
-
+import Banner13 from "../../assets/banner13.png";
+import Banner14 from "../../assets/banner14.png";
+import Banner15 from "../../assets/banner15.png";
+import HoChiMinhcity from "../../assets/HoChiMinhcity.png";
+import Hanoi from "../../assets/Hanoi.png";
+import DaLat from "../../assets/DaLat.png";
+import Vitrikhac from "../../assets/vitrikhac.png";
+import Topticket from "../../assets/topticket.png";
 
 const Home = () => {
     
-  const banners = [Banner1, Banner2, Banner11, Banner12];
+  const banners = [Banner1, Banner2, Banner11, Banner12, Banner13, Banner14, Banner15];
   
   return (
     <div className="home-container">
       {/* Header Section */}
       <div className="home-header">
-        <h1>Trang chủ</h1>
+        
 
         {/* Nếu là admin thì hiện nút Admin */}
         
@@ -50,11 +57,12 @@ const Home = () => {
         <section className="event-section">
           <h2>🔥 Sự kiện đặc sắc</h2>
           <div className="event-list">
-            {/* Replace with your event card components */}
+          <a href ="/filter" rel ="noopener noreferrer">
             <div className="event-card-large">
-              <span className="event-number">1</span>
+              {/* <span className="event-number">1</span> */}
               <img src={Banner7} alt="Event 1" />
             </div>
+            </a>
             <div className="event-card-large">
               <img src={Banner8} alt="Event 2" />
             </div>
@@ -64,6 +72,13 @@ const Home = () => {
              <div className="event-card-large">
               <img src={Banner10} alt="Event 4" />
             </div>
+            <div className="event-card-large">
+              <img src={Banner10} alt="Event 4" />
+            </div>
+            <div className="event-card-large">
+              <img src={Banner10} alt="Event 4" />
+            </div>
+            
           </div>
         </section>
 
@@ -104,7 +119,10 @@ const Home = () => {
                 </div>
             </div>
         </section>
-
+          
+          <div className='topticket'>
+            <img src={Topticket} alt="Topticket" />
+          </div>
 
         {/* This Weekend Section */}
         <section className="event-section">
@@ -112,29 +130,42 @@ const Home = () => {
           <div className="event-list">
             {/* Replace with your event card components */}
             <div className="event-card-small">
-              <img src="https://via.placeholder.com/280x160.png?text=Workshop+1" alt="Event 1" />
+              <img src={Banner5} alt="Event 1" />
               <h3>PHÁT BẢO NGHIÊM TRUYỀN...</h3>
               <p className="price">Từ 75,000₫</p>
               <p className="date">15 Tháng 10, 2025</p>
             </div>
             <div className="event-card-small">
-              <img src="https://via.placeholder.com/280x160.png?text=Workshop+2" alt="Event 2" />
+              <img src={Banner6} alt="Event 2" />
               <h3>[LIENLAB] WORKSHOP TRẢI NGHIỆM...</h3>
               <p className="price">Từ 290,000₫</p>
               <p className="date">18 Tháng 10, 2025</p>
             </div>
             <div className="event-card-small">
-              <img src="https://via.placeholder.com/280x160.png?text=Workshop+3" alt="Event 3" />
+              <img src={Banner3} alt="Event 3" />
               <h3>[GARDEN ART] ART WORKSHOP "FRUIT...</h3>
               <p className="price">Từ 400,000₫</p>
               <p className="date">18 Tháng 10, 2025</p>
             </div>
             <div className="event-card-small">
-              <img src="https://via.placeholder.com/280x160.png?text=Workshop+4" alt="Event 4" />
+              <img src={Banner4} alt="Event 4" />
               <h3>ART WORKSHOP "MON-PERU STYLE BASIL...</h3>
               <p className="price">Từ 420,000₫</p>
               <p className="date">18 Tháng 10, 2025</p>
             </div>
+            <div className="event-card-small">
+              <img src={Banner4} alt="Event 4" />
+              <h3>ART WORKSHOP "MON-PERU STYLE BASIL...</h3>
+              <p className="price">Từ 420,000₫</p>
+              <p className="date">18 Tháng 10, 2025</p>
+            </div>
+            <div className="event-card-small">
+              <img src={Banner4} alt="Event 4" />
+              <h3>ART WORKSHOP "MON-PERU STYLE BASIL...</h3>
+              <p className="price">Từ 420,000₫</p>
+              <p className="date">18 Tháng 10, 2025</p>
+            </div>
+            
           </div>
         </section>
 
@@ -142,22 +173,30 @@ const Home = () => {
          <section className="destination-section">
             <h2>Điểm đến phổ biến</h2>
             <div className="destination-list">
+              <a href ="/filter" rel ="noopener noreferrer">
                 <div className="destination-card">
-                    <img src="https://via.placeholder.com/280x180.png?text=HCM" alt="Ho Chi Minh City" />
+                    <img src={HoChiMinhcity} alt="Ho Chi Minh City" />
                     <div className="destination-name">Tp. Hồ Chí Minh</div>
                 </div>
+                </a>
+                <a href ="/filter" rel ="noopener noreferrer">
                  <div className="destination-card">
-                    <img src="https://via.placeholder.com/280x180.png?text=Hanoi" alt="Hanoi" />
+                    <img src={Hanoi} alt="Hanoi" />
                     <div className="destination-name">Hà Nội</div>
                 </div>
+                </a>
+                <a href ="/filter" rel ="noopener noreferrer">
                  <div className="destination-card">
-                    <img src="https://via.placeholder.com/280x180.png?text=Da+Lat" alt="Da Lat" />
+                    <img src={DaLat} alt="Da Lat" />
                     <div className="destination-name">Đà Lạt</div>
                 </div>
+                </a>
+                <a href ="/filter" rel ="noopener noreferrer">
                  <div className="destination-card">
-                    <img src="https://via.placeholder.com/280x180.png?text=Explore" alt="Explore" />
+                    <img src={Vitrikhac} alt="Explore" />
                     <div className="destination-name">Ví trí khác</div>
                 </div>
+                </a>
             </div>
         </section>
 

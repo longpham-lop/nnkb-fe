@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import eventPoster from '../../assets/banner1.png';
 import ticketGa from '../../assets/banner2.png';
 import ticketFanZone from '../../assets/banner3.png';
-import Vpbank from '../../assets/vpbank.png';
+import Vpbanks from '../../assets/vpbanks.png';
 import Banner1 from '../../assets/banner1.png';
 
 const TicketDetail = () => {
@@ -231,7 +231,7 @@ const TicketDetail = () => {
           <aside className="sidebar-ads">
             <div className="ad-card">
               <h4>VÉ RẺ BẤT NGỜ</h4>
-              <img src={Vpbank} alt="Ad" />
+              <img src={Vpbanks} alt="Ad" />
             </div>
           </aside>
         </div>
