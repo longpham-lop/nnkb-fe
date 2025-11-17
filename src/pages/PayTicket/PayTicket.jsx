@@ -1,22 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react'; // <-- Thêm useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './PayTicket.css'; 
-import Voucher from "../../components/Voucher/Voucher.jsx"; // <-- 1. IMPORT MODAL
+import Voucher from "../../components/Voucher/Voucher.jsx"; 
+import { ethers } from "ethers";
+import { generateNFTTicket } from "../../utils/NFTGenerator";
 
-// --- BẠN SẼ CẦN IMPORT CÁC LOGO NÀY ---
 import VnPay from "../../assets/vnpay.png";
 import ShopeePay from "../../assets/shoppe.png";
 import ZaloPay from "../../assets/zalopay.png";
 import Card from "../../assets/card.png";
 
-// Hàm format tiền tệ (cập nhật để xử lý số âm)
+// Format tiền tệ
 const formatCurrency = (amount) => {
-    if (amount < 0) {
-       return '-' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.abs(amount));
-    }
+  if (amount < 0) return '-' + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.abs(amount));
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
-
 
 function PageHeader() { /* ... */ }
 
@@ -39,46 +37,85 @@ function CountdownTimer() {
   );
 }
 
-// Component chính
 function PaymentPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const { summary, formData } = location.state || {};
   const [paymentMethod, setPaymentMethod] = useState('vnpay');
-  
-  // --- 2. THÊM STATE CHO MODAL VÀ VOUCHER ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appliedVoucher, setAppliedVoucher] = useState(null);
-  
-  // Tính toán lại tổng tiền
+  const [walletAddress, setWalletAddress] = useState(null);
+
   const { discountAmount, finalTotalPrice } = useMemo(() => {
     const basePrice = summary?.totalPrice || 0;
     const discount = appliedVoucher?.discount || 0;
-    
-    return {
-      discountAmount: discount,
-      finalTotalPrice: basePrice - discount,
-    };
+    return { discountAmount: discount, finalTotalPrice: basePrice - discount };
   }, [summary, appliedVoucher]);
-  // --- KẾT THÚC THÊM STATE ---
 
   useEffect(() => {
-    if (!summary || !formData) {
-      navigate('/');
-    }
+    if (!summary || !formData) navigate('/');
   }, [summary, formData, navigate]);
 
-  // Cập nhật hàm thanh toán để gửi đi giá cuối cùng
-  const handlePayment = () => {
+  // Kết nối MetaMask
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      alert("Vui lòng cài MetaMask!");
+      return;
+    }
+    try {
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      setWalletAddress(accounts[0]);
+      alert(`Đã kết nối ví ${accounts[0]}`);
+    } catch (err) {
+      console.error(err);
+      alert("Bạn đã hủy kết nối ví!");
+    }
+  };
+
+  // Thanh toán
+  const handlePayment = async () => {
+    if (paymentMethod === "metamask") {
+      if (!walletAddress) {
+        alert("Vui lòng kết nối MetaMask trước khi thanh toán!");
+        return;
+      }
+      try {
+        // ĐOẠN CODE ĐÃ SỬA (CÚ PHÁP V5)
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+
+        const tx = await signer.sendTransaction({
+          to: "0xd74f3c71a7997e51afc2b5ee21e2700b0f3e93a2",
+          value: ethers.utils.parseEther("0.0001"),
+        });
+
+        alert("Đang xử lý giao dịch blockchain...");
+        await tx.wait();
+
+        const nft = await generateNFTTicket({
+          eventName: summary.eventDetails.title,
+          buyer: formData.email,
+          quantity: summary.ticketsInCart.reduce((a, b) => a + b.quantity, 0),
+          txHash: tx.hash,
+        });
+
+        const oldTickets = JSON.parse(localStorage.getItem("nftTickets") || "[]");
+        localStorage.setItem("nftTickets", JSON.stringify([...oldTickets, nft]));
+
+        alert("Thanh toán + Mint vé NFT thành công!");
+        navigate("/mytickets");
+      } catch (err) {
+        console.error(err);
+        alert("Giao dịch thất bại hoặc bạn đã hủy!");
+      }
+      return;
+    }
+
     if (paymentMethod === 'vnpay' || paymentMethod === 'zalopay' || paymentMethod === 'shopeepay') {
       navigate('/pay', { 
         state: { 
-          summary: {
-            ...summary,
-            totalPrice: finalTotalPrice, // Gửi giá đã giảm
-            discount: discountAmount,
-          }, 
+          summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount }, 
           formData, 
           paymentMethod 
         } 
@@ -88,20 +125,15 @@ function PaymentPage() {
     }
   };
 
-  if (!summary || !formData) {
-    return null; 
-  }
+  if (!summary || !formData) return null;
 
   const { eventDetails, ticketsInCart } = summary;
   const originalTotalPrice = summary.totalPrice;
 
   return (
-    
     <div className="payment-page">
       <PageHeader />
-      <button className="back-btn" onClick={() => navigate(-1)}>
-              ← Trở về
-      </button>
+      <button className="back-btn" onClick={() => navigate(-1)}>← Trở về</button>
       <section className="event-banner">
         <div className="event-banner-info">
           <h3>{eventDetails.title}</h3>
@@ -114,23 +146,16 @@ function PaymentPage() {
       <div className="payment-page-container">
         <main className="main-payment-content">
           <h3>THANH TOÁN</h3>
-          
           <div className="info-section">
             <h4>Thông tin nhận vé</h4>
-            <p>
-              Vé điện tử sẽ được gửi đến địa chỉ email: <strong>{formData.email}</strong> của tài khoản
-            </p>
+            <p>Vé điện tử sẽ được gửi đến email: <strong>{formData.email}</strong></p>
           </div>
 
-          {/* --- 3. CẬP NHẬT PHẦN KHUYẾN MÃI --- */}
           <div className="info-section">
             <div className="section-header">
               <h4>Mã khuyến mãi</h4>
-              <button className="voucher-btn" onClick={() => setIsModalOpen(true)}>
-                Chọn voucher
-              </button>
+              <button className="voucher-btn" onClick={() => setIsModalOpen(true)}>Chọn voucher</button>
             </div>
-            
             {appliedVoucher ? (
               <div className="applied-voucher">
                 <span className="voucher-name">{appliedVoucher.name}</span>
@@ -138,134 +163,78 @@ function PaymentPage() {
                 <button className="remove-voucher-btn" onClick={() => setAppliedVoucher(null)}>×</button>
               </div>
             ) : (
-              <p className="voucher-text" onClick={() => setIsModalOpen(true)}>
-                + Thêm khuyến mãi
-              </p>
+              <p className="voucher-text" onClick={() => setIsModalOpen(true)}>+ Thêm khuyến mãi</p>
             )}
           </div>
-          {/* --- KẾT THÚC CẬP NHẬT --- */}
 
           <div className="info-section">
             <h4>Phương thức thanh toán</h4>
             <div className="payment-options">
-              {/* ... (Các lựa chọn thanh toán giữ nguyên) ... */}
+              {/* Các phương thức */}
               <label className="payment-option">
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="vnpay"
-                  checked={paymentMethod === 'vnpay'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
+                <input type="radio" name="payment" value="vnpay" checked={paymentMethod==='vnpay'} onChange={e=>setPaymentMethod(e.target.value)} />
                 <span>VNPAY/Ứng dụng ngân hàng</span>
-                <div className="logos">
-                  <img src={VnPay} alt="VNPAY" />
-                </div>
+                <div className="logos"><img src={VnPay} alt="VNPAY" /></div>
               </label>
               <label className="payment-option">
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="shopeepay"
-                  checked={paymentMethod === 'shopeepay'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
+                <input type="radio" name="payment" value="shopeepay" checked={paymentMethod==='shopeepay'} onChange={e=>setPaymentMethod(e.target.value)} />
                 <span>ShopeePay</span>
-                <div className="logos">
-                  <img src={ShopeePay} alt="ShopeePay" />
-                </div>
+                <div className="logos"><img src={ShopeePay} alt="ShopeePay" /></div>
               </label>
               <label className="payment-option">
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="zalopay"
-                  checked={paymentMethod === 'zalopay'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
+                <input type="radio" name="payment" value="zalopay" checked={paymentMethod==='zalopay'} onChange={e=>setPaymentMethod(e.target.value)} />
                 <span>ZaloPay</span>
-                <div className="logos">
-                  <img src={ZaloPay} alt="ZaloPay" />
-                </div>
+                <div className="logos"><img src={ZaloPay} alt="ZaloPay" /></div>
               </label>
               <label className="payment-option">
-                <input 
-                  type="radio" 
-                  name="payment" 
-                  value="card"
-                  checked={paymentMethod === 'card'}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
+                <input type="radio" name="payment" value="card" checked={paymentMethod==='card'} onChange={e=>setPaymentMethod(e.target.value)} />
                 <span>Thẻ ghi nợ/Thẻ tín dụng</span>
+                <div className="logos"><img src={Card} alt="Card" /></div>
+              </label>
+              <label className="payment-option">
+                <input type="radio" name="payment" value="metamask" checked={paymentMethod==='metamask'} onChange={e=>setPaymentMethod(e.target.value)} />
+                <span>MetaMask (Blockchain)</span>
                 <div className="logos">
-                  <img src={Card} alt="Card" />
+                  <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="MetaMask" style={{ width: "45px", marginRight: "10px" }} />
+                  {!walletAddress && <button className="connect-wallet-btn" onClick={connectWallet}>Kết nối ví</button>}
+                  {walletAddress && <span>Đã kết nối: {walletAddress.slice(0,6)}...{walletAddress.slice(-4)}</span>}
                 </div>
               </label>
             </div>
           </div>
         </main>
 
-        {/* --- 4. CẬP NHẬT SIDEBAR TÓM TẮT --- */}
         <aside className="payment-sidebar">
           <div className="payment-summary-card">
             <div className="summary-header">
               <span>Thông tin đặt vé</span>
               <span className="change-ticket" onClick={() => navigate('/select-ticket')}>Chọn lại vé</span>
             </div>
-
             <div className="summary-section tickets">
-              <div className="ticket-header">
-                <span>Loại vé</span>
-                <span>Số lượng</span>
-              </div>
+              <div className="ticket-header"><span>Loại vé</span><span>Số lượng</span></div>
               {ticketsInCart.map(ticket => (
                 <div className="ticket-item-row" key={ticket.id}>
                   <span>{ticket.name}</span>
-                  <span>{String(ticket.quantity).padStart(2, '0')}</span>
+                  <span>{String(ticket.quantity).padStart(2,'0')}</span>
                 </div>
               ))}
             </div>
-
             <div className="summary-section order">
               <h4>Thông tin đơn hàng</h4>
-              <div className="order-row">
-                <span>Tạm tính</span>
-                <span>{formatCurrency(originalTotalPrice)}</span>
-              </div>
-              
-              {/* Hiển thị giảm giá nếu có */}
-              {discountAmount > 0 && (
-                <div className="order-row discount">
-                  <span>Khuyến mãi</span>
-                  <span className="discount-amount">{formatCurrency(-discountAmount)}</span>
-                </div>
-              )}
-
-              <div className="order-row total">
-                <span>Tổng tiền</span>
-                <span>{formatCurrency(finalTotalPrice)}</span>
-              </div>
+              <div className="order-row"><span>Tạm tính</span><span>{formatCurrency(originalTotalPrice)}</span></div>
+              {discountAmount>0 && <div className="order-row discount"><span>Khuyến mãi</span><span className="discount-amount">{formatCurrency(-discountAmount)}</span></div>}
+              <div className="order-row total"><span>Tổng tiền</span><span>{formatCurrency(finalTotalPrice)}</span></div>
             </div>
-            
-            <p className="legal-text">
-              Bằng việc tiếp tục thanh toán, bạn đã đọc và đồng ý với các <a href="#">Điều khoản Dịch vụ</a>
-            </p>
-
-            <button className="pay-btn" onClick={handlePayment}>
-              Thanh toán
-            </button>
+            <p className="legal-text">Bằng việc tiếp tục thanh toán, bạn đã đọc và đồng ý với các <a href="#">Điều khoản Dịch vụ</a></p>
+            <button className="pay-btn" onClick={handlePayment}>Thanh toán</button>
           </div>
         </aside>
       </div>
 
-      {/* --- 5. RENDER MODAL (NẾU MỞ) --- */}
       {isModalOpen && (
         <Voucher 
-          onClose={() => setIsModalOpen(false)}
-          onApply={(voucher) => {
-            setAppliedVoucher(voucher);
-            setIsModalOpen(false);
-          }}
+          onClose={()=>setIsModalOpen(false)}
+          onApply={(voucher)=>{setAppliedVoucher(voucher); setIsModalOpen(false)}}
           currentOrderTotal={originalTotalPrice}
         />
       )}

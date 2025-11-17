@@ -12,6 +12,7 @@ import OrderTicket from "./pages/OrderTicket/OrderTicket";
 import Order from "./pages/Order/Order";
 import PayTicket from "./pages/PayTicket/PayTicket";
 import Pay from "./pages/Pay/Pay";
+import MyTickets from "./pages/MyTickets/MyTickets";
 import TermsPage from "./components/TermsPage/TermsPage";
 import Admin from './pages/Admin/Admin';
 import GoogleCallback from "./hook/GoogleCallback";
@@ -193,7 +194,19 @@ function AnimatedRoutes() {
             </Motion.div>
           }
         />
-       
+        <Route
+          path="/mytickets"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}  
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <MyTickets />
+            </Motion.div>
+          }
+        />
           <Route
           path="/admin"
           element={
@@ -300,7 +313,7 @@ function Layout() {
                 Admin
               </button>
             )}
-              <button className="btn-myticket" onClick={() => navigate("/tickets")}>
+              <button className="btn-myticket" onClick={() => navigate("/mytickets")}>
                 Vé của tôi
               </button>
               <button className="btn-account" onClick={() => navigate("/account")}>
