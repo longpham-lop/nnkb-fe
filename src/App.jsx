@@ -263,9 +263,11 @@ function Layout() {
   };
 
   // Ẩn Header/Footer ở trang login và register
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   const hideHeaderFooter =
-    location.pathname === "/" || location.pathname === "/register";
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    location.pathname === "/" || location.pathname === "/register"|| location.pathname === "/admin"|| location.pathname === "/admin/events"|| location.pathname === "/admin";
+  const currentUser = user.role;
 
   return (
     <>
@@ -308,8 +310,8 @@ function Layout() {
 
             {/* Các nút bên phải */}
             <div className="header-nav">
-               {currentUser?.role === "admin" && (
-              <button className="btn-myticket" onClick={() => navigate("/admin")}>
+               {currentUser === "admin" && (
+              <button className="btn-myticket" onClick={() => window.open("/admin", "_blank")}>
                 Admin
               </button>
             )}
