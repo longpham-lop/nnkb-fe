@@ -112,7 +112,7 @@ function PaymentPage() {
     }
     if (!window.ethereum.isMetaMask) {
       // vẫn có thể connect những provider khác nhưng thông báo MetaMask nếu muốn
-      console.warn("Không tìm thấy MetaMask - sử dụng provider khác.");
+      console.warn("Không tìm thấy MetaMask - sử dụng provider khác."); 
     }
 
     try {
@@ -126,6 +126,7 @@ function PaymentPage() {
       alert("Bạn đã hủy kết nối hoặc có lỗi xảy ra.");
     }
   };
+
 
   /* --- Hàm xử lý thanh toán (MetaMask) --- */
   const handlePayment = async () => {
