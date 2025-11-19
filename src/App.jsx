@@ -26,6 +26,7 @@ import Orders from './pages/Admin/order';
 import OrderItems from './pages/Admin/order_item';
 import Setting from './pages/Admin/Setting';
 import { searchEvents } from "./api/event";
+import MintAndTransferTicket from './pages/PayTicket/Blockchain';
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -209,6 +210,19 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <MyTickets />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/block-lo"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}  
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <MintAndTransferTicket />
             </Motion.div>
           }
         />

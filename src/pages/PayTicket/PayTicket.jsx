@@ -106,25 +106,7 @@ function PaymentPage() {
 
   /* --- Kết nối MetaMask --- */
   const connectWallet = async () => {
-    if (!window.ethereum) {
-      alert("Vui lòng cài MetaMask!");
-      return;
-    }
-    if (!window.ethereum.isMetaMask) {
-      // vẫn có thể connect những provider khác nhưng thông báo MetaMask nếu muốn
-      console.warn("Không tìm thấy MetaMask - sử dụng provider khác."); 
-    }
-
-    try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      if (accounts && accounts.length > 0) {
-        setWalletAddress(accounts[0]);
-        alert(`Đã kết nối ví: ${accounts[0]}`);
-      }
-    } catch (err) {
-      console.error("connectWallet error:", err);
-      alert("Bạn đã hủy kết nối hoặc có lỗi xảy ra.");
-    }
+    navigate('/block-lo')
   };
 
 
