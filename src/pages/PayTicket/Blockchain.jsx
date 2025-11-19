@@ -19,7 +19,7 @@ export default function MintAndTransferTicket() {
   const [signer, setSigner] = useState(null);
   const [account, setAccount] = useState("");
   const [chainId, setChainId] = useState(null);
-
+  console.log("Chain ID:", chainId);
   // Form / page data (some read from URL params)
   const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const initialEventId = params?.get("eventId") || "1";
@@ -103,7 +103,7 @@ export default function MintAndTransferTicket() {
             break;
           }
         } catch (e) {
-          // not our event
+          console.log("Error",e)
         }
       }
 
