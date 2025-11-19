@@ -31,6 +31,36 @@ const Admin = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/admin/location">
+              {/* <FaUsers /> */}
+              <span>Quản lý địa điểm</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/category">
+              {/* <FaUsers /> */}
+              <span>Quản lý thể loại</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/ticket">
+              {/* <FaUsers /> */}
+              <span>Quản lý vé</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/order">
+              {/* <FaUsers /> */}
+              <span>Quản lý đơn hàng</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/orderitem">
+              {/* <FaUsers /> */}
+              <span>Quản lý chi tiết đơn hàng</span>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/admin/users">
               {/* <FaUsers /> */}
               <span>Quản lý Người dùng (Users)</span>

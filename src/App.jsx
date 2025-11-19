@@ -19,6 +19,11 @@ import GoogleCallback from "./hook/GoogleCallback";
 import Dashboard from './pages/Admin/Dashboard';
 import Events from './pages/Admin/Events';
 import Users from './pages/Admin/Users';
+import Location from './pages/Admin/location'
+import Categories from './pages/Admin/category';
+import Tickets from './pages/Admin/ticket';
+import Orders from './pages/Admin/order';
+import OrderItems from './pages/Admin/order_item';
 import Setting from './pages/Admin/Setting';
 import { searchEvents } from "./api/event";
 
@@ -224,6 +229,13 @@ function AnimatedRoutes() {
           <Route path="events" element={<Events />} />
           <Route path="users" element={<Users />} />
           <Route path="setting" element={<Setting />} />
+          <Route path="location" element={<Location />} />
+          <Route path="category" element={<Categories />} />
+          <Route path="ticket" element={<Tickets />} />
+          <Route path="order" element={<Orders />} />
+          <Route path="orderitem" element={<OrderItems />} />
+          <Route path="order" element={<Orders />} />
+          <Route path="order" element={<Orders />} />
         </Route>
         </Routes>
     </AnimatePresence>
@@ -266,7 +278,7 @@ function Layout() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const hideHeaderFooter =
-    location.pathname === "/" || location.pathname === "/register"|| location.pathname === "/admin"|| location.pathname === "/admin/events"|| location.pathname === "/admin";
+    location.pathname === "/" || location.pathname === "/register"|| location.pathname === "/admin"|| location.pathname === "/admin/events"|| location.pathname === "/admin/users";
   const currentUser = user.role;
 
   return (
