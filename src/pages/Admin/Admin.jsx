@@ -48,6 +48,16 @@ const Admin = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/admin/transaction">
+              <span>Quản lý giao dịch</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/admin/payment">
+              <span>Quản lý thanh toán</span>
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/admin/users">
               <span>Quản lý Người dùng (Users)</span>
             </NavLink>
