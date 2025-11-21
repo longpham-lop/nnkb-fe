@@ -248,6 +248,47 @@ function PaymentPage() {
                 + Thêm khuyến mãi
               </p>
             )}
+          <label className="payment-option">
+              <input
+                type="radio"
+                name="payment"
+                value="metamask"
+                checked={paymentMethod === "metamask"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <span>MetaMask (Blockchain)</span>
+              <div className="logos">
+                <img
+                  src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
+                  alt="MetaMask"
+                  style={{ width: "45px", marginRight: "10px" }}
+                />
+                {!walletAddress && (
+                  <button className="connect-wallet-btn" onClick={connectWallet}>
+                    Kết nối ví
+                  </button>
+                )}
+                {walletAddress && (
+                  <span>
+                    Đã kết nối: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                  </span>
+                )}
+              </div>
+
+              {/* Phần hiển thị thêm khi chọn MetaMask */}
+              {paymentMethod === "metamask" && walletAddress && (
+                <div className="ticket-options" style={{ marginTop: "10px" }}>
+                  <label>
+                    <input type="radio" name="ticket" value="basic" />
+                    Vé cơ bản
+                  </label>
+                  <label style={{ marginLeft: "20px" }}>
+                    <input type="radio" name="ticket" value="blockchain" />
+                    Vé Blockchain
+                  </label>
+                </div>
+              )}
+            </label>
           </div>
 
           <div className="info-section">
@@ -308,34 +349,8 @@ function PaymentPage() {
                   <img src={Card} alt="Card" />
                 </div>
               </label>
-
-              <label className="payment-option">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="metamask"
-                  checked={paymentMethod === "metamask"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span>MetaMask (Blockchain)</span>
-                <div className="logos">
-                  <img
-                    src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
-                    alt="MetaMask"
-                    style={{ width: "45px", marginRight: "10px" }}
-                  />
-                  {!walletAddress && (
-                    <button className="connect-wallet-btn" onClick={connectWallet}>
-                      Kết nối ví
-                    </button>
-                  )}
-                  {walletAddress && (
-                    <span>
-                      Đã kết nối: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                    </span>
-                  )}
-                </div>
-              </label>
+            
+              
             </div>
           </div>
         </main>

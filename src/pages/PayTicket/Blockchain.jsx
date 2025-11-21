@@ -144,7 +144,9 @@ export default function MintAndTransferTicket() {
             foundTokenId = parsed.args[2].toString();
             break;
           }
-        } catch (e) {}
+        } catch (e) {
+          // Không phải log của chúng ta, bỏ qua
+        }
       }
 
       if (foundTokenId) {

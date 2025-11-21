@@ -108,11 +108,11 @@
 }
 
 /* Payment Options */
-.payment-options {
+/* .payment-options {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
+} */
 .payment-option {
   display: flex;
   align-items: center;
@@ -121,6 +121,9 @@
   padding: 15px;
   border-radius: 8px;
   cursor: pointer;
+}
+.payment-option:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 .payment-option:has(input:checked) {
   border-color: #2b9c6a;
