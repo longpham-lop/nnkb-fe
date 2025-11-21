@@ -24,7 +24,9 @@ import Categories from './pages/Admin/category';
 import Tickets from './pages/Admin/ticket';
 import Orders from './pages/Admin/order';
 import OrderItems from './pages/Admin/order_item';
+import Transactions from './pages/Admin/transaction';
 import Setting from './pages/Admin/Setting';
+import Payments from './pages/Admin/payment';
 import { searchEvents } from "./api/event";
 import MintAndTransferTicket from './pages/PayTicket/Blockchain';
 
@@ -248,8 +250,8 @@ function AnimatedRoutes() {
           <Route path="ticket" element={<Tickets />} />
           <Route path="order" element={<Orders />} />
           <Route path="orderitem" element={<OrderItems />} />
-          <Route path="order" element={<Orders />} />
-          <Route path="order" element={<Orders />} />
+          <Route path="transaction" element={<Transactions />} />
+          <Route path="payment" element={<Payments />} />
         </Route>
         </Routes>
     </AnimatePresence>
