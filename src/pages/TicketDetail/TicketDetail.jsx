@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import './TicketDetail.css';
-import { Link, useNavigate } from 'react-router-dom';
-// Import ảnh (thay thế bằng ảnh thật của bạn)
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+
 import eventPoster from '../../assets/banner1.png';
 import ticketGa from '../../assets/banner2.png';
 import ticketFanZone from '../../assets/banner3.png';
@@ -13,63 +13,77 @@ import { getAllCategories } from '../../api/category';
 import { getAllLocations } from '../../api/location';
 import { getAllTickets } from '../../api/ticket';
 
+
 const TicketDetail = () => {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [isTicketSectionExpanded, setIsTicketSectionExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTicketSectionExpanded, setIsTicketSectionExpanded] = useState(true);
 
-    //************************************************************ */
-
-
-    const [openDropdown, setOpenDropdown] = useState(null);
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
   const [tickets, setTickets] = useState([]);
+
   const [loading, setLoading] = useState(true);
 
-  const [selectedDates, setSelectedDates] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(null);
+  const eventId = localStorage.getItem("eventid"); 
 
-  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  // ========== FETCH API ==========
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const [eventRes, categoryRes, locationRes, ticketRes] = await Promise.all([
-            getAllEvents(),
-            getAllCategories(),
-            getAllLocations(),
-            getAllTickets()
-            ]);
-            setEvents(eventRes.data);
-            setCategories(categoryRes.data);
-            setLocations(locationRes.data);
-            setTickets(ticketRes.data);
-        } catch (error) {
-            console.error("Lỗi load dữ liệu:", error);
-        } finally {
-            setLoading(false);
-        }
-        };
-    fetchData();
-  }, []);
-    
-    // --- BẮT ĐẦU PHẦN THÊM MỚI ---
-    const navigate = useNavigate(); 
+      try {
+        const [eventRes, categoryRes, locationRes, ticketRes] = await Promise.all([
+          getAllEvents(),
+          getAllCategories(),
+          getAllLocations(),
+          getAllTickets()
+        ]);
 
-    const handleBuyTicket = () => {
+        const allEvents = eventRes.data;
+        const allCategories = categoryRes.data;
+        const allLocations = locationRes.data;
+        const allTickets = ticketRes.data;
+
+        // ✅ lọc vé đúng theo event đang xem
+        const filteredTickets = allTickets.filter(
+          (t) => String(t.event_id) === String(eventId)
+        );
+        if (filteredTickets) {
+        localStorage.setItem("availableTickets", JSON.stringify(filteredTickets));
+        }
+
+        setEvents(allEvents);
+        setCategories(allCategories);
+        setLocations(allLocations);
+        setTickets(filteredTickets);
+      } catch (error) {
+        console.error("Lỗi load dữ liệu:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [eventId]);
+  //---
+  const currentEvent = events.find(
+    (e) => String(e.id) === String(eventId),
+    
+  );
+  if (currentEvent) {
+  localStorage.setItem("eventDetails", JSON.stringify(currentEvent));
+  }
+
+  const currentLocation = locations.find(
+    (l) => l.id === currentEvent?.location_id
+  );
+  //---
+    
+
+  const handleBuyTicket = () => {
         
         navigate('/OrderTicket');
     };
-    // Dữ liệu vé giả để render
-    // const tickets = [
-    //     { id: 1, type: 'GA', name: 'Gói Dậy Sớm + GA 1', desc: 'Full Day Access + GA 1', price: '499.000₫', image: ticketGa },
-    //     { id: 2, type: 'GA', name: 'Gói Dậy Sớm + GA 2', desc: 'Full Day Access + GA 2', price: '699.000₫', image: ticketGa },
-    //     { id: 3, type: 'FanZone', name: 'Gói Dậy Sớm + FanZone 1', desc: 'Full Day Access + FanZone 1', price: '799.000₫', image: ticketFanZone },
-    //     { id: 4, type: 'GA', name: 'Gói Dậy Sớm + GA 2', desc: 'Full Day Access + GA 2', price: '699.000₫', image: ticketGa },
-    //     { id: 5, type: 'FanZone', name: 'Gói Dậy Sớm + FanZone 2', desc: 'Full Day Access + FanZone 2', price: '999.000₫', image: ticketFanZone }
-    // ];
 
    return (
     <div className="ticket-page">
@@ -80,13 +94,12 @@ const TicketDetail = () => {
 
             <div className="event-main-header">
               <div className="event-info">
-                <h1>GS25 MUSIC FESTIVAL 2025</h1>
+                <h1>{currentEvent?.name || 'Đang tải...'}</h1>
                 <p className="event-time">
-                  🕒 15:00 - 22:00 | 23 Tháng 11, 2025
+                  🕒 {currentEvent?.start_date} - {currentEvent?.end_date}
                 </p>
                 <p className="event-location">
-                  📍 Đường Nguyễn Thiện Thành, Phường Thủ Thiêm, Quận 2, Thành
-                  phố Hồ Chí Minh
+                  📍 {currentLocation?.address}, {currentLocation?.city}
                 </p>
                 <button className="price-box" onClick={handleBuyTicket}>
                   <span>Giá từ 499.000 ₫</span>
@@ -97,7 +110,7 @@ const TicketDetail = () => {
               <div className="event-main-divider" />
 
               <div className="event-poster">
-                <img src={eventPoster} alt="Event Poster" />
+                <img src={currentEvent?.cover_image}alt="Event Poster" />
               </div>
             </div>
           </main>
@@ -113,7 +126,7 @@ const TicketDetail = () => {
               <section className="event-description">
                 <h3>Giới thiệu</h3>
                 <img
-                  src={Banner1}
+                  src={currentEvent?.cover_image}
                   alt="Event description banner"
                   className="description-banner"
                 />
@@ -125,24 +138,7 @@ const TicketDetail = () => {
                 >
                   <div className="description-text">
                     <p>
-                      GS25 MUSIC FESTIVAL 2025 là một sự kiện âm nhạc đỉnh cao,
-                      quy tụ dàn nghệ sĩ hàng đầu trong nước và quốc tế. Với sân
-                      khấu hoành tráng, âm thanh ánh sáng hiện đại, sự kiện hứa
-                      hẹn mang đến những giây phút bùng nổ và trải nghiệm âm
-                      nhạc không thể nào quên.
-                    </p>
-                    <p>
-                      Đến với GS25 MUSIC FESTIVAL, bạn không chỉ được thưởng
-                      thức âm nhạc mà còn được tham gia vào các hoạt động bên
-                      lề hấp dẫn, các gian hàng ẩm thực đa dạng và cơ hội giao
-                      lưu cùng thần tượng. Đây là sự kiện không thể bỏ lỡ trong
-                      năm 2025!
-                    </p>
-                    <p>
-                      Sự kiện được tổ chức tại một trong những địa điểm đẹp
-                      nhất thành phố, đảm bảo không gian rộng rãi và an toàn cho
-                      hàng chục ngàn khán giả. Hãy chuẩn bị sẵn sàng để "cháy"
-                      hết mình cùng chúng tôi!
+                      {currentEvent?.description}
                     </p>
                   </div>
                 </div>
@@ -203,15 +199,20 @@ const TicketDetail = () => {
                   {tickets.map((ticket) => (
                     <div key={ticket.id} className="ticket-item">
                       <img
-                        src={ticket.image}
-                        alt={`${ticket.type} ticket`}
+                        src={ticket.seat_type === 'VIP' ? ticketFanZone : ticketGa}
+                        alt="ticket"
                         className="ticket-type-img"
                       />
+
                       <div className="ticket-details">
                         <h4>{ticket.name}</h4>
-                        <p>{ticket.desc}</p>
+                        <p>Loại ghế: {ticket.seat_type}</p>
+                        <p>Số lượng còn: {ticket.quantity - ticket.sold}</p>
                       </div>
-                      <div className="ticket-price">{ticket.price}</div>
+
+                      <div className="ticket-price">
+                        {Number(ticket.price).toLocaleString('vi-VN')} ₫
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -225,7 +226,7 @@ const TicketDetail = () => {
                   <div className="organizer-logo-wrapper">
                     {/* nếu có logo riêng thì thay src */}
                     <img
-                      src={eventPoster}
+                      src={currentEvent?.cover_image}
                       alt="Ban tổ chức"
                       className="organizer-logo"
                     />
@@ -241,7 +242,7 @@ const TicketDetail = () => {
                       vé dễ dàng, an toàn và tiện lợi.
                     </p>
                     <p>
-                      Với sự kiện GS25 MUSIC FESTIVAL, chúng tôi tự hào là đối
+                      Với sự kiện {currentEvent?.name || 'Đang tải...'}, chúng tôi tự hào là đối
                       tác đồng hành, góp phần tạo nên một lễ hội âm nhạc thành
                       công và đáng nhớ.
                     </p>
@@ -253,11 +254,10 @@ const TicketDetail = () => {
               <div className="recommendations">
                 <h3>Có thể bạn quan tâm</h3>
                 <div className="recommendation-grid">
-                  {tickets.map((event) => (
+                  {events.slice(0, 4).map((event) => (
                     <div key={event.id} className="reco-card">
-                      <img src={event.image} alt={event.name} />
+                      <img src={event.cover_image || eventPoster} alt={event.name} />
                       <h4>{event.name}</h4>
-                      <p className="reco-price">{event.price}</p>
                     </div>
                   ))}
                 </div>

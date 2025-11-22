@@ -13,6 +13,18 @@ const formatCurrency = (amount) => {
 
 function PageHeader() {}
 
+const eventDetails = JSON.parse(localStorage.getItem("eventDetails") || "{}");
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+};
+
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState(15 * 60);
 
@@ -77,7 +89,7 @@ function OrderFormPage() {
       const idd =JSON.parse(localStorage.getItem("user")) ;
       const orderPayload = {
         user_id: idd.id, 
-        event_id: 13, 
+        event_id: eventDetails.id, 
         total_amount: totalPrice,
         status: "pending",
         payment_id: null,
@@ -106,7 +118,7 @@ function OrderFormPage() {
 
   if (!summary) return null;
 
-  const { eventDetails, ticketsInCart, totalPrice } = summary;
+  const {  eventDetails,ticketsInCart, totalPrice } = summary;
 
   
 
@@ -120,9 +132,9 @@ function OrderFormPage() {
       {/* Banner thông tin sự kiện */}
       <section className="event-banner">
         <div className="event-banner-info">
-          <h3>{eventDetails.title}</h3>
-          <p>🕒 {eventDetails.date}</p>
-          <p>📍 {eventDetails.location}</p>
+          <h3>{eventDetails.name}</h3>
+          <p>🕒 {formatDate(eventDetails.start_date)} → {formatDate(eventDetails.end_date)}</p>
+          <p>📍 {eventDetails.location_id}</p>
         </div>
         <CountdownTimer />
       </section>
