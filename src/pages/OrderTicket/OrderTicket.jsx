@@ -1,24 +1,24 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OrderTicket.css';
+import eventCover from '../../assets/banner2.png'
 
-// Dữ liệu mock
-const availableTickets = [
-  {
-    id: 't1',
-    name: "Say & 'Quẩy' (Standing)",
-    price: 840000,
-    benefits: 'Benefits: Album, Fansign, Photo 1:1, Keychain, Hi-touch, Áo, Nón, Khăn Bandana, Nước Suối.',
-  },
-  //thêm các loại vé khác 
-];
 
-// Dữ liệu mock 
-const eventDetails = {
-  title: 'Phạm Quỳnh Anh Fan Meeting',
-  date: '14:00, 2 tháng 11, 2025',
-  location: 'Cici Saigon',
+const availableTickets = JSON.parse(localStorage.getItem("availableTickets") || "[]")
+
+const eventDetails = JSON.parse(localStorage.getItem("eventDetails") || "{}");
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
 };
+
 
 // Hàm format tiền tệ
 const formatCurrency = (amount) => {
@@ -100,9 +100,10 @@ function OrderTicketPage() {
         price += ticket.price * quantity;
       }
     }
+    
     return { totalItems: items, totalPrice: price };
   }, [selectedTickets]);
-
+    
     const handleContinue = () => {
     // Lọc ra các vé đã được chọn
     const ticketsInCart = availableTickets
@@ -123,7 +124,10 @@ function OrderTicketPage() {
 
     navigate('/order', { state: { summary: orderSummary } });
 };
-
+  if (!eventDetails) {
+    navigate("/events");
+    return null;
+  }
   return (
     <div className="order-page">
       <PageHeader />
@@ -136,36 +140,63 @@ function OrderTicketPage() {
             </button>
             <h2 className="main-title">Chọn vé</h2>
           </div>
-
+          
           <div className="ticket-list">
-            <div className="list-header">
-              <span>Loại vé</span>
-              <span>Số lượng</span>
-            </div>
-            {availableTickets.map((ticket) => (
-              <TicketItem
-                key={ticket.id}
-                ticket={ticket}
-                quantity={selectedTickets[ticket.id] || 0}
-                onQuantityChange={handleQuantityChange}
-              />
-            ))}
+            {availableTickets.length === 0 ? (
+              <p>Không có vé nào để hiển thị.</p>
+            ) : (
+              <>
+                <div className="list-header">
+                  <span>Loại vé</span>
+                  <span>Số lượng</span>
+                </div>
+                {availableTickets.map((ticket) => (
+                  <TicketItem
+                    key={ticket.id}
+                    ticket={ticket}
+                    quantity={selectedTickets[ticket.id] || 0}
+                    onQuantityChange={handleQuantityChange}
+                  />
+                ))}
+              </>
+            )}
           </div>
         </main>
 
         {/* Cột Sidebar (Bên phải) */}
         <aside className="sidebar">
           <div className="summary-card">
-            <h3 className="event-title">{eventDetails.title}</h3>
-            <div className="event-detail">
-              <span>🗓️</span> {eventDetails.date}
-            </div>
-            <div className="event-detail">
-              <span>📍</span> {eventDetails.location}
-            </div>
+
+            {/* Tên sự kiện */}
+            <h3 className="event-title">{eventDetails?.name || "Sự kiện không tồn tại"}</h3>
+
+            {/* Thời gian */}
+            {eventDetails?.start_date && eventDetails?.end_date && (
+              <div className="event-detail">
+                <span>🗓️</span>
+                {formatDate(eventDetails.start_date)} → {formatDate(eventDetails.end_date)}
+              </div>
+            )}
+
+            {/* Địa điểm */}
+            {eventDetails?.location_id && (
+              <div className="event-detail">
+                <span>📍</span> Địa điểm ID: {eventDetails.location_id}
+              </div>
+            )}
+
+            {/* Ảnh bìa */}
+            {eventDetails?.cover_image && (
+              <img
+                src={eventDetails.cover_image}
+                alt="Event Cover"
+                className="event-cover"
+              />
+            )}
 
             <hr className="divider" />
 
+            {/* Giá vé */}
             <div className="price-summary">
               <h4>Giá vé</h4>
               {totalItems === 0 ? (
@@ -187,17 +218,25 @@ function OrderTicketPage() {
             </div>
 
             <hr className="divider" />
-            
+
+            {/* Tổng cộng */}
             <div className="summary-total">
               <span>Tổng cộng</span>
               <span>{formatCurrency(totalPrice)}</span>
             </div>
           </div>
 
-          <button className="continue-btn" disabled={totalItems === 0} onClick={handleContinue}>
+          {/* Nút tiếp tục */}
+          <button
+            className="continue-btn"
+            disabled={totalItems === 0}
+            onClick={handleContinue}
+          >
             {totalItems === 0 ? 'Vui lòng chọn vé >>' : 'Tiếp tục >>'}
           </button>
         </aside>
+
+
       </div>
     </div>
   );

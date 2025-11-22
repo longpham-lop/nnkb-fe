@@ -7,7 +7,13 @@
   align-items: center;
   color: white;
 }
-.logo { font-size: 24px; font-weight: bold; }
+.logo {
+   font-size: 24px; 
+     display: flex;
+    align-items: center;
+    margin-top: 8px;
+   font-weight: bold; 
+}
 .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 14px; }
 
 .event-banner {
@@ -138,6 +144,8 @@
   flex-grow: 1;
   color: white;
   font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 .payment-option .logos {
   display: flex;
