@@ -294,7 +294,18 @@ function Layout() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const hideHeaderFooter =
-    location.pathname === "/" || location.pathname === "/register"|| location.pathname === "/admin"|| location.pathname === "/admin/events"|| location.pathname === "/admin/users";
+    location.pathname === "/" 
+    || location.pathname === "/register"
+    || location.pathname === "/admin"
+    || location.pathname === "/admin/events"
+    || location.pathname === "/admin/users"
+    || location.pathname === "/admin/location"
+    || location.pathname === "/admin/category"
+    || location.pathname === "/admin/ticket"
+    || location.pathname === "/admin/order"
+    || location.pathname === "/admin/orderitem"
+    || location.pathname === "/admin/transaction"
+    || location.pathname === "/admin/payment";
   const currentUser = user.role;
 
   return (
