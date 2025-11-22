@@ -8,9 +8,52 @@ import ticketFanZone from '../../assets/banner3.png';
 import Vpbanks from '../../assets/vpbanks.png';
 import Banner1 from '../../assets/banner1.png';
 
+import { getAllEvents } from '../../api/event';
+import { getAllCategories } from '../../api/category';
+import { getAllLocations } from '../../api/location';
+import { getAllTickets } from '../../api/ticket';
+
 const TicketDetail = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isTicketSectionExpanded, setIsTicketSectionExpanded] = useState(true);
+
+    //************************************************************ */
+
+
+    const [openDropdown, setOpenDropdown] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  const [searchParams] = useSearchParams();
+
+  // ========== FETCH API ==========
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const [eventRes, categoryRes, locationRes, ticketRes] = await Promise.all([
+            getAllEvents(),
+            getAllCategories(),
+            getAllLocations(),
+            getAllTickets()
+            ]);
+            setEvents(eventRes.data);
+            setCategories(categoryRes.data);
+            setLocations(locationRes.data);
+            setTickets(ticketRes.data);
+        } catch (error) {
+            console.error("Lỗi load dữ liệu:", error);
+        } finally {
+            setLoading(false);
+        }
+        };
+    fetchData();
+  }, []);
     
     // --- BẮT ĐẦU PHẦN THÊM MỚI ---
     const navigate = useNavigate(); 
@@ -20,13 +63,13 @@ const TicketDetail = () => {
         navigate('/OrderTicket');
     };
     // Dữ liệu vé giả để render
-    const tickets = [
-        { id: 1, type: 'GA', name: 'Gói Dậy Sớm + GA 1', desc: 'Full Day Access + GA 1', price: '499.000₫', image: ticketGa },
-        { id: 2, type: 'GA', name: 'Gói Dậy Sớm + GA 2', desc: 'Full Day Access + GA 2', price: '699.000₫', image: ticketGa },
-        { id: 3, type: 'FanZone', name: 'Gói Dậy Sớm + FanZone 1', desc: 'Full Day Access + FanZone 1', price: '799.000₫', image: ticketFanZone },
-        { id: 4, type: 'GA', name: 'Gói Dậy Sớm + GA 2', desc: 'Full Day Access + GA 2', price: '699.000₫', image: ticketGa },
-        { id: 5, type: 'FanZone', name: 'Gói Dậy Sớm + FanZone 2', desc: 'Full Day Access + FanZone 2', price: '999.000₫', image: ticketFanZone }
-    ];
+    // const tickets = [
+    //     { id: 1, type: 'GA', name: 'Gói Dậy Sớm + GA 1', desc: 'Full Day Access + GA 1', price: '499.000₫', image: ticketGa },
+    //     { id: 2, type: 'GA', name: 'Gói Dậy Sớm + GA 2', desc: 'Full Day Access + GA 2', price: '699.000₫', image: ticketGa },
+    //     { id: 3, type: 'FanZone', name: 'Gói Dậy Sớm + FanZone 1', desc: 'Full Day Access + FanZone 1', price: '799.000₫', image: ticketFanZone },
+    //     { id: 4, type: 'GA', name: 'Gói Dậy Sớm + GA 2', desc: 'Full Day Access + GA 2', price: '699.000₫', image: ticketGa },
+    //     { id: 5, type: 'FanZone', name: 'Gói Dậy Sớm + FanZone 2', desc: 'Full Day Access + FanZone 2', price: '999.000₫', image: ticketFanZone }
+    // ];
 
    return (
     <div className="ticket-page">
