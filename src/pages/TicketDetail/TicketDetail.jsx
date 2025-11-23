@@ -7,12 +7,16 @@ import ticketGa from '../../assets/banner2.png';
 import ticketFanZone from '../../assets/banner3.png';
 import Vpbanks from '../../assets/vpbanks.png';
 import Banner1 from '../../assets/banner1.png';
+import Logochuongtrinh from '../../assets/logochuongtrinh.png';
 
 import { getAllEvents } from '../../api/event';
 import { getAllCategories } from '../../api/category';
 import { getAllLocations } from '../../api/location';
 import { getAllTickets } from '../../api/ticket';
-
+import { getAllReviews } from '../../api/rnf';
+import { createReview } from '../../api/rnf';
+import { updateReview } from '../../api/rnf';
+import { deleteReview } from '../../api/rnf';
 
 const TicketDetail = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -24,11 +28,35 @@ const TicketDetail = () => {
   const [tickets, setTickets] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
 
   const eventId = localStorage.getItem("eventid"); 
+  const userId = JSON.parse(localStorage.getItem("user") || "{}");
 
   const navigate = useNavigate();
+  const handleSubmitReview = async () => {
+    if (!newComment) return alert("Vui lòng nhập bình luận!");
 
+    try {
+      const res = await createReview({
+        event_id: eventId,
+        user_id: userId.id,
+        rating: newRating,
+        comment: newComment,
+      });
+
+      setReviews((prev) => [res.data, ...prev]);
+      setNewComment("");
+      setNewRating(5);
+      alert("Đánh giá đã gửi!");
+    } catch (err) {
+      console.error(err);
+      alert("Gửi đánh giá thất bại!");
+    }
+  };
+      
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -62,9 +90,24 @@ const TicketDetail = () => {
         setLoading(false);
       }
     };
+      if (!eventId) return;
 
+    const fetchReviews = async () => {
+      try {
+        const res = await getAllReviews(eventId);
+        setReviews(res.data || []);
+      } catch (err) {
+        console.error("Lỗi load reviews:", err);
+      }
+    };
+
+     
+    fetchReviews();
     fetchData();
+    
   }, [eventId]);
+  
+
   //---
   const currentEvent = events.find(
     (e) => String(e.id) === String(eventId),
@@ -77,7 +120,7 @@ const TicketDetail = () => {
   const currentLocation = locations.find(
     (l) => l.id === currentEvent?.location_id
   );
-  //---
+
     
 
   const handleBuyTicket = () => {
@@ -87,7 +130,6 @@ const TicketDetail = () => {
 
    return (
     <div className="ticket-page">
-      {/* ==== PHẦN TRÊN – NỀN TỐI + CARD VÉ ==== */}
       <section className="ticket-hero">
         <div className="ticket-detail-container">
           <main className="main-detail-content">
@@ -226,7 +268,7 @@ const TicketDetail = () => {
                   <div className="organizer-logo-wrapper">
                     {/* nếu có logo riêng thì thay src */}
                     <img
-                      src={currentEvent?.cover_image}
+                      src={Logochuongtrinh}
                       alt="Ban tổ chức"
                       className="organizer-logo"
                     />
@@ -249,6 +291,61 @@ const TicketDetail = () => {
                   </div>
                 </div>
               </section>
+                
+                <section className="event-reviews">
+                  <h3>Đánh giá từ người tham dự</h3>
+                  <hr className="faint-divider" />
+
+                  {reviews.length === 0 ? (
+                    <p>Chưa có đánh giá nào cho sự kiện này.</p>
+                  ) : (
+                    <div className="reviews-list">
+                      {reviews.map((r) => (
+                        <div key={r.id} className="review-card">
+                          <div className="review-header">
+                            <strong>{r.user_name || `User ${r.user_id}`}</strong>
+                            <span className="review-date">
+                              {new Date(r.created_at).toLocaleDateString('vi-VN')}
+                            </span>
+                          </div>
+                          <div className="review-rating">
+                            {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                          </div>
+                          <p className="review-comment">{r.comment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+
+              {/* --- Form đánh giá mới --- */}
+                  <section className="submit-review">
+                    <h3>Viết đánh giá của bạn</h3>
+                    <div className="review-form">
+                      <label>
+                        Đánh giá:
+                        <select
+                          value={newRating}
+                          onChange={(e) => setNewRating(Number(e.target.value))}
+                        >
+                          <option value={5}>5 ★</option>
+                          <option value={4}>4 ★</option>
+                          <option value={3}>3 ★</option>
+                          <option value={2}>2 ★</option>
+                          <option value={1}>1 ★</option>
+                        </select>
+                      </label>
+                      <label>
+                        Bình luận:
+                        <textarea
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Viết bình luận của bạn..."
+                        />
+                      </label>
+                      <button onClick={handleSubmitReview}>Gửi đánh giá</button>
+                    </div>
+                  </section>
 
               {/* --- Gợi ý sự kiện --- */}
               <div className="recommendations">
