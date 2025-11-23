@@ -1,0 +1,105 @@
+/* Kế thừa biến màu từ Admin.css, bổ sung style riêng cho trang Categories */
+
+/* Form Layout */
+.category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px; /* Giới hạn chiều rộng form cho đẹp */
+}
+
+.form-group textarea {
+    background-color: #151725;
+    border: 1px solid #2a2e3f;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical; 
+    min-height: 100px;
+    transition: border-color 0.2s;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3d75ff;
+}
+
+/* Table Customization */
+.desc-cell {
+    color: #8b9bb4;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 400px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive Textarea */
+@media (max-width: 768px) {
+    .category-form {
+        max-width: 100%;
+    }
+    
+    .desc-cell {
+        white-space: normal; 
+        max-width: 200px;
+    }
+}
+
+.highlight-text {
+    color: #3d75ff;
+    font-weight: 600;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn-primary-action {
+    background-color: #3d75ff;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-primary-action:hover { background-color: #2a5dd6; }
+
+.btn-cancel {
+    background-color: transparent;
+    border: 1px solid #2a2e3f;
+    color: #e0e0e0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-cancel:hover { background-color: #2a2e3f; }
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-icon.edit { background: rgba(61, 117, 255, 0.1); color: #3d75ff; }
+.btn-icon.edit:hover { background: #3d75ff; color: #fff; }
+
+.btn-icon.delete { background: rgba(233, 30, 99, 0.1); color: #e91e63; }
+.btn-icon.delete:hover { background: #e91e63; color: #fff; }

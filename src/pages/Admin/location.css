@@ -1,0 +1,181 @@
+/* location.css - Kế thừa style từ Dashboard Dark Mode */
+
+/* Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    color: #fff;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.header-icon {
+    color: #3d75ff;
+}
+
+/* --- Form Styles --- */
+.form-card {
+    margin-bottom: 30px; /* Cách bảng một khoảng */
+}
+
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột */
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1; /* Chiếm hết chiều ngang */
+}
+
+.form-group label {
+    font-size: 13px;
+    color: #8b9bb4;
+    font-weight: 500;
+}
+
+.form-group input {
+    background-color: #151725;
+    border: 1px solid #2a2e3f;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #3d75ff;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end; 
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Buttons */
+.btn-primary-action {
+    background-color: #3d75ff;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-primary-action:hover {
+    background-color: #2a5dd6;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    border: 1px solid #2a2e3f;
+    color: #e0e0e0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-cancel:hover {
+    background-color: #2a2e3f;
+}
+
+/* --- Table Customization --- */
+.highlight-text {
+    color: #3d75ff;
+    font-weight: 500;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-muted {
+    color: #555;
+}
+
+/* Icon Link Map */
+.icon-link {
+    color: #00b14f;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 177, 79, 0.1);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.icon-link:hover {
+    background: #00b14f;
+    color: #fff;
+}
+
+/* Action Buttons in Table */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon.edit {
+    background-color: rgba(61, 117, 255, 0.1);
+    color: #3d75ff;
+}
+.btn-icon.edit:hover {
+    background-color: #3d75ff;
+    color: #fff;
+}
+
+.btn-icon.delete {
+    background-color: rgba(233, 30, 99, 0.1);
+    color: #e91e63;
+}
+.btn-icon.delete:hover {
+    background-color: #e91e63;
+    color: #fff;
+}
+
+/* Responsive Form */
+@media (max-width: 768px) {
+    .admin-form-grid {
+        grid-template-columns: 1fr; /* Về 1 cột trên mobile */
+    }
+}

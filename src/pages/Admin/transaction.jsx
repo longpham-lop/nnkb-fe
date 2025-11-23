@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import "./Events.css";
+import "./transaction.css";
 import {
   getAllTransactions,
   createTransaction,
   updateTransaction,
   deleteTransaction,
 } from "../../api/transaction";
+import { 
+  CreditCard, Edit, Trash2, Save, X, Plus,
+  Search, Calendar, ArrowRight, User, RefreshCw
+} from "lucide-react";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
-
   const [editingId, setEditingId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -71,6 +74,7 @@ const Transactions = () => {
       resetForm();
     } catch (err) {
       console.error("Lỗi lưu giao dịch:", err);
+      alert("Có lỗi xảy ra khi lưu giao dịch");
     }
   };
 
@@ -81,16 +85,31 @@ const Transactions = () => {
       receiver_id: t.receiver_id,
       amount: t.amount,
     });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Bạn chắc chắn muốn xóa?")) return;
+    if (!confirm("Bạn chắc chắn muốn xóa giao dịch này?")) return;
     try {
       await deleteTransaction(id);
       setTransactions(transactions.filter((t) => t.id !== id));
     } catch (err) {
       console.error("Lỗi xóa giao dịch:", err);
     }
+  };
+
+  // Helper format tiền tệ
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
+
+  // Helper format ngày
+  const formatDate = (dateString) => {
+    if (!dateString) return "—";
+    return new Date(dateString).toLocaleString('vi-VN', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
   };
 
   // ========================
@@ -100,143 +119,205 @@ const Transactions = () => {
     const matchSender = t.sender_id
       .toString()
       .toLowerCase()
-      .includes(searchSender.toLowerCase());
+      .includes(searchSender.toLowerCase()) || 
+      t.receiver_id.toString().includes(searchSender); // Tìm cả người nhận
 
     const created = new Date(t.created_at).getTime();
     const from = fromDate ? new Date(fromDate).getTime() : null;
-    const to = toDate ? new Date(toDate).getTime() : null;
+    
+    // Fix lỗi chọn toDate bị hụt giờ (thêm cuối ngày)
+    let to = null;
+    if(toDate) {
+        const d = new Date(toDate);
+        d.setHours(23, 59, 59, 999);
+        to = d.getTime();
+    }
 
-    const matchDate =
-      (!from || created >= from) && (!to || created <= to);
+    const matchDate = (!from || created >= from) && (!to || created <= to);
 
     return matchSender && matchDate;
   });
 
   return (
-    <div className="admin-page-content">
+    <div className="dashboard-wrapper">
       <div className="page-header">
-        <h2>Quản lý Giao dịch</h2>
+        <h2><CreditCard className="header-icon"/> Quản lý Giao dịch</h2>
       </div>
 
       {/* =======================
-          FORM TẠO / SỬA
+          FORM TẠO / SỬA (CARD)
       ======================= */}
-      <form className="event-form" onSubmit={handleSubmit}>
-        <label>
-          Sender ID
-          <input
-            type="text"
-            name="sender_id"
-            value={formData.sender_id}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <label>
-          Receiver ID
-          <input
-            type="text"
-            name="receiver_id"
-            value={formData.receiver_id}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <label>
-          Amount
-          <input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button className="btn btn-primary" type="submit">
-            {editingId ? "Cập nhật" : "Thêm mới"}
-          </button>
-
-          {editingId && (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={resetForm}
-            >
-              Hủy
-            </button>
-          )}
+      <div className="card form-card">
+        <div className="card-header">
+            <h3>{editingId ? `Chỉnh sửa giao dịch #${editingId}` : "Tạo giao dịch mới"}</h3>
         </div>
-      </form>
+        
+        <form className="transaction-form" onSubmit={handleSubmit}>
+            <div className="form-row">
+                <div className="form-group">
+                    <label>Người gửi (Sender ID)</label>
+                    <div className="input-with-icon">
+                        <User size={16} className="input-icon"/>
+                        <input
+                            type="text"
+                            name="sender_id"
+                            placeholder="ID người gửi"
+                            value={formData.sender_id}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="arrow-separator">
+                    <ArrowRight size={24} color="#8b9bb4"/>
+                </div>
+
+                <div className="form-group">
+                    <label>Người nhận (Receiver ID)</label>
+                    <div className="input-with-icon">
+                        <User size={16} className="input-icon"/>
+                        <input
+                            type="text"
+                            name="receiver_id"
+                            placeholder="ID người nhận"
+                            value={formData.receiver_id}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group amount-group">
+                    <label>Số tiền (VND)</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        placeholder="0"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+            </div>
+
+            <div className="form-actions">
+                {editingId && (
+                    <button type="button" className="btn-cancel" onClick={resetForm}>
+                        <X size={18} /> Hủy bỏ
+                    </button>
+                )}
+                <button className="btn-primary-action" type="submit">
+                    {editingId ? <Save size={18} /> : <Plus size={18} />}
+                    {editingId ? "Cập nhật" : "Thực hiện giao dịch"}
+                </button>
+            </div>
+        </form>
+      </div>
 
       {/* =======================
-          FILTER + SEARCH
+          TOOLBAR (SEARCH & FILTER)
       ======================= */}
-      <div className="filter-bar">
-        <input
-          type="text"
-          placeholder="Tìm theo Sender ID..."
-          value={searchSender}
-          onChange={(e) => setSearchSender(e.target.value)}
-        />
-
-        <input
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-        />
-
-        <input
-          type="date"
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-        />
+      <div className="toolbar-section">
+        <div className="search-bar">
+            <Search className="search-icon" size={18} />
+            <input 
+                type="text" 
+                placeholder="Tìm theo Sender ID hoặc Receiver ID..." 
+                value={searchSender}
+                onChange={(e) => setSearchSender(e.target.value)}
+            />
+        </div>
+        
+        <div className="date-filter-group">
+            <div className="date-input">
+                <span className="label">Từ:</span>
+                <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                />
+            </div>
+            <div className="date-input">
+                <span className="label">Đến:</span>
+                <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                />
+            </div>
+            <button className="btn-refresh" onClick={() => {setFromDate(''); setToDate(''); setSearchSender('')}} title="Reset bộ lọc">
+                <RefreshCw size={16} />
+            </button>
+        </div>
       </div>
 
       {/* =======================
           TABLE
       ======================= */}
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Sender</th>
-            <th>Receiver</th>
-            <th>Số tiền</th>
-            <th>Thời gian</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
+      <div className="card table-card">
+        <div className="table-responsive">
+          <table className="admin-table transaction-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>LUỒNG GIAO DỊCH (SENDER ➔ RECEIVER)</th>
+                <th>SỐ TIỀN</th>
+                <th>THỜI GIAN</th>
+                <th className="text-center">HÀNH ĐỘNG</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          {filteredTransactions.map((t) => (
-            <tr key={t.id}>
-              <td>{t.id}</td>
-              <td>{t.sender_id}</td>
-              <td>{t.receiver_id}</td>
-              <td>{Number(t.amount).toLocaleString()} ₫</td>
-              <td>{new Date(t.created_at).toLocaleString("vi-VN")}</td>
-              <td className="action-buttons">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => handleEdit(t)}
-                >
-                  Sửa
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(t.id)}
-                >
-                  Xóa
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            <tbody>
+              {filteredTransactions.length === 0 && (
+                 <tr><td colSpan="5" className="text-center">Không tìm thấy giao dịch nào</td></tr>
+              )}
+              {filteredTransactions.map((t) => (
+                <tr key={t.id}>
+                  <td><span className="id-badge">#{t.id}</span></td>
+                  <td>
+                    <div className="transaction-flow">
+                        <div className="user-node sender">
+                            <span className="label">Gửi</span>
+                            <span className="value">User {t.sender_id}</span>
+                        </div>
+                        <div className="flow-arrow">
+                            <ArrowRight size={16} />
+                        </div>
+                        <div className="user-node receiver">
+                            <span className="label">Nhận</span>
+                            <span className="value">User {t.receiver_id}</span>
+                        </div>
+                    </div>
+                  </td>
+                  <td className="amount-cell positive">
+                    + {Number(t.amount).toLocaleString()} ₫
+                  </td>
+                  <td className="date-cell">
+                     {formatDate(t.created_at)}
+                  </td>
+                  <td className="action-buttons text-center">
+                    <button
+                      className="btn-icon edit"
+                      onClick={() => handleEdit(t)}
+                      title="Sửa"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => handleDelete(t.id)}
+                      title="Xóa"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

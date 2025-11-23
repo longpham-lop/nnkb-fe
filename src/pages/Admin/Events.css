@@ -1,143 +1,182 @@
-/* ===== PAGE HEADER ===== */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
+/* Kế thừa từ Admin.css */
+
+/* --- Header Layout --- */
+.page-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.page-header h2 {
-  font-size: 26px;
-  font-weight: bold;
-  color: #333;
+.header-left .sub-text {
+    font-size: 13px;
+    color: #8b9bb4;
+    margin-top: 5px;
+    margin-bottom: 0;
 }
 
-/* ===== BUTTONS ===== */
-.btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.3s ease;
+/* --- Search & Toolbar --- */
+.toolbar-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
-.btn-primary {
-  background: #4e73df;
-  color: white;
-}
-.btn-success {
-  background: #4e73df;
-  color: white;
-  margin-left: 570px;
+.search-bar {
+    flex: 1;
+    position: relative;
+    max-width: 400px;
 }
 
-.btn-secondary {
-  background: #f6c23e;
-  color: white;
+.search-bar .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8b9bb4;
 }
 
-.btn-danger {
-  background: #e74a3b;
-  color: white;
+.search-bar input {
+    width: 100%;
+    background-color: #1f2233;
+    border: 1px solid #2a2e3f;
+    padding: 10px 15px 10px 40px; /* Chừa chỗ cho icon */
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
 }
 
-/* ===== DRAG & DROP ===== */
-.dropzone {
-  border: 2px dashed #6c63ff;
-  border-radius: 12px;
-  padding: 35px;
-  text-align: center;
-  color: #555;
-  background: #f8f9ff;
-  margin-bottom: 20px;
-  transition: 0.25s ease;
+.search-bar input:focus {
+    outline: none;
+    border-color: #3d75ff;
 }
 
-.dropzone:hover {
-  background: #eef0ff;
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #1f2233;
+    border: 1px solid #2a2e3f;
+    padding: 0 15px;
+    border-radius: 8px;
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
 }
 
-.dropzone p {
-  font-size: 16px;
-  margin-bottom: 8px;
+.filter-btn:hover {
+    background-color: #2a2e3f;
 }
 
-.upload-btn {
-  background: #6c63ff;
-  padding: 8px 16px;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  display: inline-block;
-  margin-top: 6px;
+/* --- Table Custom Styles --- */
+.table-card.no-padding {
+    padding: 0; /* Để bảng full viền card */
+    overflow: hidden;
 }
 
-/* ===== IMAGE PREVIEW ===== */
-.image-preview-container {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-bottom: 25px;
+.event-table td {
+    vertical-align: middle;
+    padding: 12px 15px;
 }
 
-.image-card {
-  width: 160px;
-  text-align: center;
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  transition: 0.25s;
+.id-badge {
+    background-color: #2a2e3f;
+    color: #8b9bb4;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
 }
 
-.image-card:hover {
-  transform: translateY(-4px);
+/* Thumbnail ảnh */
+.img-thumbnail {
+    width: 50px;
+    height: 35px;
+    background-color: #2a2e3f;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.image-card img {
-  width: 100%;
-  height: 110px;
-  object-fit: cover;
-  border-radius: 8px;
+.img-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.image-card p {
-  font-size: 13px;
-  margin-top: 6px;
-  color: #555;
+/* Tên sự kiện */
+.event-name-cell {
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
-/* ===== TABLE STYLE ===== */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background: white;
-  border-radius: 12px;
-  color:#333;
-  overflow: hidden;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+.organizer-sub {
+    font-size: 11px;
+    color: #6c757d;
+    margin-top: 2px;
 }
 
-.data-table th {
-  background: #4e73df;
-  color: white;
-  padding: 12px;
-  text-align: left;
-  font-size: 15px;
+/* Thời gian */
+.date-cell {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
 }
 
-.data-table td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
+.start-date {
+    color: #e0e0e0;
 }
 
-.action-buttons button {
-  margin-right: 6px;
+.end-date {
+    color: #8b9bb4;
+    font-size: 11px;
 }
-.minipic{
-  height: 50px;
-  width: 100px;
-  object-fit: cover;
+
+/* Badges */
+.badge-gray {
+    background-color: #2a2e3f;
+    color: #aab2c8;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: capitalize;
+}
+
+.status-badge.success {
+    background-color: rgba(0, 177, 79, 0.15);
+    color: #00b14f;
+}
+
+.status-badge.warning {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.status-badge.danger {
+    background-color: rgba(233, 30, 99, 0.15);
+    color: #e91e63;
+}
+
+.status-badge.default {
+    background-color: #2a2e3f;
+    color: #8b9bb4;
 }

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import "./Events.css";  
+import "./category.css"; // Đổi tên file CSS cho đúng ngữ cảnh
 import {
   getAllCategories,
   createCategory,
   updateCategory,
   deleteCategory,
 } from "../../api/category";
+import { Layers, Edit, Trash2, Plus, Save, X } from "lucide-react";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -34,6 +35,7 @@ const Categories = () => {
       name: cat.name,
       description: cat.description,
     });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -44,6 +46,11 @@ const Categories = () => {
     } catch (err) {
       console.error("Lỗi xóa thể loại:", err);
     }
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setForm({ name: "", description: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -58,79 +65,110 @@ const Categories = () => {
         const res = await createCategory(form);
         setCategories([...categories, res.data]);
       }
-      setForm({ name: "", description: "" });
-      setEditingId(null);
+      handleCancel(); // Reset form sau khi lưu
     } catch (err) {
       console.error("Lỗi lưu thể loại:", err);
     }
   };
 
   return (
-    <div className="admin-page-content">
+    <div className="dashboard-wrapper">
       <div className="page-header">
-        <h2>Quản lý Thể loại</h2>
+        <h2><Layers className="header-icon"/> Quản lý Thể loại</h2>
       </div>
 
-      {/* FORM */}
-      <form className="event-form" onSubmit={handleSubmit}>
-        <label>
-          Tên thể loại:
-          <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </label>
+      {/* --- KHỐI FORM (Bên trái hoặc Trên cùng) --- */}
+      <div className="card form-card">
+        <div className="card-header">
+          <h3>{editingId ? "Cập nhật thể loại" : "Thêm thể loại mới"}</h3>
+        </div>
 
-        <label>
-          Mô tả:
-          <textarea
-            value={form.description}
-            onChange={(e) =>
-              setForm({ ...form, description: e.target.value })
-            }
-          />
-        </label>
+        <form className="category-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Tên thể loại</label>
+            <input
+              type="text"
+              placeholder="VD: Nhạc Rock, Bolero..."
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+            />
+          </div>
 
-        <button className="btn btn-primary" type="submit">
-          {editingId ? "Cập nhật" : "Thêm mới"}
-        </button>
-      </form>
+          <div className="form-group">
+            <label>Mô tả</label>
+            <textarea
+              rows={4}
+              placeholder="Mô tả ngắn về thể loại này..."
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+            />
+          </div>
 
-      {/* TABLE */}
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>Tên thể loại</th>
-            <th>Mô tả</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
+          <div className="form-actions">
+            {editingId && (
+              <button type="button" className="btn-cancel" onClick={handleCancel}>
+                <X size={18} /> Hủy bỏ
+              </button>
+            )}
+            <button type="submit" className="btn-primary-action">
+              {editingId ? <Save size={18} /> : <Plus size={18} />}
+              {editingId ? "Lưu thay đổi" : "Thêm mới"}
+            </button>
+          </div>
+        </form>
+      </div>
 
-        <tbody>
-          {categories.map((cat) => (
-            <tr key={cat.id}>
-              <td>{cat.id}</td>
-              <td>{cat.name}</td>
-              <td>{cat.description || "—"}</td>
-              <td className="action-buttons">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => handleEdit(cat)}
-                >
-                  Sửa
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(cat.id)}
-                >
-                  Xóa
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* --- KHỐI BẢNG DỮ LIỆU --- */}
+      <div className="card table-card">
+        <div className="card-header">
+          <h3>Danh sách thể loại ({categories.length})</h3>
+        </div>
+        
+        <div className="table-responsive">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th style={{width: '80px'}}>ID</th>
+                <th style={{width: '25%'}}>TÊN THỂ LOẠI</th>
+                <th>MÔ TẢ</th>
+                <th className="text-center" style={{width: '120px'}}>HÀNH ĐỘNG</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {categories.length === 0 && (
+                 <tr><td colSpan="4" className="text-center">Chưa có dữ liệu</td></tr>
+              )}
+              {categories.map((cat) => (
+                <tr key={cat.id}>
+                  <td>#{cat.id}</td>
+                  <td className="highlight-text">{cat.name}</td>
+                  <td className="desc-cell">{cat.description || "—"}</td>
+                  <td className="action-buttons text-center">
+                    <button
+                      className="btn-icon edit"
+                      onClick={() => handleEdit(cat)}
+                      title="Sửa"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => handleDelete(cat.id)}
+                      title="Xóa"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,86 @@
+/* Kế thừa từ Admin.css */
+
+/* --- Form Styles --- */
+.payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+/* Responsive: Mobile form stack vertical */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: #8b9bb4;
+    pointer-events: none;
+}
+
+.icon-padding {
+    padding-left: 40px !important;
+}
+
+/* Status Select Colors in Form */
+.status-select.pending { border-color: #ffc107; color: #ffc107; }
+.status-select.success { border-color: #00b14f; color: #00b14f; }
+.status-select.failed { border-color: #e91e63; color: #e91e63; }
+
+/* --- Table Customization --- */
+.payment-table td {
+    vertical-align: middle;
+}
+
+.amount-cell {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: #fff;
+}
+
+.method-cell {
+    font-weight: 500;
+    color: #e0e0e0;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.code-text {
+    font-family: monospace;
+    background-color: #2a2e3f;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #aab2c8;
+    font-size: 12px;
+}
+
+.order-badge {
+    background-color: rgba(61, 117, 255, 0.1);
+    color: #3d75ff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Status Badges Override (if needed specific for payment) */
+.status-badge {
+    min-width: 90px;
+    justify-content: flex-start;
+}

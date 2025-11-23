@@ -1,0 +1,175 @@
+/* Kế thừa từ Admin.css */
+
+/* --- User Info Cell --- */
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-circle {
+    width: 36px;
+    height: 36px;
+    background-color: #3d75ff;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.row-locked .avatar-circle {
+    background-color: #6c757d; /* Xám nếu bị khóa */
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #fff;
+    font-size: 14px;
+}
+
+.user-id {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+/* --- Contact Cell --- */
+.contact-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #aab2c8;
+}
+
+/* --- Role Select --- */
+.role-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 130px;
+}
+
+.role-icon {
+    position: absolute;
+    left: 10px;
+    z-index: 1;
+    pointer-events: none;
+}
+.role-icon.admin { color: #ffc107; }
+.role-icon.user { color: #3d75ff; }
+
+.role-select {
+    width: 100%;
+    background-color: #151725;
+    border: 1px solid #2a2e3f;
+    border-radius: 6px;
+    color: #e0e0e0;
+    padding: 6px 10px 6px 30px; /* Chừa chỗ cho icon */
+    font-size: 12px;
+    cursor: pointer;
+    appearance: none;
+    transition: border-color 0.2s;
+}
+
+.role-select:hover:not(:disabled) {
+    border-color: #3d75ff;
+}
+
+.role-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Highlight admin role text */
+.role-select.admin {
+    color: #ffc107;
+    font-weight: 500;
+}
+
+/* --- Filter Dropdown --- */
+.filter-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filter-icon {
+    position: absolute;
+    left: 10px;
+    color: #8b9bb4;
+    pointer-events: none;
+}
+
+.custom-select {
+    background-color: #1f2233;
+    border: 1px solid #2a2e3f;
+    color: #fff;
+    padding: 8px 15px 8px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+/* --- Action Buttons (Pill style) --- */
+.btn-action-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-action-pill.ban {
+    background-color: rgba(233, 30, 99, 0.1);
+    color: #e91e63;
+    border-color: rgba(233, 30, 99, 0.2);
+}
+.btn-action-pill.ban:hover {
+    background-color: #e91e63;
+    color: white;
+}
+
+.btn-action-pill.unban {
+    background-color: rgba(0, 177, 79, 0.1);
+    color: #00b14f;
+    border-color: rgba(0, 177, 79, 0.2);
+}
+.btn-action-pill.unban:hover {
+    background-color: #00b14f;
+    color: white;
+}
+
+.btn-action-pill:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Row Locked Visual */
+.row-locked td {
+    opacity: 0.6; /* Làm mờ dòng bị khóa */
+}
+.row-locked .action-buttons {
+    opacity: 1; /* Giữ nút hành động sáng */
+}

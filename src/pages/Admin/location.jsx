@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import "./Events.css";  
+import "./location.css";
 import {
   getAllLocations,
   createLocation,
   updateLocation,
   deleteLocation,
 } from "../../api/location";
+import { MapPin, Edit, Trash2, Plus, Save, X, Navigation } from "lucide-react";
 
 const Locations = () => {
   const [locations, setLocations] = useState([]);
@@ -42,6 +43,8 @@ const Locations = () => {
       capacity: loc.capacity,
       map_link: loc.map_link,
     });
+    // Scroll lên đầu trang để sửa cho dễ
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -52,6 +55,18 @@ const Locations = () => {
     } catch (err) {
       console.error("Lỗi xóa địa điểm:", err);
     }
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setForm({
+      name: "",
+      address: "",
+      city: "",
+      province: "",
+      capacity: "",
+      map_link: "",
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -66,133 +81,161 @@ const Locations = () => {
         const res = await createLocation(form);
         setLocations([...locations, res.data]);
       }
-      setForm({
-        name: "",
-        address: "",
-        city: "",
-        province: "",
-        capacity: "",
-        map_link: "",
-      });
-      setEditingId(null);
+      handleCancel();
     } catch (err) {
       console.error("Lỗi lưu địa điểm:", err);
     }
   };
 
   return (
-    <div className="admin-page-content">
+    <div className="dashboard-wrapper">
       <div className="page-header">
-        <h2>Quản lý Địa điểm</h2>
+        <h2><MapPin className="header-icon"/> Quản lý Địa điểm</h2>
       </div>
 
-      {/* FORM */}
-      <form className="event-form" onSubmit={handleSubmit}>
-        <label>
-          Tên địa điểm:
-          <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </label>
+      {/* --- FORM CARD --- */}
+      <div className="card form-card">
+        <div className="card-header">
+            <h3>{editingId ? "Cập nhật địa điểm" : "Thêm địa điểm mới"}</h3>
+        </div>
+        
+        <form className="admin-form-grid" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Tên địa điểm</label>
+            <input
+              type="text"
+              placeholder="VD: Sân vận động Mỹ Đình"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+            />
+          </div>
 
-        <label>
-          Địa chỉ:
-          <input
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-          />
-        </label>
+          <div className="form-group">
+            <label>Sức chứa</label>
+            <input
+              type="number"
+              placeholder="VD: 5000"
+              value={form.capacity}
+              onChange={(e) => setForm({ ...form, capacity: e.target.value })}
+            />
+          </div>
 
-        <label>
-          Thành phố:
-          <input
-            value={form.city}
-            onChange={(e) => setForm({ ...form, city: e.target.value })}
-          />
-        </label>
+          <div className="form-group full-width">
+            <label>Địa chỉ chi tiết</label>
+            <input
+              type="text"
+              placeholder="Số nhà, tên đường..."
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
+          </div>
 
-        <label>
-          Tỉnh/Thành:
-          <input
-            value={form.province}
-            onChange={(e) => setForm({ ...form, province: e.target.value })}
-          />
-        </label>
+          <div className="form-group">
+            <label>Thành phố</label>
+            <input
+              type="text"
+              placeholder="VD: Hà Nội"
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+            />
+          </div>
 
-        <label>
-          Sức chứa:
-          <input
-            type="number"
-            value={form.capacity}
-            onChange={(e) => setForm({ ...form, capacity: e.target.value })}
-          />
-        </label>
+          <div className="form-group">
+            <label>Tỉnh/Thành</label>
+            <input
+              type="text"
+              placeholder="VD: Hà Nội"
+              value={form.province}
+              onChange={(e) => setForm({ ...form, province: e.target.value })}
+            />
+          </div>
 
-        <label>
-          Link bản đồ:
-          <input
-            value={form.map_link}
-            onChange={(e) => setForm({ ...form, map_link: e.target.value })}
-          />
-        </label>
+          <div className="form-group full-width">
+            <label>Link Google Map (Embed/Share)</label>
+            <input
+              type="text"
+              placeholder="https://maps.google.com/..."
+              value={form.map_link}
+              onChange={(e) => setForm({ ...form, map_link: e.target.value })}
+            />
+          </div>
 
-        <button className="btn btn-primary" type="submit">
-          {editingId ? "Cập nhật" : "Thêm mới"}
-        </button>
-      </form>
+          <div className="form-actions full-width">
+            {editingId && (
+                <button type="button" className="btn-cancel" onClick={handleCancel}>
+                    <X size={18} /> Hủy bỏ
+                </button>
+            )}
+            <button type="submit" className="btn-primary-action">
+              {editingId ? <Save size={18} /> : <Plus size={18} />}
+              {editingId ? "Lưu thay đổi" : "Thêm mới"}
+            </button>
+          </div>
+        </form>
+      </div>
 
-      {/* TABLE */}
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>Tên địa điểm</th>
-            <th>Địa chỉ</th>
-            <th>Thành phố</th>
-            <th>Tỉnh/Thành</th>
-            <th>Sức chứa</th>
-            <th>Link bản đồ</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
+      {/* --- TABLE CARD --- */}
+      <div className="card table-card">
+        <div className="card-header">
+            <h3>Danh sách địa điểm ({locations.length})</h3>
+        </div>
+        <div className="table-responsive">
+            <table className="admin-table">
+            <thead>
+                <tr>
+                <th>ID</th>
+                <th>TÊN ĐỊA ĐIỂM</th>
+                <th>ĐỊA CHỈ</th>
+                <th>THÀNH PHỐ</th>
+                <th>SỨC CHỨA</th>
+                <th className="text-center">BẢN ĐỒ</th>
+                <th className="text-center">HÀNH ĐỘNG</th>
+                </tr>
+            </thead>
 
-        <tbody>
-          {locations.map((loc) => (
-            <tr key={loc.id}>
-              <td>{loc.id}</td>
-              <td>{loc.name}</td>
-              <td>{loc.address}</td>
-              <td>{loc.city}</td>
-              <td>{loc.province}</td>
-              <td>{loc.capacity}</td>
-              <td>
-                {loc.map_link ? (
-                  <a href={loc.map_link} target="_blank" rel="noreferrer">
-                    Xem
-                  </a>
-                ) : (
-                  "—"
+            <tbody>
+                {locations.length === 0 && (
+                    <tr><td colSpan="7" className="text-center">Chưa có dữ liệu</td></tr>
                 )}
-              </td>
-              <td className="action-buttons">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => handleEdit(loc)}
-                >
-                  Sửa
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(loc.id)}
-                >
-                  Xóa
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                {locations.map((loc) => (
+                <tr key={loc.id}>
+                    <td>#{loc.id}</td>
+                    <td className="highlight-text">{loc.name}</td>
+                    <td>{loc.address}</td>
+                    <td>{loc.city}</td>
+                    <td>{loc.capacity ? Number(loc.capacity).toLocaleString() : '---'}</td>
+                    <td className="text-center">
+                    {loc.map_link ? (
+                        <a href={loc.map_link} target="_blank" rel="noreferrer" className="icon-link">
+                        <Navigation size={18} />
+                        </a>
+                    ) : (
+                        <span className="text-muted">—</span>
+                    )}
+                    </td>
+                    <td className="action-buttons text-center">
+                    <button
+                        className="btn-icon edit"
+                        onClick={() => handleEdit(loc)}
+                        title="Sửa"
+                    >
+                        <Edit size={16} />
+                    </button>
+                    <button
+                        className="btn-icon delete"
+                        onClick={() => handleDelete(loc.id)}
+                        title="Xóa"
+                    >
+                        <Trash2 size={16} />
+                    </button>
+                    </td>
+                </tr>
+                ))}
+            </tbody>
+            </table>
+        </div>
+      </div>
     </div>
   );
 };
