@@ -4,36 +4,29 @@ import { getAllEvents } from '../../api/event';
 import { getAllCategories } from '../../api/category';
 import { getAllLocations } from '../../api/location';
 import { getAllTickets } from '../../api/ticket';
-import './Filter.css'; // Cập nhật CSS nếu cần
+import './Filter.css';
 
 // =================== HELPER FUNCTIONS ===================
-const isSameDay = (d1, d2) => {
-  return d1.getDate() === d2.getDate() && 
-         d1.getMonth() === d2.getMonth() && 
-         d1.getFullYear() === d2.getFullYear();
-};
+const isSameDay = (d1, d2) => d1.getDate() === d2.getDate() &&
+                               d1.getMonth() === d2.getMonth() &&
+                               d1.getFullYear() === d2.getFullYear();
 
-const isBetween = (date, start, end) => {
-  return date > start && date < end;
-};
+const isBetween = (date, start, end) => date > start && date < end;
 
 // =================== SINGLE CALENDAR MONTH COMPONENT ===================
 const CalendarMonth = ({ year, month, startDate, endDate, onDateClick }) => {
   const monthNames = ["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6","Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"];
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
 
   const generateDays = () => {
     const days = [];
     const date = new Date(year, month, 1);
-    const firstDayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1; // T2=0
+    const firstDayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;
     const daysInMonth = new Date(year, month+1, 0).getDate();
 
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      days.push(<span key={`prev-${i}`} className="day-cell empty"></span>);
-    }
+    for(let i=0;i<firstDayOfWeek;i++) days.push(<span key={`prev-${i}`} className="day-cell empty"></span>);
 
-    for (let i = 1; i <= daysInMonth; i++) {
+    for(let i=1;i<=daysInMonth;i++){
       const currentLoopDate = new Date(year, month, i);
       currentLoopDate.setHours(0,0,0,0);
 
@@ -42,13 +35,13 @@ const CalendarMonth = ({ year, month, startDate, endDate, onDateClick }) => {
       const isEnd = endDate && isSameDay(currentLoopDate, endDate);
       const isInRange = startDate && endDate && isBetween(currentLoopDate, startDate, endDate);
 
-      let className = `day-cell ${isToday ? 'today' : ''}`;
-      if (isStart) className += ' range-start selected';
-      if (isEnd) className += ' range-end selected';
-      if (isInRange) className += ' in-range';
+      let className = `day-cell ${isToday?'today':''}`;
+      if(isStart) className += ' range-start selected';
+      if(isEnd) className += ' range-end selected';
+      if(isInRange) className += ' in-range';
 
       days.push(
-        <span key={`day-${i}`} className={className} onClick={() => onDateClick(currentLoopDate)}>
+        <span key={`day-${i}`} className={className} onClick={()=>onDateClick(currentLoopDate)}>
           {i}
         </span>
       );
@@ -71,25 +64,20 @@ const CalendarMonth = ({ year, month, startDate, endDate, onDateClick }) => {
 const DatePickerDropdown = ({ onClose, startDate, endDate, setDateRange }) => {
   const [viewDate, setViewDate] = useState(new Date());
 
-  const changeMonth = (offset) => {
-    const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth()+offset, 1);
-    setViewDate(newDate);
-  };
+  const changeMonth = (offset) => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth()+offset, 1));
 
   const handleDateClick = (date) => {
-    if (!startDate || (startDate && endDate)) {
-      setDateRange({ start: date, end: null });
+    if(!startDate || (startDate && endDate)){
+      setDateRange({start: date, end: null});
     } else {
-      if (date < startDate) setDateRange({ start: date, end: startDate });
-      else setDateRange({ start: startDate, end: date });
+      if(date < startDate) setDateRange({start: date, end: startDate});
+      else setDateRange({start: startDate, end: date});
     }
   };
 
   const handleQuickFilter = (type) => {
-    const today = new Date();
-    today.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0,0,0,0);
     let start=null, end=null;
-
     switch(type){
       case 'all': start=null; end=null; break;
       case 'today': start=new Date(today); end=new Date(today); break;
@@ -104,7 +92,7 @@ const DatePickerDropdown = ({ onClose, startDate, endDate, setDateRange }) => {
       case 'month': start=new Date(today.getFullYear(),today.getMonth(),1); end=new Date(today.getFullYear(),today.getMonth()+1,0); break;
       default: break;
     }
-    setDateRange({ start, end });
+    setDateRange({start,end});
   };
 
   const nextMonthDate = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 1);
@@ -135,29 +123,18 @@ const DatePickerDropdown = ({ onClose, startDate, endDate, setDateRange }) => {
 };
 
 // =================== ADVANCED FILTER DROPDOWN ===================
-const MainFilterDropdown = ({ onClose, filters, setFilters }) => {
-  const locations = ["Toàn quốc","Hồ Chí Minh","Hà Nội","Đà Lạt","Vị trí khác"];
-  const categories = [
-    { id:'music', name:'Nhạc sống' },
-    { id:'art', name:'Sân khấu & Nghệ thuật' },
-    { id:'sport', name:'Thể thao' },
-    { id:'other', name:'Khác' }
-  ];
-  
-  const updateFilter = (key,value) => {
-    setFilters(prev => ({...prev, [key]: value}));
-  };
+const MainFilterDropdown = ({ onClose, filters, setFilters, categories, locations }) => {
+  const updateFilter = (key,value) => setFilters(prev => ({...prev, [key]:value}));
 
   return (
-    
     <div className="main-filter-dropdown">
       <div className="filter-section">
         <h4>Vị trí</h4>
         <div className="radio-group-vertical">
-          {locations.map(loc=>(
-            <label key={loc} className="radio-label">
-              <input type="radio" name="location" checked={filters.location===loc} onChange={()=>updateFilter('location',loc)} />
-              <span className="radio-custom"></span>{loc}
+          {locations.map(loc => (
+            <label key={loc.id} className="radio-label">
+              <input type="radio" name="location" checked={filters.location===loc.name} onChange={()=>updateFilter('location', loc.name)} />
+              <span className="radio-custom"></span>{loc.name}
             </label>
           ))}
         </div>
@@ -168,7 +145,7 @@ const MainFilterDropdown = ({ onClose, filters, setFilters }) => {
         <div className="price-row">
           <span>Miễn phí</span>
           <label className="switch">
-            <input type="checkbox" checked={filters.isFree} onChange={e=>updateFilter('isFree',e.target.checked)} />
+            <input type="checkbox" checked={filters.isFree} onChange={e=>updateFilter('isFree', e.target.checked)} />
             <span className="slider round"></span>
           </label>
         </div>
@@ -177,8 +154,8 @@ const MainFilterDropdown = ({ onClose, filters, setFilters }) => {
       <div className="filter-section">
         <h4>Thể loại</h4>
         <div className="category-chips">
-          {categories.map(cat=>(
-            <button key={cat.id} className={`chip-btn ${filters.category===cat.id?'active':''}`} onClick={()=>updateFilter('category', filters.category===cat.id?null:cat.id)}>
+          {categories.map(cat => (
+            <button key={cat.id} className={`chip-btn ${filters.category===cat.name?'active':''}`} onClick={()=>updateFilter('category', filters.category===cat.name?null:cat.name)}>
               {cat.name}
             </button>
           ))}
@@ -186,7 +163,7 @@ const MainFilterDropdown = ({ onClose, filters, setFilters }) => {
       </div>
 
       <div className="dropdown-footer">
-        <button className="reset-btn" onClick={()=>setFilters({location:'Toàn quốc', isFree:false, category:null})}>Thiết lập lại</button>
+        <button className="reset-btn" onClick={()=>setFilters({location:'Toàn quốc',isFree:false,category:null})}>Thiết lập lại</button>
         <button className="apply-btn" onClick={onClose}>Áp dụng</button>
       </div>
     </div>
@@ -198,18 +175,15 @@ const FilterPage = () => {
   const navigate = useNavigate();
   const [openDropdown,setOpenDropdown] = useState(null);
 
-  // Data states
   const [events,setEvents] = useState([]);
   const [categories,setCategories] = useState([]);
   const [locations,setLocations] = useState([]);
   const [tickets,setTickets] = useState([]);
   const [loading,setLoading] = useState(true);
 
-  // Filter states
   const [dateRange,setDateRange] = useState({start:null,end:null});
-  const [advancedFilters,setAdvancedFilters] = useState({location:'Toàn quốc', isFree:false, category:null});
+  const [advancedFilters,setAdvancedFilters] = useState({location:'Toàn quốc',isFree:false,category:null});
 
-  // Fetch data
   useEffect(()=>{
     const fetchData = async ()=>{
       try{
@@ -218,64 +192,60 @@ const FilterPage = () => {
         ]);
         setEvents(eventRes.data);
         setCategories(categoryRes.data);
-        setLocations(locationRes.data);
+        setLocations(locationRes.data); // giữ nguyên object {id, name}
         setTickets(ticketRes.data);
-      }catch(err){
-        console.error("Lỗi load dữ liệu:",err);
-      }finally{
-        setLoading(false);
-      }
+      }catch(err){console.error(err);}
+      finally{setLoading(false);}
     };
     fetchData();
   },[]);
 
-  const getLocationNameByEventId = (eventId)=>{
-    const event = events.find(e=>e.id===eventId);
+  const getLocationNameByEventId = (eventId) => {
+    const event = events.find(e => e.id === eventId);
     if(!event) return "";
-    const loc = locations.find(l=>l.id===event.location_id);
+    const loc = locations.find(l => l.id === event.location_id);
     return loc?.name || "";
   };
 
-  const getMinTicketPrice = (eventId)=>{
+  const getCategoryNameByEventId = (eventId) => {
+    const event = events.find(e => e.id === eventId);
+    if(!event) return "";
+    const cat = categories.find(c => c.id === event.category_id);
+    return cat?.name || "";
+  };
+
+  const getMinTicketPrice = (eventId) => {
     const eventTickets = tickets.filter(t=>t.event_id===eventId);
     if(eventTickets.length===0) return null;
     return Math.min(...eventTickets.map(t=>Number(t.price)));
   };
 
-  const goToDetail = (id)=>{
-    localStorage.setItem("eventid",id);
+  const goToDetail = (id) => {
+    localStorage.setItem("eventid", id);
     navigate("/ticketdetail");
   };
 
   // =================== FILTER LOGIC ===================
-  const categoryNameMap = {
-    'music':'Nhạc sống',
-    'art':'Sân khấu & Nghệ thuật',
-    'sport':'Thể thao',
-    'other':'Khác'
-  };
-
   const filteredEvents = events.filter(event=>{
     let pass = true;
 
     // Date Range
     if(dateRange.start){
-      const eventDate = new Date(event.start_date);
-      eventDate.setHours(0,0,0,0);
+      const eventDate = new Date(event.start_date); eventDate.setHours(0,0,0,0);
       const effectiveEnd = dateRange.end || dateRange.start;
-      if(eventDate < dateRange.start || eventDate > effectiveEnd) pass=false;
+      if(eventDate<dateRange.start || eventDate>effectiveEnd) pass=false;
     }
 
     // Category
     if(advancedFilters.category && pass){
-      const eventCategoryId = event.category_id || event.category;
-      if(eventCategoryId !== advancedFilters.category) pass = false;
+      const categoryName = getCategoryNameByEventId(event.id);
+      if(categoryName!==advancedFilters.category) pass=false;
     }
 
     // Location
     if(advancedFilters.location!=='Toàn quốc' && pass){
       const locName = getLocationNameByEventId(event.id);
-      if(!locName.includes(advancedFilters.location)) pass=false;
+      if(locName!==advancedFilters.location) pass=false;
     }
 
     // Free price
@@ -289,13 +259,8 @@ const FilterPage = () => {
 
   if(loading) return <div className="loading-container">Đang tải dữ liệu...</div>;
 
-  // Date label
-  const getDateLabel = ()=>{
-    if(dateRange.start && dateRange.end){
-      const d1 = dateRange.start.getDate() + "/" + (dateRange.start.getMonth()+1);
-      const d2 = dateRange.end.getDate() + "/" + (dateRange.end.getMonth()+1);
-      return `${d1} - ${d2}`;
-    }
+  const getDateLabel = () => {
+    if(dateRange.start && dateRange.end) return `${dateRange.start.getDate()}/${dateRange.start.getMonth()+1} - ${dateRange.end.getDate()}/${dateRange.end.getMonth()+1}`;
     if(dateRange.start) return `${dateRange.start.getDate()}/${dateRange.start.getMonth()+1}`;
     return "Tất cả các ngày";
   };
@@ -325,29 +290,13 @@ const FilterPage = () => {
             <button className={`filter-btn ${openDropdown==='filter'?'active':''}`} onClick={()=>setOpenDropdown(openDropdown==='filter'?null:'filter')}>
               ⚙️ Bộ lọc ▼
             </button>
-            {openDropdown==='filter' && <MainFilterDropdown onClose={()=>setOpenDropdown(null)} filters={advancedFilters} setFilters={setAdvancedFilters} />}
+            {openDropdown==='filter' && <MainFilterDropdown onClose={()=>setOpenDropdown(null)} filters={advancedFilters} setFilters={setAdvancedFilters} categories={categories} locations={locations} />}
           </div>
 
-          {/* Location Chip */}
-          {advancedFilters.location!=='Toàn quốc' && (
-            <button className="filter-chip" onClick={()=>handleRemoveFilter('location')}>
-              <span className="chip-close-icon">✕</span>{advancedFilters.location}
-            </button>
-          )}
-
-          {/* Category Chip */}
-          {advancedFilters.category && (
-            <button className="filter-chip" onClick={()=>handleRemoveFilter('category')}>
-              <span className="chip-close-icon">✕</span>{categoryNameMap[advancedFilters.category]}
-            </button>
-          )}
-
-          {/* Price Chip */}
-          {advancedFilters.isFree && (
-            <button className="filter-chip" onClick={()=>handleRemoveFilter('isFree')}>
-              <span className="chip-close-icon">✕</span>Miễn phí
-            </button>
-          )}
+          {/* Filter Chips */}
+          {advancedFilters.location!=='Toàn quốc' && <button className="filter-chip" onClick={()=>handleRemoveFilter('location')}><span className="chip-close-icon">✕</span>{advancedFilters.location}</button>}
+          {advancedFilters.category && <button className="filter-chip" onClick={()=>handleRemoveFilter('category')}><span className="chip-close-icon">✕</span>{advancedFilters.category}</button>}
+          {advancedFilters.isFree && <button className="filter-chip" onClick={()=>handleRemoveFilter('isFree')}><span className="chip-close-icon">✕</span>Miễn phí</button>}
         </div>
       </div>
 
