@@ -154,9 +154,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* =======================
-            DESTINATION
-        ==========================*/}
+       
         <section className="destination-section">
           <h2>Điểm đến phổ biến</h2>
           <div className="destination-list">
