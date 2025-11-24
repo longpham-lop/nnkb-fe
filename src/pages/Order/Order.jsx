@@ -102,12 +102,11 @@ function OrderFormPage() {
       console.log("Order Created:", createdOrder);
          // Khi tạo Order thành công → Điều hướng sang thanh toán
       navigate("/payticket", {
-        state: {
-          summary: summary,
-          formData: formData,
-          order: createdOrder,
-        },
-      });
+          state: {
+            summary: { ...summary, orderId: createdOrder.id },
+            formData: formData,
+          },
+        });
     } catch (error) {
       console.error("Lỗi tạo Order:", error);
       alert("Không thể tạo đơn hàng. Vui lòng thử lại.");

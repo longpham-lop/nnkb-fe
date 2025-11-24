@@ -1,4 +1,273 @@
-/* ----- Layout ----- */
+/* --- Biến màu & Cấu hình chung --- */
+:root {
+  --primary-color: #00ba51;   /* Xanh lá chủ đạo */
+  --primary-hover: #009e45;
+  --warning-color: #ff9800;   /* Màu cam cho nút Transfer */
+  --warning-hover: #e68900;
+  --bg-dark: #121212;         /* Nền body */
+  --bg-card: #1f1f1f;         /* Nền các khối */
+  --bg-input: #2a2a2a;
+  --border-color: #333333;
+  --text-white: #ffffff;
+  --text-gray: #a0a0a0;
+  --font-main: "Inter", sans-serif;
+  --font-code: "Courier New", Courier, monospace;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  font-family: var(--font-main);
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Container chính --- */
+.page-container {
+  max-width: 800px; /* Giới hạn chiều rộng cho gọn */
+  margin: 50px auto;
+  padding: 0 20px 50px;
+}
+
+.page-title {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 10px rgba(0, 186, 81, 0.3);
+}
+
+/* --- Wallet Box (Thanh kết nối ví) --- */
+.wallet-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 10px rgba(223, 218, 218, 0.3);
+}
+
+.chain-info {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+/* --- Các Section (Mint, Transfer, Check) --- */
+.section-box {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s;
+  
+}
+
+.section-box:hover {
+  border-color: #f3f1f1;
+}
+
+.section-title {
+  margin-top: 0;
+  color: var(--text-white);
+  font-size: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+/* --- Grid & Inputs --- */
+.grid-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.label-group {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 8px;
+}
+
+.input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 15px;
+  color: var(--text-white);
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: var(--font-main);
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 186, 81, 0.2);
+}
+
+.input::placeholder {
+  color: #555;
+}
+
+/* --- Buttons --- */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  padding: 12px 20px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* Nút Connect Wallet (Màu tối) */
+.btn-primary {
+  background: #333;
+  color: var(--text-white);
+  border: 1px solid #555;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #444;
+  border-color: #666;
+}
+
+/* Nút Mint (Màu xanh chủ đạo) */
+.btn-success {
+  background: var(--primary-color);
+  color: white;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-success:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 12px rgba(0, 186, 81, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Nút Transfer (Màu cam cảnh báo) */
+.btn-warning {
+  background: var(--warning-color);
+  color: #121212; /* Chữ đen trên nền cam */
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-warning:hover:not(:disabled) {
+  background: var(--warning-hover);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Nút Check Owner (Nằm ngang với input) */
+.btn-secondary {
+  background: #444;
+  color: white;
+  min-width: 100px;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #555;
+}
+
+/* Layout riêng cho dòng Check Owner */
+.owner-check-row {
+  display: flex;
+  gap: 15px;
+}
+.owner-check-row .input {
+  flex: 1; /* Input chiếm hết chỗ còn lại */
+}
+
+/* --- Status Box (Giao diện Console/Terminal) --- */
+.status-box {
+  background: #000;
+  border: 1px dashed #444;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 30px;
+  font-family: var(--font-code); /* Font kiểu code */
+  font-size: 0.9rem;
+  color: #ccc;
+  position: relative;
+}
+
+.status-box::before {
+  content: "> Console Output";
+  position: absolute;
+  top: -10px;
+  left: 15px;
+  background: var(--bg-dark);
+  padding: 0 10px;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.status-box strong {
+  color: var(--text-white);
+}
+
+.link {
+  color: var(--primary-color);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--primary-color);
+}
+.link:hover {
+  color: var(--primary-hover);
+  border-bottom-style: solid;
+}
+
+.success-highlight {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .wallet-box {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .owner-check-row {
+    flex-direction: column;
+  }
+  
+  .btn-secondary {
+    width: 100%;
+  }
+}
+/* ----- Layout -----
 .page-container {
   max-width: 780px;
   margin: 30px auto;
@@ -15,12 +284,11 @@
   color: black;
 }
 
-/* ----- Wallet box ----- */
+
 .wallet-box {
   margin-bottom: 24px;
 }
 
-/* ----- Section ----- */
 .section-box {
   margin-bottom: 35px;
   padding: 20px;
@@ -36,14 +304,14 @@
   color:black
 }
 
-/* ----- Grid layout ----- */
+
 .grid-box {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
 }
 
-/* ----- Inputs & labels ----- */
+
 .label-group {
   display: flex;
   flex-direction: column;
@@ -65,7 +333,6 @@
   box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
 }
 
-/* ----- Buttons ----- */
 .btn-primary,
 .btn-success,
 .btn-warning,
@@ -79,7 +346,7 @@
   transition: 0.2s ease;
 }
 
-/* Connect button */
+
 .btn-primary {
   background: #4f46e5;
   color: white;
@@ -88,7 +355,7 @@
   background: #4338ca;
 }
 
-/* Mint button */
+
 .btn-success {
   background: #16a34a;
   color: white;
@@ -97,7 +364,7 @@
   background: #15803d;
 }
 
-/* Transfer button */
+
 .btn-warning {
   background: #d97706;
   color: white;
@@ -106,7 +373,7 @@
   background: #b45309;
 }
 
-/* Check Owner button */
+
 .btn-secondary {
   background: #475569;
   color: white;
@@ -115,14 +382,13 @@
   background: #334155;
 }
 
-/* Owner check row */
+
 .owner-check-row {
   display: flex;
   gap: 12px;
   margin-top: 10px;
 }
 
-/* ----- Status Box ----- */
 .status-box {
   margin-top: 20px;
   padding: 14px;
@@ -132,13 +398,13 @@
   color:black
 }
 
-/* Link */
+
 .link {
   color: #2563eb;
   text-decoration: underline;
 }
 
-/* Notes */
+
 .notes {
   margin-top: 20px;
   font-size: 13px;
@@ -148,4 +414,4 @@
 .notes ul {
   margin: 8px 0 0 20px;
   list-style: disc;
-}
+} */

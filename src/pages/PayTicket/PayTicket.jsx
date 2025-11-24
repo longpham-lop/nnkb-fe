@@ -3,8 +3,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./PayTicket.css";
 import Voucher from "../../components/Voucher/Voucher.jsx";
-import { ethers } from "ethers";
-import { generateNFTTicket } from "../../utils/NFTGenerator";
+import { ethers } from "ethers"; 
+import { createPayment } from "../../api/payment";
 
 import VnPay from "../../assets/vnpay.png";
 import ShopeePay from "../../assets/shoppe.png";
@@ -24,7 +24,7 @@ const formatCurrency = (amount) => {
   );
 };
 
-/* --- Simple PageHeader (bạn có thể thay bằng component riêng nếu muốn) --- */
+/* --- Simple PageHeader --- */
 function PageHeader() {
   return (
     <header className="payment-header">
@@ -33,7 +33,7 @@ function PageHeader() {
   );
 }
 
-/* --- CountdownTimer giữ nguyên logic của bạn --- */
+/* --- CountdownTimer --- */
 function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState(15 * 60);
 
@@ -63,11 +63,13 @@ function PaymentPage() {
   const location = useLocation();
 
   const { summary, formData } = location.state || {};
-  const [paymentMethod, setPaymentMethod] = useState("vnpay");
+  const [paymentMethod, setPaymentMethod] = useState("vnpay"); // Mặc định là vnpay hoặc metamask tuỳ bạn
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appliedVoucher, setAppliedVoucher] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentId, setPaymentId] = useState(null);
+
 
   const { discountAmount, finalTotalPrice } = useMemo(() => {
     const basePrice = summary?.totalPrice || 0;
@@ -79,7 +81,7 @@ function PaymentPage() {
     if (!summary || !formData) navigate("/");
   }, [summary, formData, navigate]);
 
-  /* --- Detect account/network change (good UX) --- */
+  /* --- Detect account/network change (Giữ lại để hiển thị địa chỉ ví nếu đã connect từ trước) --- */
   useEffect(() => {
     if (!window.ethereum) return;
 
@@ -88,7 +90,10 @@ function PaymentPage() {
       else setWalletAddress(null);
     };
 
-        try {
+  
+    window.ethereum.request({ method: 'eth_accounts' }).then(handleAccountsChanged).catch(console.error);
+
+    try {
       window.ethereum.on && window.ethereum.on("accountsChanged", handleAccountsChanged);
     } catch {
       // ignore
@@ -101,94 +106,78 @@ function PaymentPage() {
         // ignore
       }
     };
-  },
-  []);
+  }, []);
 
-  /* --- Kết nối MetaMask --- */
+
   const connectWallet = async () => {
-    navigate('/block-lo')
+    navigate('/block-lo', {
+        state: {
+          summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount },
+          formData,
+        }
+    });
   };
 
-
-  /* --- Hàm xử lý thanh toán (MetaMask) --- */
+  /* --- LOGIC XỬ LÝ THANH TOÁN ĐÃ CHỈNH SỬA --- */
   const handlePayment = async () => {
-    if (!summary || !formData) {
-      alert("Thông tin đơn hàng không hợp lệ.");
-      return;
+  if (!summary || !formData) {
+    alert("Thông tin đơn hàng không hợp lệ.");
+    return;
+  }
+
+  setIsProcessing(true);
+
+  try {
+    // ====== DỮ LIỆU GỬI LÊN BACKEND ======
+    const paymentData = {
+      order_id: summary.orderId,  
+      method: paymentMethod.toUpperCase(),
+      status: "pending",
+      transaction_code: "TXN" + Date.now(),  
+      paid_at: null,
+      total_paid: finalTotalPrice
+};
+
+
+    // ====== GỌI API createPayment ======
+    const res = await createPayment(paymentData);
+
+    // Lưu lại paymentId nếu backend trả về
+    if (res.data?.id) {
+      setPaymentId(res.data.id);
     }
 
-    // Non-blockchain paths
-    if (paymentMethod !== "metamask") {
-      navigate("/pay", {
+    // ====== Nếu thanh toán bằng MetaMask => chuyển sang trang blockchain ======
+    if (paymentMethod === "metamask") {
+      navigate("/block-lo", {
         state: {
+          paymentId: res.data?.id,
           summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount },
           formData,
           paymentMethod,
         },
       });
-      return;
-    }
-
-    // MetaMask path
-    if (!walletAddress) {
-      alert("Vui lòng kết nối MetaMask trước khi thanh toán!");
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      // --- Provider & signer (ethers v6 style) ---
-      // Nếu bạn dùng ethers v5, thay đổi tương ứng.
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      // TODO: Thay giá trị này bằng quy đổi VND -> ETH từ backend/oracle nếu cần chính xác.
-      // Hiện để test dùng giá cố định
-      const ethAmount = "0.0001"; // ví dụ: 0.0001 ETH, hãy điều chỉnh trước khi demo/đi thi
-
-      // Gửi giao dịch thanh toán on-chain
-      const tx = await signer.sendTransaction({
-        to: "0xd74f3c71a7997e51afc2b5ee21e2700b0f3e93a2", // đổi thành địa chỉ thu tiền của bạn (testnet)
-        value: ethers.parseEther(String(ethAmount)),
-        // gasLimit có thể để provider tự ước lượng; nếu gặp lỗi, thử thêm gasLimit
-      });
-
-      // Thông báo cho người dùng
-      alert("Đã gửi giao dịch. Đang chờ xác nhận trên blockchain...");
-      // Chờ tx mined
-      const _RECEIPT = await tx.wait();
-      // receipt.transactionHash hoặc tx.hash
-
-      // --- TẠO NFT (thuần FE) ---
-      // generateNFTTicket phải là hàm của bạn (trả về object metadata/tokenId/...) .
-      // Ở đây chúng ta lưu NFT "phát hành" cục bộ cùng txHash để minh chứng.
-      const nft = await generateNFTTicket({
-        eventName: summary.eventDetails.title,
-        buyer: formData.email,
-        quantity: summary.ticketsInCart.reduce((a, b) => a + b.quantity, 0),
-        txHash: tx.hash,
-        wallet: walletAddress,
-        mintedAt: new Date().toISOString(),
-      });
-
-      // Lưu vào localStorage (client-side)
-      const oldTickets = JSON.parse(localStorage.getItem("nftTickets") || "[]");
-      localStorage.setItem("nftTickets", JSON.stringify([...oldTickets, nft]));
-
-      alert(`Thanh toán & tạo NFT vé thành công!\nTX: ${tx.hash}`);
-      navigate("/mytickets");
-    } catch (err) {
-      console.error("handlePayment error:", err);
-      // nếu user reject, err.code có thể là 4001
-      if (err?.code === 4001) {
-        alert("Bạn đã hủy giao dịch.");
-      } else {
-        alert("Giao dịch thất bại. Kiểm tra console để biết chi tiết.");
-      }
-    } finally {
       setIsProcessing(false);
+      return;
     }
-  };
+
+   
+    navigate("/Pay", {
+      state: {
+        paymentId: res.data?.id,
+        summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount },
+        formData,
+        paymentMethod,
+      },
+    });
+  } catch (error) {
+    console.error("Lỗi khi tạo thanh toán:", error);
+    alert("Không thể tạo thanh toán. Vui lòng thử lại.");
+  }
+
+  setIsProcessing(false);
+};
+
 
   if (!summary || !formData) return null;
 
@@ -222,7 +211,7 @@ function PaymentPage() {
             </p>
             <p style={{ marginTop: 6, color: "#555" }}>
               Nếu chọn MetaMask, NFT vé sẽ được tạo và liên kết với ví:{" "}
-              <strong>{walletAddress ? walletAddress : formData.email}</strong>
+              <strong>{walletAddress ? walletAddress : "Ví Blockchain của bạn"}</strong>
             </p>
           </div>
 
@@ -248,51 +237,56 @@ function PaymentPage() {
                 + Thêm khuyến mãi
               </p>
             )}
-          <label className="payment-option">
-              <input
-                type="radio"
-                name="payment"
-                value="metamask"
-                checked={paymentMethod === "metamask"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-              <span>MetaMask (Blockchain)</span>
-              <div className="logos">
-                <img
-                  src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
-                  alt="MetaMask"
-                  style={{ width: "45px", marginRight: "10px" }}
-                />
-                {!walletAddress && (
-                  <button className="connect-wallet-btn" onClick={connectWallet}>
-                    Kết nối ví
-                  </button>
-                )}
-                {walletAddress && (
-                  <span>
-                    Đã kết nối: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                  </span>
-                )}
-              </div>
 
-              {/* Phần hiển thị thêm khi chọn MetaMask */}
-              {paymentMethod === "metamask" && walletAddress && (
-                <div className="ticket-options" style={{ marginTop: "10px" }}>
-                  <label>
-                    <input type="radio" name="ticket" value="basic" />
-                    Vé cơ bản
-                  </label>
-                  <label style={{ marginLeft: "20px" }}>
-                    <input type="radio" name="ticket" value="blockchain" />
-                    Vé Blockchain
-                  </label>
+            {/* --- Lựa chọn Thanh toán --- */}
+            <div className="payment-options">
+                
+              {/* Option MetaMask */}
+              <label className="payment-option">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="metamask"
+                  checked={paymentMethod === "metamask"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span>MetaMask (Blockchain)</span>
+                <div className="logos">
+                  <img
+                    src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
+                    alt="MetaMask"
+                    style={{ width: "45px", marginRight: "10px" }}
+                  />
+                  {/* Nút kết nối ví: click vào sẽ sang trang block-lo */}
+                  {!walletAddress && (
+                    <button className="connect-wallet-btn" onClick={(e) => {
+                        e.preventDefault(); // Ngăn chặn trigger radio input nếu cần thiết
+                        connectWallet();
+                    }}>
+                      Kết nối ví
+                    </button>
+                  )}
+                  {walletAddress && (
+                    <span>
+                      Đã kết nối: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                    </span>
+                  )}
                 </div>
-              )}
-            </label>
+
+                
+                {paymentMethod === "metamask" && (
+                  
+                    <label style={{ marginLeft: "20px" }}>
+                      <input type="radio" name="ticket" value="blockchain"  /> 
+                    </label>
+                  
+                )}
+              </label>
+            </div>
           </div>
 
           <div className="info-section">
-            <h4>Phương thức thanh toán</h4>
+            <h4>Phương thức thanh toán khác</h4>
             <div className="payment-options">
               <label className="payment-option">
                 <input
@@ -349,8 +343,6 @@ function PaymentPage() {
                   <img src={Card} alt="Card" />
                 </div>
               </label>
-            
-              
             </div>
           </div>
         </main>
@@ -385,7 +377,7 @@ function PaymentPage() {
                 <span>{formatCurrency(originalTotalPrice)}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="order-row discount">
+                <div className="order-row ">
                   <span>Khuyến mãi</span>
                   <span className="discount-amount">{formatCurrency(-discountAmount)}</span>
                 </div>
@@ -400,14 +392,14 @@ function PaymentPage() {
               Bằng việc tiếp tục thanh toán, bạn đã đọc và đồng ý với các{" "}
               <a href="#">Điều khoản Dịch vụ</a>
             </p>
-
+            
             <button
               className="pay-btn"
               onClick={handlePayment}
               disabled={isProcessing}
               style={{ opacity: isProcessing ? 0.7 : 1 }}
             >
-              {isProcessing ? "Đang xử lý..." : paymentMethod === "metamask" ? "Thanh toán & Mint NFT" : "Thanh toán"}
+              {isProcessing ? "Đang xử lý..." : paymentMethod === "metamask" ? "Tiếp tục tới Blockchain" : "Thanh toán"}
             </button>
           </div>
         </aside>

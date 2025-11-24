@@ -1,285 +1,403 @@
-/* Header và Banner (Giống hệt các trang trước) */
-.page-header {
-  background-color: #2b9c6a;
-  padding: 12px 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-}
-.logo {
-   font-size: 24px; 
-     display: flex;
-    align-items: center;
-    margin-top: 8px;
-   font-weight: bold; 
-}
-.nav-links a { color: white; text-decoration: none; margin-left: 20px; font-size: 14px; }
-
-.event-banner {
-  max-width: 1300px;
-  margin: 20px auto;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.event-banner-info h3 { margin-top: 0; font-size: 22px; }
-.event-banner-info p { margin: 5px 0; color: #aaa; font-size: 14px; }
-
-.countdown-timer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #ccc;
-  font-size: 14px;
-}
-.timer-box { display: flex; gap: 10px; margin-top: 10px; }
-.timer-box span {
-  background-color: #d9534f;
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  padding: 8px 12px;
-  border-radius: 4px;
+/* --- Biến màu sắc & Cấu hình chung --- */
+:root {
+  --primary-color: #00ba51; /* Màu xanh lá chủ đạo */
+  --primary-hover: #009e45;
+  --bg-dark: #121212;       /* Nền chính tối */
+  --bg-card: #1f1f1f;       /* Nền các khối nội dung */
+  --text-white: #ffffff;
+  --text-gray: #a0a0a0;
+  --sidebar-bg: #ffffff;    /* Sidebar nền trắng như trong ảnh */
+  --border-color: #333333;
+  --transition-speed: 0.3s;
 }
 
-/* Container chính */
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  font-family: "Inter", sans-serif; /* Nên dùng font hiện đại */
+}
+
+/* --- Layout chính --- */
+.payment-page {
+  padding-bottom: 50px;
+  min-height: 100vh;
+}
+
 .payment-page-container {
   display: flex;
-  max-width: 1300px;
-  width: 100%;
-  margin: 20px auto;
   gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
 }
 
-/* Nội dung (Bên trái) */
-.main-payment-content {
-  flex: 2;
-  background-color: #2c2c2c;
-  padding: 25px 30px;
-  border-radius: 8px;
-  color: #eee;
-  /* Đảm bảo nó tự co chiều cao */
-  align-self: flex-start;
+/* Header & Nút Back */
+.payment-header h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text-white);
+  font-size: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
+
+.back-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-gray);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 20px 0 20px 120px; /* Căn chỉnh cho thẳng hàng với container */
+  transition: var(--transition-speed);
+}
+
+.back-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* --- Banner sự kiện --- */
+.event-banner {
+  background: var(--bg-card);
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  padding: 20px 30px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 5px solid var(--primary-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.event-banner h3 {
+  margin: 0 0 10px 0;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.event-banner p {
+  margin: 5px 0;
+  color: var(--text-gray);
+  font-size: 0.95rem;
+}
+
+/* --- Countdown Timer --- */
+.countdown-timer {
+  text-align: right;
+  font-size: 0.9rem;
+  color: var(--text-gray);
+}
+
+.timer-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-white);
+}
+
+.timer-box span {
+  background: #333;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: var(--primary-color);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* --- Cột bên trái (Main Content) --- */
+.main-payment-content {
+  flex: 1; /* Chiếm phần lớn diện tích */
+}
+
 .main-payment-content h3 {
-  margin-top: 0;
-  border-bottom: 1px solid #555;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 15px;
-  font-size: 16px;
+  margin-bottom: 25px;
+  font-size: 1.2rem;
   text-transform: uppercase;
 }
 
 .info-section {
-  border-bottom: 1px solid #555;
-  padding: 20px 0;
+  background: var(--bg-card);
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
-.info-section:last-child {
-  border-bottom: none;
-}
+
 .info-section h4 {
   margin-top: 0;
   margin-bottom: 15px;
-  color: white;
-  font-size: 16px;
+  font-size: 1.1rem;
+  color: var(--text-white);
 }
-.info-section p {
-  font-size: 14px;
-  color: #aaa;
-  line-height: 1.5;
-}
+
+/* Style cho Voucher */
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.voucher-btn {
-  background: none;
-  border: 1px solid #2b9c6a;
-  color: #2b9c6a;
-  padding: 8px 15px;
+
+.voucher-btn, .connect-wallet-btn {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: 500;
+  font-size: 0.85rem;
+  transition: 0.3s;
 }
+
+.voucher-btn:hover, .connect-wallet-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
 .voucher-text {
-  color: #2b9c6a !important;
+  color: var(--primary-color);
+  cursor: pointer;
   font-weight: 500;
-  cursor: pointer;
-  margin-top: 10px;
 }
 
-/* Payment Options */
-/* .payment-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-} */
-.payment-option {
-  display: flex;
-  align-items: center;
-  background-color: #1a1a1a;
-  border: 1px solid #555;
-  padding: 15px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.payment-option:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-.payment-option:has(input:checked) {
-  border-color: #2b9c6a;
-  background-color: #222;
-}
-.payment-option input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  margin-right: 15px;
-}
-.payment-option span {
-  flex-grow: 1;
-  color: white;
-  font-weight: 500;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-.payment-option .logos {
-  display: flex;
-  gap: 5px;
-}
-.payment-option .logos img {
-  height: 20px;
-}
-
-/* Sidebar (Bên phải) */
-.payment-sidebar {
-  flex: 1;
-}
-.payment-summary-card {
-  background-color: #f0f0f0; /* Nền sáng */
-  color: #111;
-  padding: 20px;
-  border-radius: 8px;
-}
-.summary-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  font-weight: 500;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 15px;
-}
-.summary-header .change-ticket {
-  color: #2b9c6a;
-  cursor: pointer;
-}
-
-.summary-section {
-  padding: 20px 0;
-  border-bottom: 1px solid #ddd;
-}
-.summary-section.tickets .ticket-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #777;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.ticket-item-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-bottom: 5px;
-}
-.ticket-item-row span:first-child {
-  max-width: 80%;
-}
-
-.summary-section.order h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 16px;
-}
-.order-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-.order-row.total {
-  font-size: 18px;
-  font-weight: bold;
-}
-.order-row.total span:last-child {
-  color: #2b9c6a;
-}
-
-.legal-text {
-  font-size: 12px;
-  color: #555;
-  line-height: 1.5;
-  margin-top: 20px;
-}
-.legal-text a {
-  color: #111;
-  text-decoration: underline;
-}
-
-.pay-btn {
-  width: 100%;
-  padding: 15px;
-  background-color: #2b9c6a;
-  border: none;
-  color: white;
-  border-radius: 8px;
-  margin-top: 20px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.pay-btn:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
-}
-
-/* Hiển thị voucher đã áp dụng */
 .applied-voucher {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: #1a1a1a;
-  border: 1px dashed #2b9c6a; /* Viền xanh lá */
-  padding: 10px 15px;
-  border-radius: 4px;
-  margin-top: 10px;
+  gap: 10px;
+  background: rgba(0, 186, 81, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px dashed var(--primary-color);
 }
-.applied-voucher .voucher-name {
-  font-size: 14px;
-  color: #fff;
-  font-weight: 500;
-}
-.applied-voucher .voucher-discount {
-  font-size: 14px;
-  color: #d9534f; /* Màu đỏ */
-  font-weight: bold;
-}
+
 .remove-voucher-btn {
   background: none;
   border: none;
-  color: #aaa;
-  font-size: 20px;
+  color: #ff4d4f;
+  font-size: 1.2rem;
   cursor: pointer;
-  padding: 0 5px;
-  line-height: 1;
+  margin-left: auto;
 }
 
-/* Thêm vào tóm tắt đơn hàng */
-.order-row.discount .discount-amount {
-  color: #d9534f; /* Màu đỏ */
+/* --- Các lựa chọn thanh toán (Radio Buttons đẹp) --- */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-option {
+  display: flex;
+  flex-wrap: wrap; /* Để phần mở rộng MetaMask xuống dòng */
+  align-items: center;
+  padding: 15px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  background: #2a2a2a;
+  transition: all 0.2s ease-in-out;
+}
+
+.payment-option:hover {
+  background: #333;
+  border-color: #555;
+}
+
+/* Khi radio được chọn */
+.payment-option:has(input:checked) {
+  border-color: var(--primary-color);
+  background: rgba(0, 186, 81, 0.05); /* Xanh nhạt */
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.payment-option input[type="radio"] {
+  accent-color: var(--primary-color);
+  transform: scale(1.2);
+  margin-right: 15px;
+}
+
+.payment-option span {
   font-weight: 500;
+  font-size: 1rem;
+}
+
+.logos {
+  margin-left: auto; /* Đẩy logo sang phải cùng */
+  display: flex;
+  align-items: center;
+}
+
+.logos img {
+  height: 30px; /* Kích thước logo đồng đều */
+  object-fit: contain;
+}
+
+/* Ticket Options (Radio con của MetaMask) */
+.ticket-options {
+  width: 100%; /* Xuống dòng full chiều rộng */
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.ticket-options label {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ticket-options input {
+  margin-right: 8px;
+  transform: scale(1);
+}
+
+/* --- Cột bên phải (Sidebar - Summary) --- */
+.payment-sidebar {
+  flex: 0 0 380px; /* Chiều rộng cố định */
+}
+
+/* Card tổng tiền màu trắng */
+.payment-summary-card {
+  background: var(--sidebar-bg); /* Màu trắng */
+  color: #ffffff; /* Chữ đen vì nền trắng */
+  border-radius: 12px;
+  padding: 25px;
+  position: sticky; /* Dính khi cuộn */
+  top: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.change-ticket {
+  color: var(--primary-color);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.summary-section {
+  margin-bottom: 20px;
+}
+
+/* Danh sách vé */
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.ticket-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+/* Tổng tiền */
+.order-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.order-row.total {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px dashed #eee;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.order-row.total span:last-child {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+}
+
+.discount-amount {
+  color: #ff4d4f; /* Màu đỏ cho số tiền giảm */
+}
+
+.legal-text {
+  font-size: 0.8rem;
+  color: #ffffff;
+  margin: 20px 0;
+  line-height: 1.4;
+}
+
+.legal-text a {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Nút Thanh Toán To */
+.pay-btn {
+  width: 100%;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 186, 81, 0.3);
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 186, 81, 0.4);
+}
+
+.pay-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- Responsive Mobile --- */
+@media (max-width: 900px) {
+  .payment-page-container {
+    flex-direction: column;
+  }
+
+  .payment-sidebar {
+    flex: 1;
+    width: 100%;
+    color:#ccc
+  }
+  
+  .event-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .countdown-timer {
+    text-align: left;
+  }
 }
