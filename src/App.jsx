@@ -285,7 +285,8 @@ function Layout() {
   };
 
   const onSelectEvent = (event) => {
-    navigate(`/events/${event.id}`);
+    localStorage.setItem("eventid", event.id);
+    navigate("/ticketdetail");
     setShowDropdown(false);
     setKeyword("");
   };
@@ -307,6 +308,11 @@ function Layout() {
     || location.pathname === "/admin/transaction"
     || location.pathname === "/admin/payment";
   const currentUser = user.role;
+
+  const logout =()=>{
+    localStorage.clear();
+    navigate("/");
+  }
 
   return (
     <>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ticket.css"; 
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import {
   getAllTickets,
   createTicket,
@@ -303,14 +304,14 @@ const Tickets = () => {
                         className="btn-icon edit"
                         onClick={() => handleEdit(t)}
                         title="Sửa"
-                      >
+                      ><i className="bi bi-pencil-square"></i>
                         <Edit size={16} />
                       </button>
                       <button
                         className="btn-icon delete"
                         onClick={() => handleDelete(t.id)}
                         title="Xóa"
-                      >
+                      ><i className="bi bi-trash"></i>
                         <Trash2 size={16} />
                       </button>
                     </td>

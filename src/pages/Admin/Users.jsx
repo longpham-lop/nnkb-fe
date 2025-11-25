@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Users.css";
 import { getAllUsers, updateUser } from "../../api/auth";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { 
   Users as UsersIcon, Search, Shield, ShieldAlert, 
   CheckCircle, Ban, Filter, Phone, Mail 

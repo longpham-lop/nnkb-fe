@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Setting.css'; 
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Setting = () => {
   const [settings, setSettings] = useState({

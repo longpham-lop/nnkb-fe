@@ -6,6 +6,7 @@ import {
   deletePayment,
 } from "../../api/payment";
 import "./payment.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { 
   CreditCard, Edit, Trash2, Save, X, Plus, 
   Search, CheckCircle, XCircle, Clock, Wallet
@@ -279,19 +280,20 @@ const Payments = () => {
                   <td className="date-cell">
                     {p.paid_at ? new Date(p.paid_at).toLocaleString('vi-VN') : '—'}
                   </td>
+                  
                   <td className="action-buttons text-center">
                     <button
                       className="btn-icon edit"
                       onClick={() => handleEdit(p)}
                       title="Sửa"
-                    >
+                    ><i className="bi bi-pencil-square"></i>
                       <Edit size={16} />
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(p.id)}
                       title="Xoá"
-                    >
+                    ><i className="bi bi-trash"></i>
                       <Trash2 size={16} />
                     </button>
                   </td>
