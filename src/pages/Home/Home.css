@@ -1,94 +1,45 @@
 /* --- Cấu trúc chung trang Home --- */
 .home-container {
   margin: 0 auto;
-  padding: 180px 80px;
+  padding: 20px 40px;
   width: 100%;
-  padding-top: 0;
-  padding-bottom: 0;
+  box-sizing: border-box;
 }
 
 main {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 40px;
 }
 
 section h2 {
   font-size: 1.5rem;
-  color: var(--text-white);
+  color: var(--text-white, #fff);
   margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-left: 4px solid var(--primary-color);
+  border-left: 4px solid var(--primary-color, #1db954);
   padding-left: 15px;
 }
 
-.see-more {
-  font-size: 0.9rem;
-  color: var(--primary-color);
-  text-transform: none;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.see-more:hover {
-  text-decoration: underline;
-  color: var(--text-white);
-}
-
-
-.marquee-slider {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); 
-}
-
-.marquee-track {
+/* --- Slider sự kiện kéo chuột --- */
+.event-list {
   display: flex;
   gap: 20px;
-  width: max-content;
-  animation: scroll 40s linear infinite;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  cursor: grab;
 }
 
-.marquee-item {
-  flex: 0 0 300px; 
-  height: 200px;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+.event-list.active {
+  cursor: grabbing;
 }
 
-.marquee-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s;
-}
-
-.marquee-item:hover img {
-  transform: scale(1.1); 
-}
-
-@keyframes scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } 
-}
-
-
-.event-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-  gap: 25px;
-}
-
-
-.event-card, .event-card-large, .event-card-small {
-  background: rgba(255, 255, 255, 0.05); 
+.event-card,
+.event-card-large,
+.event-card-small {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -99,63 +50,105 @@ section h2 {
   flex-direction: column;
 }
 
-.event-card:hover, .event-card-large:hover, .event-card-small:hover {
+.event-card:hover,
+.event-card-large:hover,
+.event-card-small:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 186, 81, 0.2);
-  border-color: var(--primary-color);
+  border-color: var(--primary-color, #1db954);
 }
 
-
-.event-card img, .event-card-large img, .event-card-small img {
+.event-card img,
+.event-card-large img,
+.event-card-small img {
   width: 100%;
-  height: 250px; 
+  height: 250px;
   object-fit: cover;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-
-.event-card-large {
-  grid-column: span 1; 
-}
 .event-card-large img {
-  height: 300px; 
+  height: 300px;
 }
 
-
-.event-card h3, .event-card-small h3 {
+.event-card h3,
+.event-card-small h3 {
   font-size: 1rem;
   font-weight: 600;
-  margin: 15px 15px 5px;
-  color: var(--text-white);
+  margin: 15px;
+  color: var(--text-white, #fff);
   line-height: 1.4;
-  
-
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.event-card .price, .event-card-small .price {
-  color: var(--primary-color);
+.event-card .price,
+.event-card-small .price {
+  color: var(--primary-color, #1db954);
   font-weight: bold;
-  margin: 0 15px;
+  margin: 0 15px 10px;
   font-size: 0.95rem;
 }
 
-.event-card .date, .event-card-small .date {
-  color: var(--text-gray);
+.event-card .date,
+.event-card-small .date {
+  color: var(--text-gray, #ccc);
   font-size: 0.8rem;
-  margin: 5px 15px 15px;
+  margin: 0 15px 15px;
 }
 
-/* --- 4. TOPTICKET BANNER --- */
+/* --- MARQUEE --- */
+.marquee-slider {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  padding: 16px 0;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: marquee 20s linear infinite;
+}
+
+.marquee-item {
+  flex: 0 0 300px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.marquee-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.marquee-item:hover img {
+  transform: scale(1.1);
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* --- TOP TICKET --- */
 .topticket {
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
   margin: 20px 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .topticket img {
@@ -164,40 +157,38 @@ section h2 {
   display: block;
 }
 
-/* --- 5. DESTINATION SECTION (Điểm đến) --- */
-
+/* --- DESTINATION --- */
 .destination-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; 
+  gap: 20px;
   justify-content: center;
 }
 
 .destination-card {
-  width: 320px; 
-  border-radius: 15px; 
-  overflow: hidden; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: transform 0.3s, box-shadow 0.3s; 
+  width: 320px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
 }
 
 .destination-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .destination-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .destination-card:hover img {
-  border-color: var(--primary-color);
-  transform: scale(1.05); 
+  transform: scale(1.05);
   box-shadow: 0 0 15px rgba(0, 186, 81, 0.5);
 }
 
@@ -206,158 +197,34 @@ section h2 {
   padding: 0.5rem 0;
   font-weight: 500;
   font-size: 1rem;
-  color:black;
+  color: black;
   background-color: rgb(7, 174, 37);
 }
 
-/* --- RESPONSIVE MOBILE --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .home-container {
     padding: 10px;
   }
 
-  main {
-    gap: 30px;
-  }
-
-  
-  .marquee-item {
-    flex: 0 0 200px;
-    height: 120px;
-  }
-
   .event-list {
-    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
   }
 
-  section h2 {
-    font-size: 1.2rem;
-  }
-
-  .event-card img, .event-card-large img, .event-card-small img {
+  .event-card img,
+  .event-card-large img,
+  .event-card-small img {
     height: 160px;
   }
 
-  .destination-list {
-    gap: 50px;
+  .marquee-item {
+    flex: 0 0 200px;
+    height: 120px;
   }
 }
 
 @media (max-width: 480px) {
   .event-list {
-    grid-template-columns: 1fr;
+    gap: 10px;
   }
 }
-
-
-/* .event-section, .event-list {
-    overflow: visible  
-}
-.hero-section {
-    width: 2000px;       
-    margin: 0;          
-    padding: 0;         
-    box-sizing: border-box;
-    
-}
-.home-container {
-    padding: -200px 40px;
-    padding-top: -200px;
-    margin: 0 auto;
-}
-.hero-slider{
-   
-    width: fit-content;
-    height: 350px;
-    overflow: hidden;
-    animation : slide 2s linear infinite;
-}
-.hero-banner{
-    
-    width: 100%;
-    height: 350px;
-}
-.hero-banner img{
-    
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-} 
-
-.hero-section::-webkit-scrollbar{
-    display: none;
-}
-.event-card-large {
-    position: relative;
-    margin-left: 40px; 
-}
-
-.event-number {
-    position: absolute; 
-    z-index: 2;
-    top: 50%;
-    transform: translateY(-50%);
-    left: -65px; 
-    color: #1DB954; 
-    font-size: 120px; 
-    font-weight: 900; 
-    line-height: 1; 
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-    user-select: none;
-}
-.admin-btn {
-    padding: 8px 14px;
-    background: #ff6600;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.admin-btn:hover {
-  background: #e05a00;
-}
-
-.topticket {
-  margin: 40px 0;
-  text-align: center;
-}
-
-.marquee-slider {
-  width: 100vw;       
-  overflow: hidden;
-  box-sizing: border-box;
-  padding: 16px 0;     
-}
-
-.marquee-track {
-  display: flex;
-  width: max-content;   
-  animation: marquee 20s linear infinite;
-}
-
-.marquee-item {
-  flex: 0 0 auto;      
-  margin-right: 24px;  
-}
-
-.marquee-item img {
-  width: 300px;         
-  height: 200px;        
-  object-fit: cover;
-  border-radius: 12px;  
-}
-
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%); 
-  }
-}
- */
