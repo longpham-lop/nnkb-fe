@@ -5,6 +5,7 @@ import "./PayTicket.css";
 import Voucher from "../../components/Voucher/Voucher.jsx";
 import { ethers } from "ethers"; 
 import { createPayment } from "../../api/payment";
+import { createvnpay } from "../../api/vnpay.js";
 
 import VnPay from "../../assets/vnpay.png";
 import ShopeePay from "../../assets/shoppe.png";
@@ -117,7 +118,6 @@ function PaymentPage() {
     });
   };
 
-  /* --- LOGIC XỬ LÝ THANH TOÁN ĐÃ CHỈNH SỬA --- */
   const handlePayment = async () => {
   if (!summary || !formData) {
     alert("Thông tin đơn hàng không hợp lệ.");
@@ -126,8 +126,24 @@ function PaymentPage() {
 
   setIsProcessing(true);
 
+  if (paymentMethod === "vnpay") {
+        try {
+      const paymentDa = { amount: finalTotalPrice, bankCode: "NCB", language: "vn" };
+      const res = await createvnpay(paymentDa)
+      
+      if (res.data.url) {
+        window.location.href = res.data.url;
+      } else {
+        console.error("Không nhận được link:", res.data);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Không thể tạo thanh toán");
+    }
+  }
+    
+
   try {
-    // ====== DỮ LIỆU GỬI LÊN BACKEND ======
     const paymentData = {
       order_id: summary.orderId,  
       method: paymentMethod.toUpperCase(),
@@ -139,12 +155,10 @@ function PaymentPage() {
 
     const res = await createPayment(paymentData);
 
-    // Lưu lại paymentId nếu backend trả về
     if (res.data?.id) {
       setPaymentId(res.data.id);
     }
 
-    // ====== Nếu thanh toán bằng MetaMask => chuyển sang trang blockchain ======
     if (paymentMethod === "metamask") {
       navigate("/block-lo", {
         state: {
