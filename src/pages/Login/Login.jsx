@@ -71,7 +71,7 @@ function Login() {
           <span>Hoặc đăng nhập với</span>
         </div>
 
-        <button className="btn-google" onClick={() => window.location.href = "http://localhost:5000/auth/google" }>
+        <button className="btn-google" onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/auth/google` }>
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
