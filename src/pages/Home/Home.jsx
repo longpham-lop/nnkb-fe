@@ -9,7 +9,7 @@ import { getAllTickets } from "../../api/ticket";
 
 import HoChiMinhcity from "../../assets/HoChiMinhcity.png";
 import Hanoi from "../../assets/Hanoi.png";
-import DaLat from "../../assets/DaLat.png";
+import DaLat from "../../assets/Dalat.png";
 import Vitrikhac from "../../assets/vitrikhac.png";
 import Topticket from "../../assets/topticket.png";
 
