@@ -5,7 +5,7 @@ const GoogleCallback = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  fetch("http://localhost:5000/auth/me", {
+  fetch("https://073f96edc15a.ngrok-free.app/auth/me", {
     credentials: "include"
   })
     .then(res => res.json())
