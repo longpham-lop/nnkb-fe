@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./order.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import {
   getAllOrders,
   updateOrder,
@@ -199,14 +200,14 @@ const Orders = () => {
                       className="btn-icon edit"
                       onClick={() => handleEdit(o)}
                       title="Cập nhật trạng thái"
-                    >
+                    ><i className="bi bi-pencil-square"></i>
                       <Edit size={16} />
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(o.id)}
                       title="Xóa đơn hàng"
-                    >
+                    ><i className="bi bi-trash"></i>
                       <Trash2 size={16} />
                     </button>
                   </td>

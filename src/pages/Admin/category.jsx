@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "./category.css"; // Đổi tên file CSS cho đúng ngữ cảnh
+import "./category.css"; 
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import {
   getAllCategories,
   createCategory,
@@ -152,14 +153,14 @@ const Categories = () => {
                       className="btn-icon edit"
                       onClick={() => handleEdit(cat)}
                       title="Sửa"
-                    >
+                    ><i className="bi bi-pencil-square"></i>
                       <Edit size={16} />
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(cat.id)}
                       title="Xóa"
-                    >
+                    ><i className="bi bi-trash"></i>
                       <Trash2 size={16} />
                     </button>
                   </td>

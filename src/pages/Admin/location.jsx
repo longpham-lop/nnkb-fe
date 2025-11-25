@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./location.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import {
   getAllLocations,
   createLocation,
@@ -214,15 +215,22 @@ const Locations = () => {
                         <span className="text-muted">—</span>
                     )}
                     </td>
-                   <td className="action-buttons text-center">
-                      <button className="btn-icon edit" onClick={() => handleEdit(loc)} title="Sửa">
-                          <Edit size={16} />
-                      </button>
-
-                      <button className="btn-icon delete" onClick={() => handleDelete(loc.id)} title="Xóa">
-                          <Trash2 size={16} />
-                      </button>
-                  </td>
+                    <td className="action-buttons text-center">
+                    <button
+                        className="btn-icon edit"
+                        onClick={() => handleEdit(loc)}
+                        title="Sửa"
+                    ><i className="bi bi-pencil-square"></i>
+                        <Edit size={16} />
+                    </button>
+                    <button
+                        className="btn-icon delete"
+                        onClick={() => handleDelete(loc.id)}
+                        title="Xóa"
+                    ><i className="bi bi-trash"></i>
+                        <Trash2 size={16} />
+                    </button>
+                    </td>
                 </tr>
                 ))}
             </tbody>
