@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './Account.css';
 import { Link } from 'react-router-dom';
-import emptyTicketIcon from '../../assets/longavt.png';
 
 // --- COMPONENT CON CHO GIAO DIỆN "THÔNG TIN TÀI KHOẢN" ---
 import { uploadImage } from '../../api/upload';
@@ -48,7 +47,6 @@ const AccountInfo = () => {
       const dataToUpdate = { ...formData, avata };
       await updateUser(user.id, dataToUpdate);
 
-      // Cập nhật localStorage
       const userData = { ...user, ...dataToUpdate };
       localStorage.setItem("user", JSON.stringify(userData));
 
@@ -110,90 +108,6 @@ const AccountInfo = () => {
   );
 };
 
-
-
-// --- COMPONENT CON CHO GIAO DIỆN "VÉ CỦA TÔI" ---
-const MyTickets = () => {
-    // Tạo một mảng dữ liệu giả
-    const recommendedEvents = [
-        {
-            id: 1,
-            image: 'https://via.placeholder.com/280x160.png?text=Super+Week',
-            title: 'SUPER WEEK - ĐẠI LỘ DÂN CHƠI GỌI TÊN...',
-            price: 'Từ 899,000₫',
-            date: '28 Tháng 11, 2025'
-        },
-        {
-            id: 2,
-            image: 'https://via.placeholder.com/280x160.png?text=Garden+Arts',
-            title: '[GARDEN ARTS] - ART WORKSHOP "FRUIT...',
-            price: 'Từ 400,000₫',
-            date: '18 Tháng 10, 2025'
-        },
-        {
-            id: 3,
-            image: 'https://via.placeholder.com/280x160.png?text=The+Masked+Singer',
-            title: 'THE MASKED SINGER VIETNAM ALL-STAR...',
-            price: 'Từ 1,000,000₫',
-            date: '16 Tháng 12, 2025'
-        },
-        {
-            id: 4,
-            image: 'https://via.placeholder.com/280x160.png?text=Perfume',
-            title: 'WORKSHOP NƯỚC HOA SOLID PERFUME...',
-            price: 'Từ 449,000₫',
-            date: '18 Tháng 10, 2025'
-        }
-    ];
-
-    return (
-        <>
-            <h1>Vé của tôi</h1>
-            <hr className="divider" />
-            <div className="ticket-tabs">
-                <button className="tab active">Tất cả</button>
-                <button className="tab">Thành công</button>
-                <button className="tab">Đang xử lý</button>
-                <button className="tab">Đã hủy</button>
-            </div>
-            <div className="ticket-list-container">
-                <div className="ticket-status-section">
-                    <h2>Sắp diễn ra</h2>
-                    <div className="empty-tickets">
-                        <img src={emptyTicketIcon} alt="Empty tickets"/>
-                        <p>Bạn chưa có vé nào</p>
-                        <button className="buy-now-btn">Mua vé ngay</button>
-                    </div>
-                </div>
-                <div className="ticket-status-section">
-                    <h2>Đã kết thúc</h2>
-                </div>
-            </div>
-
-            {/* PHẦN MỚI ĐƯỢC THÊM VÀO */}
-            <div className="recommendations">
-                <h3>Có thể bạn quan tâm</h3>
-                <div className="recommendation-grid">
-                    {recommendedEvents.map(event => (
-                        <div key={event.id} className="reco-card">
-                            <img src={event.image} alt={event.title} />
-                            <h4>{event.title}</h4>
-                            <p className="reco-price">{event.price}</p>
-                            <p className="reco-date">{event.date}</p>
-                        </div>
-                    ))}
-                </div>
-                <div className="see-more-container">
-                 
-                    <Link to="/home" className="see-more-btn">Xem thêm sự kiện</Link>
-                </div>
-            </div>
-           
-        </>
-    );
-};
-
-
 // --- COMPONENT CHÍNH ---
 const Account = () => {
 
@@ -216,12 +130,7 @@ const Account = () => {
                     >
                         Thông tin tài khoản
                     </div>
-                    <div 
-                        className={`nav-item ${activeView === 'tickets' ? 'active' : ''}`}
-                        onClick={() => setActiveView('tickets')}
-                    >
-                        Vé của tôi
-                    </div>
+                    
                     <div 
                         className={`nav-item ${activeView === 'events' ? 'active' : ''}`}
                         onClick={() => setActiveView('events')}

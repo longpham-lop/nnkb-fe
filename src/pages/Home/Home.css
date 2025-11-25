@@ -1,9 +1,10 @@
 /* --- Cấu trúc chung trang Home --- */
 .home-container {
-  max-width: 1440px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 180px 80px;
   width: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 main {

@@ -299,7 +299,7 @@ const Tickets = () => {
                         <span>{formatDate(t.sale_end)}</span>
                       </div>
                     </td>
-                    <td className="action-buttons">
+                    <td>
                       <button
                         className="btn-icon edit"
                         onClick={() => handleEdit(t)}

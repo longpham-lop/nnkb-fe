@@ -63,17 +63,16 @@ function PaymentPage() {
   const location = useLocation();
 
   const { summary, formData } = location.state || {};
-  const [paymentMethod, setPaymentMethod] = useState("vnpay"); // Mặc định là vnpay hoặc metamask tuỳ bạn
+  const [paymentMethod, setPaymentMethod] = useState("vnpay"); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appliedVoucher, setAppliedVoucher] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentId, setPaymentId] = useState(null);
-
-
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const { discountAmount, finalTotalPrice } = useMemo(() => {
-    const basePrice = summary?.totalPrice || 0;
-    const discount = appliedVoucher?.discount || 0;
+  const basePrice = summary?.totalPrice || 0;
+  const discount = appliedVoucher?.discount || 0;
     return { discountAmount: discount, finalTotalPrice: basePrice - discount };
   }, [summary, appliedVoucher]);
 
@@ -138,8 +137,6 @@ function PaymentPage() {
       total_paid: finalTotalPrice
 };
 
-
-    // ====== GỌI API createPayment ======
     const res = await createPayment(paymentData);
 
     // Lưu lại paymentId nếu backend trả về
@@ -207,12 +204,9 @@ function PaymentPage() {
           <div className="info-section">
             <h4>Thông tin nhận vé</h4>
             <p>
-              Vé điện tử sẽ được gửi đến email: <strong>{formData.email}</strong>
+              Vé điện tử sẽ được gửi đến email: <strong>{user.email}</strong>
             </p>
-            <p style={{ marginTop: 6, color: "#555" }}>
-              Nếu chọn MetaMask, NFT vé sẽ được tạo và liên kết với ví:{" "}
-              <strong>{walletAddress ? walletAddress : "Ví Blockchain của bạn"}</strong>
-            </p>
+           
           </div>
 
           <div className="info-section">
@@ -266,11 +260,7 @@ function PaymentPage() {
                       Kết nối ví
                     </button>
                   )}
-                  {walletAddress && (
-                    <span>
-                      Đã kết nối: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                    </span>
-                  )}
+                  
                 </div>
 
                 

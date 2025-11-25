@@ -16,3 +16,4 @@ export const updateOrder = (id, data) =>
 
 export const deleteOrder = (id) =>
   axiosInstance.delete(`${API}/api/orders/${id}`);
+

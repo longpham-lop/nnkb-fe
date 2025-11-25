@@ -184,7 +184,7 @@ const Events = () => {
                   <td><span className="badge-gray">{event.category_id}</span></td>
                   <td>{renderStatus(event.status)}</td>
                   
-                  <td className="action-buttons text-center">
+                  <td>
                     <button
                       className="btn-icon edit"
                       onClick={() => handleEdit(event)}

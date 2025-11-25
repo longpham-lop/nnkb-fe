@@ -84,3 +84,8 @@
     min-width: 90px;
     justify-content: flex-start;
 }
+.action-buttons{
+    display: flex;
+    justify-content: center;
+    margin-left: 130%;
+}

@@ -148,7 +148,7 @@ const Categories = () => {
                   <td>#{cat.id}</td>
                   <td className="highlight-text">{cat.name}</td>
                   <td className="desc-cell">{cat.description || "—"}</td>
-                  <td className="action-buttons text-center">
+                  <td >
                     <button
                       className="btn-icon edit"
                       onClick={() => handleEdit(cat)}

@@ -277,11 +277,11 @@ const Payments = () => {
                         <span className="code-text">{p.transaction_code}</span>
                     ) : <span className="text-muted">—</span>}
                   </td>
-                  <td className="date-cell">
+                  <td >
                     {p.paid_at ? new Date(p.paid_at).toLocaleString('vi-VN') : '—'}
                   </td>
                   
-                  <td className="action-buttons text-center">
+                  <td>
                     <button
                       className="btn-icon edit"
                       onClick={() => handleEdit(p)}

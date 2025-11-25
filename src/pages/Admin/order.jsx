@@ -195,20 +195,20 @@ const Orders = () => {
                         </div>
                     ) : <span className="text-muted">—</span>}
                   </td>
-                  <td className="action-buttons text-center">
+                  <td>
                     <button
                       className="btn-icon edit"
                       onClick={() => handleEdit(o)}
                       title="Cập nhật trạng thái"
                     ><i className="bi bi-pencil-square"></i>
-                      <Edit size={16} />
+                     
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(o.id)}
                       title="Xóa đơn hàng"
                     ><i className="bi bi-trash"></i>
-                      <Trash2 size={16} />
+                      
                     </button>
                   </td>
                 </tr>

@@ -32,7 +32,7 @@ const TicketDetail = () => {
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState("");
 
-  const eventId = localStorage.getItem("eventid"); 
+  const eventId = Number(localStorage.getItem("eventid")); 
   const userId = JSON.parse(localStorage.getItem("user") || "{}");
 
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const TicketDetail = () => {
 
     try {
       const res = await createReview({
-        event_id: eventId,
+        event_id: Number(eventId),
         user_id: userId.id,
         rating: newRating,
         comment: newComment,
@@ -92,13 +92,19 @@ const TicketDetail = () => {
     };
       if (!eventId) return;
 
-    const fetchReviews = async () => {
-      try {
-        const res = await getAllReviews(eventId);
-        setReviews(res.data || []);
-      } catch (err) {
-        console.error("Lỗi load reviews:", err);
-      }
+      const fetchReviews = async () => {
+        try {
+      const res = await getAllReviews();
+
+   
+    const filtered = res.data.filter(
+      (r) => Number(r.event_id) === Number(eventId)
+    );
+
+    setReviews(filtered);
+  } catch (err) {
+    console.error("Lỗi load reviews:", err);
+  }
     };
 
      

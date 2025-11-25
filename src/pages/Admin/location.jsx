@@ -215,7 +215,7 @@ const Locations = () => {
                         <span className="text-muted">—</span>
                     )}
                     </td>
-                    <td className="action-buttons text-center">
+                    <td>
                     <button
                         className="btn-icon edit"
                         onClick={() => handleEdit(loc)}

@@ -317,7 +317,7 @@ function Layout() {
   return (
     <>
       {!hideHeaderFooter && (
-        <div className="home-container">
+        <div className="home-container-app">
           <header className="header">
             {/* Logo */}
             <button className="logo" onClick={() => navigate("/home")}>
