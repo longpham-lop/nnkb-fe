@@ -214,22 +214,15 @@ const Locations = () => {
                         <span className="text-muted">—</span>
                     )}
                     </td>
-                    <td className="action-buttons text-center">
-                    <button
-                        className="btn-icon edit"
-                        onClick={() => handleEdit(loc)}
-                        title="Sửa"
-                    >
-                        <Edit size={16} />
-                    </button>
-                    <button
-                        className="btn-icon delete"
-                        onClick={() => handleDelete(loc.id)}
-                        title="Xóa"
-                    >
-                        <Trash2 size={16} />
-                    </button>
-                    </td>
+                   <td className="action-buttons text-center">
+                      <button className="btn-icon edit" onClick={() => handleEdit(loc)} title="Sửa">
+                          <Edit size={16} />
+                      </button>
+
+                      <button className="btn-icon delete" onClick={() => handleDelete(loc.id)} title="Xóa">
+                          <Trash2 size={16} />
+                      </button>
+                  </td>
                 </tr>
                 ))}
             </tbody>

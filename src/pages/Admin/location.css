@@ -172,7 +172,9 @@
     background-color: #e91e63;
     color: #fff;
 }
-
+.btn-icon svg {
+  stroke: #ffffff; /* Lucide dùng stroke để vẽ icon */
+}
 /* Responsive Form */
 @media (max-width: 768px) {
     .admin-form-grid {
