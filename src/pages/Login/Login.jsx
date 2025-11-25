@@ -71,7 +71,7 @@ function Login() {
           <span>Hoặc đăng nhập với</span>
         </div>
 
-        <button className="btn-google" onClick={() => window.location.href = "https://nnkb-fe-iota.vercel.app/auth/google" }>
+        <button className="btn-google" onClick={() => window.location.href = "http://localhost:5000/auth/google" }>
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
             alt="Google"
