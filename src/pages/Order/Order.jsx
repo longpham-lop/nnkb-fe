@@ -98,9 +98,9 @@ function OrderFormPage() {
         
       const response = await createOrder(orderPayload);
       const createdOrder = response.data;
+      localStorage.setItem("oderid",response.data.id)
 
       console.log("Order Created:", createdOrder);
-         // Khi tạo Order thành công → Điều hướng sang thanh toán
       navigate("/payticket", {
           state: {
             summary: { ...summary, orderId: createdOrder.id },

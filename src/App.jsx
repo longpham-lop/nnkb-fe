@@ -29,6 +29,7 @@ import Setting from './pages/Admin/Setting';
 import Payments from './pages/Admin/payment';
 import { searchEvents } from "./api/event";
 import MintAndTransferTicket from './pages/PayTicket/Blockchain';
+import PaymentSelection from './pages/PaymentSelection/PaymentSelection';
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -225,6 +226,19 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <MintAndTransferTicket />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/chonve"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}  
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <PaymentSelection />
             </Motion.div>
           }
         />

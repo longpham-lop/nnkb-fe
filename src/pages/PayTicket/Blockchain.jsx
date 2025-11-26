@@ -1,375 +1,320 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import "./MintAndTransferTicket.css";
+import { createBlockTicket } from "../../api/blockTicket"; // Đảm bảo đường dẫn API đúng
 
-// --- CONFIG - Thay bằng giá trị thật của bạn ---
-const contractAddress = "0x9167D3D0dEF21275e374b2A49a066741EF78aE2f"; // Địa chỉ mới nhất của bạn
+// --- CẤU HÌNH ---
+const CONTRACT_ADDRESS = "0x9167D3D0dEF21275e374b2A49a066741EF78aE2f";
+const FIXED_PRICE_ETH = "0.001"; // <--- CỐ ĐỊNH GIÁ 0.001 ETH TẠI ĐÂY
 
-const contractABI = [
+const CONTRACT_ABI = [
   "function mintTicket(uint256 eventId, uint256 quantity) payable returns (uint256)",
   "function safeTransferFrom(address from, address to, uint256 tokenId)",
   "function ownerOf(uint256 tokenId) view returns (address)",
+  "function balanceOf(address owner) view returns (uint256)",
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
 ];
 
-export default function MintAndTransferTicket() {
-  // Wallet/chain state
+export default function TicketManagerFixedPrice() {
+  // --- STATE ---
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [account, setAccount] = useState("");
-  const [chainId, setChainId] = useState(null);
-
-  // Form / page data
-  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const [myBalance, setMyBalance] = useState("0");
   
-  const [eventId, setEventId] = useState(params?.get("eventId") || "1");
-  const [pricePerTicket, setPricePerTicket] = useState(params?.get("price") || "0.01");
-  const [quantity, setQuantity] = useState(params?.get("quantity") || "1");
-
-  // UX state
+  // UI State
   const [status, setStatus] = useState("");
-  const [txHash, setTxHash] = useState("");
-  const [lastTokenId, setLastTokenId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Transfer form
+  // Transfer & Check State
   const [transferTokenId, setTransferTokenId] = useState("");
   const [transferTo, setTransferTo] = useState("");
-
-  // Owner Check Form
   const [checkTokenId, setCheckTokenId] = useState("");
 
-  // Contract instance
-  const [contract, setContract] = useState(null);
-
-  // Helper: Lấy URL Explorer dựa trên ChainID
-  const getExplorerUrl = (hash) => {
-    const baseUrl = chainId === 11155111n ? "https://sepolia.etherscan.io" : 
-                    chainId === 137n ? "https://polygonscan.com" : 
-                    chainId === 80001n ? "https://mumbai.polygonscan.com" :
-                    "https://etherscan.io";
-    return `${baseUrl}/tx/${hash}`;
-  };
-
-  // --- CONNECT WALLET (ĐÃ SỬA: BẮT BUỘC SEPOLIA) ---
-  async function connectWallet() {
+  // --- 1. KẾT NỐI VÍ & CHECK MẠNG ---
+  const connectWallet = async (silent = false) => {
     try {
-      if (!window.ethereum) throw new Error("MetaMask not found. Please install it.");
-      
-      // 1. Kết nối provider ban đầu
-      const _provider = new ethers.BrowserProvider(window.ethereum);
-      await _provider.send("eth_requestAccounts", []);
-      
-      // 2. Kiểm tra và Ép chuyển mạng sang Sepolia
-      const network = await _provider.getNetwork();
-      if (network.chainId !== 11155111n) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: "0xaa36a7" }], // Mã Hex của Sepolia
-            });
-          } catch (switchError) {
-            // Nếu chưa có mạng Sepolia thì báo lỗi (thường MetaMask mặc định đã có)
-            throw new Error("Please switch to Sepolia network in MetaMask manually.");
-          }
+      if (!window.ethereum) {
+        if (!silent) alert("Vui lòng cài MetaMask!");
+        return;
       }
 
-      // 3. Lấy lại Provider và Signer sau khi đã chuyển mạng thành công
-      const _providerFinal = new ethers.BrowserProvider(window.ethereum);
-      const _signer = await _providerFinal.getSigner();
-      const _account = await _signer.getAddress();
-      const _networkFinal = await _providerFinal.getNetwork();
+      const _provider = new ethers.BrowserProvider(window.ethereum);
       
-      // Log kiểm tra số dư
-      const balance = await _providerFinal.getBalance(_account);
-      console.log("Connected:", _account);
-      console.log("Balance:", ethers.formatEther(balance));
+      // Silent mode: Chỉ lấy account nếu đã connect từ trước
+      if (silent) {
+        const accounts = await _provider.listAccounts();
+        if (accounts.length === 0) return;
+      } else {
+        await _provider.send("eth_requestAccounts", []);
+      }
 
-      setProvider(_providerFinal);
+      // Ép mạng Sepolia (ChainId: 11155111)
+      const network = await _provider.getNetwork();
+      if (network.chainId !== 11155111n) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xaa36a7" }],
+          });
+        } catch (e) {
+          console.warn("Switch network failed", e);
+        }
+      }
+
+      const _signer = await _provider.getSigner();
+      const _account = await _signer.getAddress();
+
+      setProvider(_provider);
       setSigner(_signer);
       setAccount(_account);
-      setChainId(_networkFinal.chainId);
-
-      const _contract = new ethers.Contract(contractAddress, contractABI, _signer);
-      setContract(_contract);
       
-      setStatus(`Wallet connected: ${_account}`);
+      // Lấy số dư vé ngay
+      fetchBalance(_account, _provider);
+      
+      if (!silent) setStatus(`✅ Đã kết nối: ${_account}`);
+    } catch (err) {
+      console.error(err);
+      if (!silent) setStatus("Lỗi kết nối: " + err.message);
+    }
+  };
 
-      // Listeners
-      if (window.ethereum.on) {
-        window.ethereum.removeAllListeners(); 
-        window.ethereum.on("accountsChanged", (accounts) => {
-             setAccount(accounts[0] || "");
-             window.location.reload();
-        });
-        window.ethereum.on("chainChanged", () => window.location.reload());
+  const fetchBalance = async (addr, prov) => {
+    try {
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
+      const bal = await contract.balanceOf(addr);
+      setMyBalance(bal.toString());
+    } catch (e) {
+      console.log("Lỗi đọc balance (có thể do chưa connect)");
+    }
+  };
+
+  useEffect(() => {
+    connectWallet(true);
+  }, []);
+
+  // --- 2. XỬ LÝ MINT GIỎ HÀNG (QUAN TRỌNG NHẤT) ---
+  const handleMintCart = async () => {
+    if (!signer) return alert("Vui lòng kết nối ví!");
+    
+    // Lấy giỏ hàng
+    const cartRaw = localStorage.getItem("ticketsInCart");
+    const cart = cartRaw ? JSON.parse(cartRaw) : [];
+    
+    if (cart.length === 0) {
+      setStatus("⚠️ Giỏ hàng trống!");
+      return;
+    }
+
+    setIsProcessing(true);
+    const orderId = localStorage.getItem("oderid") || `ORD-${Date.now()}`;
+
+    // B1: GOM NHÓM (Để tránh mint lẻ tẻ nếu có 2 dòng cùng ID)
+    const grouped = cart.reduce((acc, item) => {
+      const key = item.id;
+      if (!acc[key]) acc[key] = { ...item, totalQty: 0 };
+      acc[key].totalQty += parseInt(item.quantity);
+      return acc;
+    }, {});
+
+    const queue = Object.values(grouped); // Biến thành mảng để lặp
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+    const iface = new ethers.Interface(CONTRACT_ABI);
+
+    let successCount = 0;
+
+    try {
+      // B2: VÒNG LẶP MINT TỪNG LOẠI VÉ
+      for (let i = 0; i < queue.length; i++) {
+        const item = queue[i];
+        const { id: eventId, totalQty, name } = item; // name, price gốc trong JSON chỉ để hiển thị/lưu DB
+
+        setStatus(`🔔 [${i + 1}/${queue.length}] Đang mua ${totalQty} vé "${name}" (ID: ${eventId})...`);
+
+        try {
+          // TÍNH GIÁ: 0.001 * Số lượng (Bất kể giá gốc là bao nhiêu)
+          const priceWei = ethers.parseEther(FIXED_PRICE_ETH); 
+          const totalValue = priceWei * BigInt(totalQty);
+
+          // Gửi Transaction
+          const tx = await contract.mintTicket(eventId, totalQty, {
+            value: totalValue,
+            gasLimit: 500000, // Gas dư dả chút cho an toàn
+          });
+
+          setStatus(`⏳ [${i + 1}/${queue.length}] Chờ xác nhận Tx...`);
+          const receipt = await tx.wait();
+
+          // Lọc Log để lấy Token ID
+          const mintedTokenIds = [];
+          for (const log of receipt.logs) {
+            try {
+              const parsed = iface.parseLog(log);
+              if (parsed.name === "Transfer" && parsed.args.to === account) {
+                mintedTokenIds.push(parsed.args.tokenId.toString());
+              }
+            } catch (e) {}
+          }
+
+          // Fallback cho ERC721A (Nếu chỉ trả về 1 Log gộp)
+          if (mintedTokenIds.length === 1 && totalQty > 1) {
+            const startId = BigInt(mintedTokenIds[0]);
+            for (let k = 1; k < totalQty; k++) {
+              mintedTokenIds.push((startId + BigInt(k)).toString());
+            }
+          }
+
+          // Lưu DB Backend
+          const savePromises = mintedTokenIds.map((tokenId, idx) => 
+            createBlockTicket({
+                ticket_unique_id: `${eventId}_${orderId}_${tokenId}`,
+                token_id: tokenId,
+                order_id: orderId,
+                ticket_id: eventId,
+                quantity: 1,
+                unit_price: item.price, // Lưu giá gốc VND vào DB để đối soát
+                tx_hash: tx.hash,
+                wallet_address: account,
+                
+            })
+          );
+          
+          await Promise.all(savePromises);
+          successCount++;
+          console.log(`✅ Xong ID ${eventId}`);
+
+        } catch (subError) {
+          console.error(`Lỗi Mint ID ${eventId}`, subError);
+          // Hỏi user có muốn tiếp tục không, hoặc tự động skip
+          const cont = window.confirm(`Lỗi khi mua vé "${name}". Bạn có muốn thử tiếp các vé còn lại không?`);
+          if (!cont) break; 
+        }
+      }
+
+      // Kết thúc vòng lặp
+      if (successCount === queue.length) {
+        setStatus("🎉 Đã thanh toán xong toàn bộ giỏ hàng!");
+        // localStorage.removeItem("ticketsInCart"); // Mở dòng này nếu muốn xóa giỏ
+        fetchBalance(account, provider); // Cập nhật số dư hiển thị
+      } else {
+        setStatus(`⚠️ Hoàn tất ${successCount}/${queue.length} loại vé.`);
       }
 
     } catch (err) {
       console.error(err);
-      setStatus("Connect failed: " + (err.message || err));
+      setStatus("❌ Lỗi hệ thống: " + err.message);
+    } finally {
+      setIsProcessing(false);
     }
-  }
+  };
 
-  // --- MINT FUNCTION (ĐÃ SỬA: THÊM GAS LIMIT) ---
-  async function handleMint() {
+  // --- 3. CHUYỂN NHƯỢNG ---
+  const handleTransfer = async () => {
+    if (!signer) return alert("Chưa kết nối ví");
+    if (!transferTokenId || !transferTo) return alert("Thiếu thông tin");
+
     try {
-      if (!contract || !signer) throw new Error("Please connect wallet first");
-      setStatus("Preparing mint transaction...");
-      setTxHash("");
-      setLastTokenId(null);
-
-      const priceBN = ethers.parseEther(String(pricePerTicket));
-      const totalValue = priceBN * BigInt(Number(quantity));
-
-      // Gửi transaction với Gas Limit thủ công để tránh lỗi estimate
-      const tx = await contract.mintTicket(BigInt(eventId), BigInt(quantity), {
-        value: totalValue,
-        gasLimit: 300000, // <-- QUAN TRỌNG: Ép gas limit
-      });
-      
-      setStatus("Tx sent. Waiting for confirmation...");
-      setTxHash(tx.hash);
-
-      const receipt = await tx.wait();
-      setStatus("Transaction confirmed!");
-
-      // Phân tích Logs
-      const iface = new ethers.Interface(contractABI);
-      let foundTokenId = null;
-      
-      for (const log of receipt.logs) {
-        try {
-          const parsed = iface.parseLog({ topics: [...log.topics], data: log.data });
-          if (parsed && parsed.name === "Transfer") {
-            foundTokenId = parsed.args[2].toString();
-            break;
-          }
-        } catch (e) {
-          // Không phải log của chúng ta, bỏ qua
-        }
-      }
-
-      if (foundTokenId) {
-        setLastTokenId(foundTokenId);
-        setStatus(`Mint successful! Token ID: ${foundTokenId}`);
-        notifyBackendMint(foundTokenId, tx.hash);
-      } else {
-        setStatus("Mint confirmed but Token ID not found in logs.");
-      }
-
-    } catch (err) {
-      console.error("Mint error:", err);
-      if (err.code === "ACTION_REJECTED") {
-        setStatus("Transaction rejected by user.");
-      } else {
-        setStatus("Mint failed: " + (err.reason || err.message));
-      }
-    }
-  }
-
-  // --- TRANSFER FUNCTION ---
-  async function handleTransfer() {
-    try {
-      if (!contract || !signer) throw new Error("Wallet not connected");
-      if (!transferTokenId || !transferTo) throw new Error("Missing Token ID or Recipient");
-      if (!ethers.isAddress(transferTo)) throw new Error("Invalid recipient address");
-
-      setStatus("Preparing transfer...");
-      const userAddress = await signer.getAddress();
-
+      setStatus(`🚀 Đang chuyển Token #${transferTokenId}...`);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       const tx = await contract["safeTransferFrom(address,address,uint256)"](
-        userAddress, 
-        transferTo, 
-        BigInt(transferTokenId),
-        { gasLimit: 100000 } // Thêm gas limit cho chắc ăn
+        account, transferTo, transferTokenId, { gasLimit: 200000 }
       );
-
-      setStatus("Transfer tx sent. Waiting...");
-      setTxHash(tx.hash);
-      
       await tx.wait();
-      setStatus(`Transfer successful: Token ${transferTokenId} -> ${transferTo}`);
-      notifyBackendTransfer(transferTokenId, userAddress, transferTo, tx.hash);
-
+      setStatus(`✅ Chuyển thành công #${transferTokenId}!`);
+      fetchBalance(account, provider); // Trừ số dư
     } catch (err) {
-      console.error("Transfer error:", err);
-      if (err.code === "ACTION_REJECTED") {
-        setStatus("Transfer rejected by user.");
-      } else {
-        setStatus("Transfer failed: " + (err.reason || err.message || err));
-      }
+      setStatus("❌ Lỗi chuyển: " + (err.reason || err.message));
     }
-  }
-
-  // --- CHECK OWNER FUNCTION ---
-  async function handleCheckOwner() {
-    if (!checkTokenId) {
-      setStatus("Please enter a Token ID to check.");
-      return;
-    }
-    try {
-      setStatus(`Checking owner of ID ${checkTokenId}...`);
-      if (!provider) throw new Error("Please connect wallet to read data.");
-      
-      const readContract = new ethers.Contract(contractAddress, contractABI, provider);
-      const owner = await readContract.ownerOf(BigInt(checkTokenId));
-      
-      setStatus(`Owner of #${checkTokenId}: ${owner}`);
-    } catch (err) {
-      console.warn(err);
-      setStatus("Check failed (Token may not exist or error).");
-    }
-  }
-
-  // --- BACKEND API HELPERS ---
-  const notifyBackendMint = async (tokenId, txHash) => {
-    try {
-      await fetch("/api/save-ticket", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            tokenId, txHash, owner: account, eventId, quantity 
-        }),
-      });
-    } catch (e) { console.warn("API error", e); }
   };
 
-  const notifyBackendTransfer = async (tokenId, from, to, txHash) => {
+  // --- 4. CHECK OWNER ---
+  const handleCheckOwner = async () => {
+    if (!checkTokenId) return;
     try {
-      await fetch("/api/transfer-ticket", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tokenId, from, to, txHash }),
-      });
-    } catch (e) { console.warn("API error", e); }
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+      setStatus(`🔍 Đang check #${checkTokenId}...`);
+      const owner = await contract.ownerOf(checkTokenId);
+      setStatus(`👤 Chủ sở hữu #${checkTokenId}: ${owner}`);
+    } catch (err) {
+      setStatus("❌ Token không tồn tại hoặc lỗi mạng.");
+    }
   };
 
-  useEffect(() => {
-    // Auto connect logic removed for simplicity/safety, user clicks button
-  }, []);
-
+  // --- GIAO DIỆN ---
   return (
     <div className="page-container">
-      <h1 className="page-title">Mint & Transfer NFT Ticket</h1>
+      <h1 className="page-title">Cổng Thanh Toán Vé NFT</h1>
 
+      {/* INFO BOX */}
       <div className="wallet-box">
-        <button onClick={connectWallet} className="btn-primary">
-          {account 
-            ? `Connected: ${account.slice(0, 6)}...${account.slice(-4)}` 
-            : "Connect MetaMask (Sepolia)"}
-        </button>
-        {chainId && <span className="chain-info"> Chain ID: {chainId.toString()}</span>}
+        {!account ? (
+          <button onClick={() => connectWallet(false)} className="btn-primary">Kết Nối MetaMask</button>
+        ) : (
+          <div style={{ textAlign: "left", paddingLeft: 20 }}>
+            <div style={{ color: "green", fontWeight: "bold" }}>● Online: {account.slice(0,6)}...{account.slice(-4)}</div>
+            <div style={{ fontSize: "1.4rem", marginTop: 5 }}>
+              🎫 Số dư vé của bạn: <strong>{myBalance}</strong>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* MINT SECTION */}
-      <section className="section-box">
-        <h2 className="section-title">1. Mint Ticket</h2>
-        <div className="grid-box">
-          <label className="label-group">
-            Event ID
-            <input 
-                value={eventId} 
-                onChange={(e) => setEventId(e.target.value)} 
-                className="input" 
-                type="number"
-            />
-          </label>
-          <label className="label-group">
-            Price (ETH)
-            <input 
-                value={pricePerTicket} 
-                onChange={(e) => setPricePerTicket(e.target.value)} 
-                className="input" 
-            />
-          </label>
-          <label className="label-group">
-            Quantity
-            <input 
-                type="number" 
-                value={quantity} 
-                onChange={(e) => setQuantity(e.target.value)} 
-                className="input" 
-            />
-          </label>
-        </div>
-        <div style={{ marginTop: 12 }}>
+      {/* MAIN ACTIONS */}
+      <div className="grid-layout" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+        
+        {/* CỘT TRÁI: MINT CART */}
+        <section className="section-box">
+          <h2 className="section-title">1. Thanh Toán Giỏ Hàng</h2>
+          <div style={{ marginBottom: 15, padding: 10, background: "#f0f8ff", borderRadius: 8 }}>
+            ℹ️ Phí cố định: <strong>{FIXED_PRICE_ETH} ETH / vé</strong>
+          </div>
           <button 
-            onClick={handleMint} 
-            className="btn-success"
-            disabled={!account}
+            onClick={handleMintCart} 
+            disabled={!account || isProcessing}
+            className={`btn-success ${isProcessing ? "disabled" : ""}`}
+            style={{ width: "100%", padding: "15px", fontSize: "1.1rem" }}
           >
-            Mint Ticket
+            {isProcessing ? "⏳ Đang xử lý giao dịch..." : "🚀 Mua Toàn Bộ Giỏ Hàng"}
           </button>
-        </div>
-      </section>
+        </section>
 
-      {/* TRANSFER SECTION */}
-      <section className="section-box">
-        <h2 className="section-title">2. Transfer Ticket</h2>
-        <div className="grid-box">
-          <label className="label-group">
-            Token ID
-            <input 
-                value={transferTokenId} 
-                onChange={(e) => setTransferTokenId(e.target.value)} 
-                className="input" 
-                type="number"
-            />
-          </label>
-          <label className="label-group">
-            Recipient Address (0x...)
-            <input 
-                value={transferTo} 
-                onChange={(e) => setTransferTo(e.target.value)} 
-                className="input" 
-                placeholder="0x123..."
-            />
-          </label>
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <button 
-            onClick={handleTransfer} 
-            className="btn-warning"
-            disabled={!account}
-          >
-            Transfer
+        {/* CỘT PHẢI: TRANSFER */}
+        <section className="section-box">
+          <h2 className="section-title">2. Chuyển Vé (Tặng)</h2>
+          <input 
+            className="input" type="number" placeholder="Token ID (VD: 105)"
+            value={transferTokenId} onChange={(e) => setTransferTokenId(e.target.value)}
+          />
+          <input 
+            className="input" placeholder="Địa chỉ người nhận (0x...)"
+            value={transferTo} onChange={(e) => setTransferTo(e.target.value)}
+            style={{ marginTop: 10 }}
+          />
+          <button onClick={handleTransfer} className="btn-warning" style={{ marginTop: 10, width: "100%" }}>
+            Gửi Vé
           </button>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* CHECK OWNER SECTION */}
-      <section className="section-box">
-        <h2 className="section-title">3. Check Owner</h2>
-        <div className="owner-check-row">
+      <section className="section-box" style={{ marginTop: 20 }}>
+        <h2 className="section-title">3. Kiểm Tra Vé</h2>
+        <div style={{ display: "flex", gap: 10 }}>
           <input 
-            value={checkTokenId}
-            onChange={(e) => setCheckTokenId(e.target.value)}
-            placeholder="Enter Token ID" 
-            className="input" 
-            type="number"
+            className="input" type="number" placeholder="Nhập Token ID để kiểm tra"
+            value={checkTokenId} onChange={(e) => setCheckTokenId(e.target.value)}
+            style={{ flex: 1 }}
           />
-          <button onClick={handleCheckOwner} className="btn-secondary">
-            Check
-          </button>
+          <button onClick={handleCheckOwner} className="btn-secondary">Kiểm tra</button>
         </div>
       </section>
 
-      {/* STATUS & LOGS */}
+      {/* STATUS BAR */}
       <div className="status-box">
-        <div style={{ fontWeight: "bold" }}>Status:</div>
-        <div style={{ marginBottom: 10, color: "#333" }}>{status}</div>
-        
-        {txHash && (
-          <div style={{ marginTop: 8 }}>
-            Transaction: <a className="link" href={getExplorerUrl(txHash)} target="_blank" rel="noreferrer">View on Explorer</a>
-          </div>
-        )}
-        
-        {lastTokenId && (
-          <div className="success-highlight">
-             🎉 Minted Token ID: <strong>{lastTokenId}</strong>
-          </div>
-        )}
+        <strong>Trạng thái hệ thống:</strong>
+        <p style={{ margin: "5px 0 0 0", color: isProcessing ? "#e67e22" : "#333" }}>
+          {status || "Sẵn sàng."}
+        </p>
       </div>
     </div>
   );
