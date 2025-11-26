@@ -120,7 +120,7 @@ const Home = () => {
               <div
                 key={event.id}
                 className="event-card-large"
-                onClick={() => window.location.href = `/detail/${event.id}`}
+                onDoubleClick={() => window.location.href = `/detail/${event.id}`}
               >
                 <img src={event.cover_image} alt={event.name} />
                 <h3>{event.name}</h3>
