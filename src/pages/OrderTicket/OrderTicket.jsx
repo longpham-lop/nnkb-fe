@@ -149,6 +149,8 @@ function OrderTicketPage() {
       totalPrice
     };
 
+    localStorage.setItem("ticketsInCart", JSON.stringify(ticketsInCart));
+
     navigate('/order', { state: { summary: orderSummary } });
   };
 

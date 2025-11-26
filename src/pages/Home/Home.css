@@ -29,6 +29,7 @@ section h2 {
   overflow-x: auto;
   scroll-behavior: smooth;
   cursor: grab;
+  overflow: hidden;
 }
 
 .event-list.active {
