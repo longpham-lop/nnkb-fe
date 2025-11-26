@@ -250,42 +250,7 @@ function PaymentPage() {
             <div className="payment-options">
                 
               {/* Option MetaMask */}
-              <label className="payment-option">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="metamask"
-                  checked={paymentMethod === "metamask"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span>MetaMask (Blockchain)</span>
-                <div className="logos">
-                  <img
-                    src="https://cryptologos.cc/logos/ethereum-eth-logo.png"
-                    alt="MetaMask"
-                    style={{ width: "45px", marginRight: "10px" }}
-                  />
-                  {/* Nút kết nối ví: click vào sẽ sang trang block-lo */}
-                  {!walletAddress && (
-                    <button className="connect-wallet-btn" onClick={(e) => {
-                        e.preventDefault(); // Ngăn chặn trigger radio input nếu cần thiết
-                        connectWallet();
-                    }}>
-                      Kết nối ví
-                    </button>
-                  )}
-                  
-                </div>
-
-                
-                {paymentMethod === "metamask" && (
-                  
-                    <label style={{ marginLeft: "20px" }}>
-                      <input type="radio" name="ticket" value="blockchain"  /> 
-                    </label>
-                  
-                )}
-              </label>
+              
             </div>
           </div>
 
