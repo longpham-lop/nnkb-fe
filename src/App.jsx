@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import ProtectedRoute from './routes/ProtectedRoute';
+import AdminRoute from './routes/AdminRoute';
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -108,7 +109,7 @@ function AnimatedRoutes() {
         />
         <Route
           path="/account"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -116,12 +117,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Account />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/ticketdetail"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -129,12 +130,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <TicketDetail />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/filter"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -142,12 +143,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Filter />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/orderticket"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -155,12 +156,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <OrderTicket />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/order"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -168,12 +169,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Order />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/payticket"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -181,12 +182,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <PayTicket />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/pay"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -194,12 +195,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Pay />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/termspage"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -207,12 +208,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <TermsPage />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/mytickets"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}  
               animate={{ opacity: 1 }}
@@ -220,12 +221,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <MyTickets />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/mywal"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}  
               animate={{ opacity: 1 }}
@@ -233,12 +234,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <MyWallet />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/block-lo"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}  
               animate={{ opacity: 1 }}
@@ -246,12 +247,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <MintAndTransferTicket />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
           path="/chonve"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}  
               animate={{ opacity: 1 }}
@@ -259,12 +260,12 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <PaymentSelection />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
           <Route
           path="/admin"
-          element={
+          element={<AdminRoute>
             <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -272,7 +273,7 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <Admin />
-            </Motion.div>
+            </Motion.div></AdminRoute>
           }
         >
           <Route index element={<Dashboard />} />

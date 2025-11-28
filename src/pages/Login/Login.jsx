@@ -7,7 +7,6 @@ import { loginSuccess } from "../../redux/authSlice";
 import "./Login.css";
 
 
-
 function Login() {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");

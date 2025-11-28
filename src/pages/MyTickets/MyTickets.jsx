@@ -4,12 +4,13 @@ import emptyTicketIcon from "../../assets/longavt.png";
 import { Link } from "react-router-dom";
 import { getAllOrders, getOrderById, createOrder, updateOrder, deleteOrder } from "../../api/order";
 import { getAllOrderItems, getOrderItemById, createOrderItem, updateOrderItem, deleteOrderItem } from "../../api/orderitem";
+import { useNavigate } from "react-router-dom";
 
 export default function MyTickets() {
   const [regularTickets, setRegularTickets] = useState([]);
   const [nftTickets, setNftTickets] = useState([]);
   const [activeCategory, setActiveCategory] = useState("Vé Thường"); 
-
+  const navigate = useNavigate();
   const [activeStatusTab, setActiveStatusTab] = useState("Tất cả"); 
   const userId = localStorage.getItem("userid");
 
@@ -128,7 +129,7 @@ export default function MyTickets() {
                 <img src={emptyTicketIcon} alt="Empty tickets" />
                 <p>Chưa có vé NFT nào</p>
                 <button className="buy-now-btn">
-                  <Link to="/home">Mua vé ngay</Link>
+                  <Link to="/mywal">chi tiết</Link>
                 </button>
               </div>
             ) : (
