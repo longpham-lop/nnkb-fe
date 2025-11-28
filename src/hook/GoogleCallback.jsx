@@ -1,45 +1,57 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom"; // Thêm useSearchParams
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
-import { jwtDecode } from "jwt-decode"; // Gợi ý: cài thêm npm install jwt-decode để lấy info từ token
+import { jwtDecode } from "jwt-decode"; // Import thư viện decode
 
 const GoogleCallback = () => {
-  // 1. DI CHUYỂN HOOK VÀO TRONG COMPONENT
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // 2. Lấy token trực tiếp từ URL thay vì fetch /auth/me
     const tokenFromUrl = searchParams.get("token");
 
     if (tokenFromUrl) {
-      console.log("Token received:", tokenFromUrl);
+      try {
+        console.log("Token received:", tokenFromUrl);
 
-      // Lưu vào localStorage
-      localStorage.setItem("token", tokenFromUrl);
-      
-      // Nếu bạn muốn lấy thông tin user ngay lập tức, bạn có thể decode token
-      // Hoặc gọi API get profile sau khi đã có token.
-      // Ở đây mình giả sử lưu token xong là thành công:
-      
-      // Dispatch Redux (Tạm thời lưu token, user có thể fetch sau hoặc decode)
-      // Lưu ý: Nếu user trong redux cần object user đầy đủ, bạn nên gọi API get profile bằng token vừa có
-      
-      dispatch(loginSuccess({ token: tokenFromUrl })); 
+        // 1. Giải mã token để lấy thông tin user
+        const userDecoded = jwtDecode(tokenFromUrl);
+        console.log("User info decoded:", userDecoded);
 
-      // Điều hướng về trang chủ
-      navigate("/home");
+        // 2. Lưu vào LocalStorage
+        localStorage.setItem("token", tokenFromUrl);
+        // Quan trọng: Phải dùng JSON.stringify để tránh lỗi "undefined is not valid JSON"
+        localStorage.setItem("user", JSON.stringify(userDecoded));
+
+        // 3. Cập nhật Redux Store
+        dispatch(
+          loginSuccess({
+            token: tokenFromUrl,
+            user: userDecoded,
+          })
+        );
+
+        // 4. Chuyển hướng về Home
+        navigate("/home");
+
+      } catch (error) {
+        console.error("Lỗi khi giải mã token:", error);
+        // Nếu token sai hoặc lỗi format -> đá về login
+        navigate("/login?error=invalid_token");
+      }
     } else {
-      // Trường hợp fallback: Nếu không có token trên URL thì mới thử fetch cookie
-      // Nhưng thường thì nếu URL không có token là lỗi rồi.
       console.error("Không tìm thấy token trên URL");
       navigate("/login?error=google_auth_failed");
     }
   }, [dispatch, navigate, searchParams]);
 
-  return <div>Đang xử lý đăng nhập Google...</div>;
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h3>Đang xử lý đăng nhập Google...</h3>
+    </div>
+  );
 };
 
 export default GoogleCallback;
