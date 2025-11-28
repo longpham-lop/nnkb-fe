@@ -23,11 +23,46 @@ section h2 {
 }
 
 /* --- Slider sự kiện kéo chuột --- */
+.event-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: white;
+  font-size: 28px;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 20;
+  transition: 0.2s;
+}
+
+.arrow:hover {
+  background: rgba(0,0,0,0.65);
+}
+
+.arrow.left {
+  left: 0;
+}
+
+.arrow.right {
+  right: 0;
+}
+.event-list::-webkit-scrollbar {
+  display: none;
+}
 .event-list {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   scroll-behavior: smooth;
+  scrollbar-width: none;
   cursor: grab;
   overflow: hidden;
 }
@@ -50,6 +85,30 @@ section h2 {
   display: flex;
   flex-direction: column;
 }
+.event-card h3,
+.event-card-small h3,
+.event-card-large h3 {
+  font-size: 0.95rem;
+  margin: 12px 10px 8px;
+  line-height: 1.3;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.event-card .price,
+.event-card-small .price,
+.event-card-large .price {
+  margin: 5px 10px 0;
+  font-size: 0.9rem;
+}
+.event-card .date,
+.event-card-small .date,
+.event-card-large .date {
+  margin: 0 10px 12px;
+  font-size: 0.75rem;
+  color: #ddd;
+}
 
 .event-card:hover,
 .event-card-large:hover,
@@ -68,37 +127,6 @@ section h2 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.event-card-large img {
-  height: 300px;
-}
-
-.event-card h3,
-.event-card-small h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 15px;
-  color: var(--text-white, #fff);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.event-card .price,
-.event-card-small .price {
-  color: var(--primary-color, #1db954);
-  font-weight: bold;
-  margin: 0 15px 10px;
-  font-size: 0.95rem;
-}
-
-.event-card .date,
-.event-card-small .date {
-  color: var(--text-gray, #ccc);
-  font-size: 0.8rem;
-  margin: 0 15px 15px;
-}
 
 /* --- MARQUEE --- */
 .marquee-slider {
@@ -117,8 +145,8 @@ section h2 {
 }
 
 .marquee-item {
-  flex: 0 0 300px;
-  height: 200px;
+  flex: 0 0 520px;
+  height: 360px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -201,7 +229,9 @@ section h2 {
   color: black;
   background-color: rgb(7, 174, 37);
 }
-
+.see-more{
+  margin-left: 1000px;
+}
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .home-container {

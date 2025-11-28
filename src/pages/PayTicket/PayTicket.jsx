@@ -3,6 +3,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./PayTicket.css";
 import Voucher from "../../components/Voucher/Voucher.jsx";
+import { ethers } from "ethers"; 
+import { createPayment } from "../../api/payment";
 import { createvnpay } from "../../api/vnpay.js";
 
 import VnPay from "../../assets/vnpay.png";
@@ -78,6 +80,8 @@ function PaymentPage() {
   useEffect(() => {
     if (!summary || !formData) navigate("/");
   }, [summary, formData, navigate]);
+
+  /* --- Detect account/network change (Giữ lại để hiển thị địa chỉ ví nếu đã connect từ trước) --- */
   useEffect(() => {
     if (!window.ethereum) return;
 
@@ -92,16 +96,27 @@ function PaymentPage() {
     try {
       window.ethereum.on && window.ethereum.on("accountsChanged", handleAccountsChanged);
     } catch {
+      // ignore
     }
     return () => {
       try {
         window.ethereum.removeListener &&
           window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
       } catch {
+        // ignore
       }
     };
   }, []);
 
+
+  const connectWallet = async () => {
+    navigate('/block-lo', {
+        state: {
+          summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount },
+          formData,
+        }
+    });
+  };
 
   const handlePayment = async () => {
   if (!summary || !formData) {
@@ -125,7 +140,52 @@ function PaymentPage() {
       console.error(err);
       alert("Không thể tạo thanh toán");
     }
-  } 
+  }
+    
+
+  try {
+    const paymentData = {
+      order_id: summary.orderId,  
+      method: paymentMethod.toUpperCase(),
+      status: "pending",
+      transaction_code: "TXN" + Date.now(),  
+      paid_at: null,
+      total_paid: finalTotalPrice
+};
+
+    const res = await createPayment(paymentData);
+
+    if (res.data?.id) {
+      setPaymentId(res.data.id);
+    }
+
+    if (paymentMethod === "metamask") {
+      navigate("/block-lo", {
+        state: {
+          paymentId: res.data?.id,
+          summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount },
+          formData,
+          paymentMethod,
+        },
+      });
+      setIsProcessing(false);
+      return;
+    }
+
+   
+    navigate("/Pay", {
+      state: {
+        paymentId: res.data?.id,
+        summary: { ...summary, totalPrice: finalTotalPrice, discount: discountAmount },
+        formData,
+        paymentMethod,
+      },
+    });
+  } catch (error) {
+    console.error("Lỗi khi tạo thanh toán:", error);
+    alert("Không thể tạo thanh toán. Vui lòng thử lại.");
+  }
+
   setIsProcessing(false);
 };
 

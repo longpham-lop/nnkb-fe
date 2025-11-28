@@ -8,10 +8,36 @@ import './Filter.css';
 
 // =================== HELPER FUNCTIONS ===================
 const isSameDay = (d1, d2) => d1.getDate() === d2.getDate() &&
-                               d1.getMonth() === d2.getMonth() &&
-                               d1.getFullYear() === d2.getFullYear();
+                              d1.getMonth() === d2.getMonth() &&
+                              d1.getFullYear() === d2.getFullYear();
 
 const isBetween = (date, start, end) => date > start && date < end;
+
+// === CẬP NHẬT QUAN TRỌNG: Hàm lọc trùng mạnh mẽ hơn ===
+const getUniqueBy = (arr, key) => {
+  const seen = new Set();
+  
+  return arr.filter(item => {
+    // Lấy giá trị cần kiểm tra
+    const rawValue = item[key];
+    
+    // Nếu không có giá trị thì bỏ qua
+    if (!rawValue) return false;
+
+    // CHUẨN HÓA CHUỖI ĐỂ SO SÁNH:
+    // 1. trim(): Xóa khoảng trắng thừa đầu đuôi
+    // 2. toLowerCase(): Chuyển về chữ thường
+    // 3. normalize('NFC'): Đưa tiếng Việt về cùng 1 chuẩn Unicode
+    const compareValue = rawValue.toString().trim().toLowerCase().normalize("NFC");
+
+    if (seen.has(compareValue)) {
+      return false; // Đã tồn tại -> Bỏ qua
+    }
+    
+    seen.add(compareValue); // Chưa có -> Thêm vào tập đã thấy
+    return true; // Giữ lại phần tử này
+  });
+};
 
 // =================== SINGLE CALENDAR MONTH COMPONENT ===================
 const CalendarMonth = ({ year, month, startDate, endDate, onDateClick }) => {
@@ -126,14 +152,26 @@ const DatePickerDropdown = ({ onClose, startDate, endDate, setDateRange }) => {
 const MainFilterDropdown = ({ onClose, filters, setFilters, categories, locations }) => {
   const updateFilter = (key,value) => setFilters(prev => ({...prev, [key]:value}));
 
+  // Helper so sánh an toàn khi render checked/active
+  const isSameString = (s1, s2) => {
+     if(!s1 || !s2) return s1 === s2;
+     return s1.toString().trim().toLowerCase().normalize("NFC") === s2.toString().trim().toLowerCase().normalize("NFC");
+  }
+
   return (
     <div className="main-filter-dropdown">
       <div className="filter-section">
         <h4>Vị trí</h4>
         <div className="radio-group-vertical">
-          {locations.map(loc => (
-            <label key={loc.id} className="radio-label">
-              <input type="radio" name="location" checked={filters.location===loc.name} onChange={()=>updateFilter('location', loc.name)} />
+          {locations.map((loc, index) => (
+            <label key={`${loc.name}-${index}`} className="radio-label">
+              {/* So sánh chuẩn hóa để radio checked đúng ngay cả khi chuỗi hơi khác nhau */}
+              <input 
+                type="radio" 
+                name="location" 
+                checked={isSameString(filters.location, loc.name)} 
+                onChange={()=>updateFilter('location', loc.name)} 
+              />
               <span className="radio-custom"></span>{loc.name}
             </label>
           ))}
@@ -154,11 +192,18 @@ const MainFilterDropdown = ({ onClose, filters, setFilters, categories, location
       <div className="filter-section">
         <h4>Thể loại</h4>
         <div className="category-chips">
-          {categories.map(cat => (
-            <button key={cat.id} className={`chip-btn ${filters.category===cat.name?'active':''}`} onClick={()=>updateFilter('category', filters.category===cat.name?null:cat.name)}>
-              {cat.name}
-            </button>
-          ))}
+          {categories.map((cat, index) => {
+             const isActive = isSameString(filters.category, cat.name);
+             return (
+                <button 
+                  key={`${cat.name}-${index}`} 
+                  className={`chip-btn ${isActive ? 'active' : ''}`} 
+                  onClick={()=>updateFilter('category', isActive ? null : cat.name)}
+                >
+                  {cat.name}
+                </button>
+             );
+          })}
         </div>
       </div>
 
@@ -192,13 +237,19 @@ const FilterPage = () => {
         ]);
         setEvents(eventRes.data);
         setCategories(categoryRes.data);
-        setLocations(locationRes.data); // giữ nguyên object {id, name}
+        setLocations(locationRes.data);
         setTickets(ticketRes.data);
       }catch(err){console.error(err);}
       finally{setLoading(false);}
     };
     fetchData();
   },[]);
+
+  // Hàm so sánh chuỗi chuẩn hóa (Dùng lại logic này khi filter events)
+  const isSameString = (s1, s2) => {
+    if(!s1 || !s2) return s1 === s2;
+    return s1.toString().trim().toLowerCase().normalize("NFC") === s2.toString().trim().toLowerCase().normalize("NFC");
+  };
 
   const getLocationNameByEventId = (eventId) => {
     const event = events.find(e => e.id === eventId);
@@ -239,13 +290,15 @@ const FilterPage = () => {
     // Category
     if(advancedFilters.category && pass){
       const categoryName = getCategoryNameByEventId(event.id);
-      if(categoryName!==advancedFilters.category) pass=false;
+      // Sử dụng so sánh chuẩn hóa thay vì ===
+      if(!isSameString(categoryName, advancedFilters.category)) pass=false;
     }
 
     // Location
     if(advancedFilters.location!=='Toàn quốc' && pass){
       const locName = getLocationNameByEventId(event.id);
-      if(locName!==advancedFilters.location) pass=false;
+      // Sử dụng so sánh chuẩn hóa thay vì ===
+      if(!isSameString(locName, advancedFilters.location)) pass=false;
     }
 
     // Free price
@@ -290,7 +343,16 @@ const FilterPage = () => {
             <button className={`filter-btn ${openDropdown==='filter'?'active':''}`} onClick={()=>setOpenDropdown(openDropdown==='filter'?null:'filter')}>
               ⚙️ Bộ lọc ▼
             </button>
-            {openDropdown==='filter' && <MainFilterDropdown onClose={()=>setOpenDropdown(null)} filters={advancedFilters} setFilters={setAdvancedFilters} categories={categories} locations={locations} />}
+            {openDropdown==='filter' && (
+              <MainFilterDropdown 
+                onClose={()=>setOpenDropdown(null)} 
+                filters={advancedFilters} 
+                setFilters={setAdvancedFilters} 
+                // Gọi hàm lọc trùng
+                categories={getUniqueBy(categories, 'name')} 
+                locations={getUniqueBy(locations, 'name')} 
+              />
+            )}
           </div>
 
           {/* Filter Chips */}
