@@ -1,321 +1,393 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import "./MintAndTransferTicket.css";
-import { createBlockTicket } from "../../api/blockTicket"; // Đảm bảo đường dẫn API đúng
+import "./MintAndTransferTicket.css"; // Giữ nguyên file CSS cũ của bạn
+import { createBlockTicket } from "../../api/blockTicket"; 
 
 // --- CẤU HÌNH ---
-const CONTRACT_ADDRESS = "0x9167D3D0dEF21275e374b2A49a066741EF78aE2f";
-const FIXED_PRICE_ETH = "0.001"; // <--- CỐ ĐỊNH GIÁ 0.001 ETH TẠI ĐÂY
+// ⚠️ Thay địa chỉ Contract MỚI NHẤT của bạn vào đây
+const CONTRACT_ADDRESS = "0x6830550Aaf8484c64E0bb6B51247bAc1Bfda7a17"; 
 
+// ABI MỚI (Khớp với Smart Contract SophiaEventTicket đã sửa)
 const CONTRACT_ABI = [
-  "function mintTicket(uint256 eventId, uint256 quantity) payable returns (uint256)",
+  "function mintTicket(uint256 quantity) payable",
+  "function checkIn(uint256 tokenId)",
+  "function withdraw()",
+  "function isTicketUsed(uint256 tokenId) view returns (bool)",
   "function safeTransferFrom(address from, address to, uint256 tokenId)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function balanceOf(address owner) view returns (uint256)",
+  "function hasRole(bytes32 role, address account) view returns (bool)",
+  "function grantRole(bytes32 role, address account)",
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
+  "event TicketCheckedIn(uint256 indexed tokenId, address indexed checkedBy, uint256 timestamp)"
 ];
 
-export default function TicketManagerFixedPrice() {
+// Mã Hash của Role (Tính sẵn để đỡ phải tính lại)
+const GATEKEEPER_ROLE = ethers.id("GATEKEEPER_ROLE");
+const DEFAULT_ADMIN_ROLE = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+export default function TicketSystem() {
   // --- STATE ---
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [account, setAccount] = useState("");
   const [myBalance, setMyBalance] = useState("0");
   
+  // Roles
+  const [isGatekeeper, setIsGatekeeper] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
   // UI State
   const [status, setStatus] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Transfer & Check State
+  // Inputs
+  const [customEthPrice, setCustomEthPrice] = useState("0.001"); // Để test chỉnh giá
+  const [checkInTokenId, setCheckInTokenId] = useState("");
+  const [staffAddress, setStaffAddress] = useState(""); // Để cấp quyền
   const [transferTokenId, setTransferTokenId] = useState("");
   const [transferTo, setTransferTo] = useState("");
   const [checkTokenId, setCheckTokenId] = useState("");
+  const [checkStatusRes, setCheckStatusRes] = useState(null);
 
-  // --- 1. KẾT NỐI VÍ & CHECK MẠNG ---
-  const connectWallet = async (silent = false) => {
+  // --- 1. KẾT NỐI VÍ ---
+  const connectWallet = async () => {
+    if (!window.ethereum) return alert("Cài MetaMask đi bạn ơi!");
+    
     try {
-      if (!window.ethereum) {
-        if (!silent) alert("Vui lòng cài MetaMask!");
-        return;
-      }
-
       const _provider = new ethers.BrowserProvider(window.ethereum);
-      
-      // Silent mode: Chỉ lấy account nếu đã connect từ trước
-      if (silent) {
-        const accounts = await _provider.listAccounts();
-        if (accounts.length === 0) return;
-      } else {
-        await _provider.send("eth_requestAccounts", []);
-      }
-
-      // Ép mạng Sepolia (ChainId: 11155111)
-      const network = await _provider.getNetwork();
-      if (network.chainId !== 11155111n) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0xaa36a7" }],
-          });
-        } catch (e) {
-          console.warn("Switch network failed", e);
-        }
-      }
-
       const _signer = await _provider.getSigner();
       const _account = await _signer.getAddress();
 
       setProvider(_provider);
       setSigner(_signer);
       setAccount(_account);
-      
-      // Lấy số dư vé ngay
+
+      // Check quyền hạn & Số dư
+      checkRoles(_account, _provider);
       fetchBalance(_account, _provider);
-      
-      if (!silent) setStatus(`✅ Đã kết nối: ${_account}`);
+
+      setStatus(`✅ Đã kết nối: ${_account.slice(0,6)}...`);
     } catch (err) {
       console.error(err);
-      if (!silent) setStatus("Lỗi kết nối: " + err.message);
+      setStatus("Lỗi kết nối: " + err.message);
+    }
+  };
+
+  const checkRoles = async (userAddress, prov) => {
+    try {
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
+      const _isGatekeeper = await contract.hasRole(GATEKEEPER_ROLE, userAddress);
+      const _isAdmin = await contract.hasRole(DEFAULT_ADMIN_ROLE, userAddress);
+      
+      setIsGatekeeper(_isGatekeeper);
+      setIsAdmin(_isAdmin);
+    } catch (e) {
+      console.log("Không check được role (có thể do sai mạng)");
     }
   };
 
   const fetchBalance = async (addr, prov) => {
-    try {
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
-      const bal = await contract.balanceOf(addr);
-      setMyBalance(bal.toString());
-    } catch (e) {
-      console.log("Lỗi đọc balance (có thể do chưa connect)");
-    }
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
+    const bal = await contract.balanceOf(addr);
+    setMyBalance(bal.toString());
   };
 
-  useEffect(() => {
-    connectWallet(true);
-  }, []);
+  useEffect(() => { connectWallet(); }, []);
 
-  // --- 2. XỬ LÝ MINT GIỎ HÀNG (QUAN TRỌNG NHẤT) ---
+
+  // --- 2. MINT VÉ (THANH TOÁN) ---
   const handleMintCart = async () => {
-    if (!signer) return alert("Vui lòng kết nối ví!");
+    if (!signer) return alert("Kết nối ví trước!");
     
-    // Lấy giỏ hàng
+    // Lấy giỏ hàng từ LocalStorage
     const cartRaw = localStorage.getItem("ticketsInCart");
     const cart = cartRaw ? JSON.parse(cartRaw) : [];
-    
-    if (cart.length === 0) {
-      setStatus("⚠️ Giỏ hàng trống!");
-      return;
-    }
+    if (cart.length === 0) return setStatus("⚠️ Giỏ hàng trống!");
 
     setIsProcessing(true);
     const orderId = localStorage.getItem("oderid") || `ORD-${Date.now()}`;
-
-    // B1: GOM NHÓM (Để tránh mint lẻ tẻ nếu có 2 dòng cùng ID)
-    const grouped = cart.reduce((acc, item) => {
-      const key = item.id;
-      if (!acc[key]) acc[key] = { ...item, totalQty: 0 };
-      acc[key].totalQty += parseInt(item.quantity);
-      return acc;
-    }, {});
-
-    const queue = Object.values(grouped); // Biến thành mảng để lặp
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-    const iface = new ethers.Interface(CONTRACT_ABI);
 
-    let successCount = 0;
+    // Tính tổng số lượng vé trong giỏ
+    const totalQuantity = cart.reduce((sum, item) => sum + parseInt(item.quantity), 0);
+    
+    setStatus(`💸 Đang mua tổng ${totalQuantity} vé...`);
 
     try {
-      // B2: VÒNG LẶP MINT TỪNG LOẠI VÉ
-      for (let i = 0; i < queue.length; i++) {
-        const item = queue[i];
-        const { id: eventId, totalQty, name } = item; // name, price gốc trong JSON chỉ để hiển thị/lưu DB
+      // Tính tiền: (Giá nhập từ Client để test) * Tổng số lượng
+      const pricePerTicket = ethers.parseEther(customEthPrice); 
+      const totalValue = pricePerTicket * BigInt(totalQuantity);
 
-        setStatus(`🔔 [${i + 1}/${queue.length}] Đang mua ${totalQty} vé "${name}" (ID: ${eventId})...`);
+      // GỌI SMART CONTRACT (Chỉ truyền quantity, contract mới đã bỏ eventId)
+      const tx = await contract.mintTicket(totalQuantity, {
+        value: totalValue, // Gửi ETH theo
+        gasLimit: 500000
+      });
 
+      setStatus("⏳ Đang xác nhận trên Blockchain...");
+      const receipt = await tx.wait();
+
+      // --- XỬ LÝ LOG ĐỂ LẤY TOKEN ID ---
+      // Logic: Lấy tất cả Token ID vừa được mint ra từ event Transfer
+      const iface = new ethers.Interface(CONTRACT_ABI);
+      const mintedIds = [];
+      
+      receipt.logs.forEach((log) => {
         try {
-          // TÍNH GIÁ: 0.001 * Số lượng (Bất kể giá gốc là bao nhiêu)
-          const priceWei = ethers.parseEther(FIXED_PRICE_ETH); 
-          const totalValue = priceWei * BigInt(totalQty);
-
-          // Gửi Transaction
-          const tx = await contract.mintTicket(eventId, totalQty, {
-            value: totalValue,
-            gasLimit: 500000, // Gas dư dả chút cho an toàn
-          });
-
-          setStatus(`⏳ [${i + 1}/${queue.length}] Chờ xác nhận Tx...`);
-          const receipt = await tx.wait();
-
-          // Lọc Log để lấy Token ID
-          const mintedTokenIds = [];
-          for (const log of receipt.logs) {
-            try {
-              const parsed = iface.parseLog(log);
-              if (parsed.name === "Transfer" && parsed.args.to === account) {
-                mintedTokenIds.push(parsed.args.tokenId.toString());
-              }
-            } catch (e) {}
+          const parsed = iface.parseLog(log);
+          if (parsed.name === "Transfer" && parsed.args.to === account) {
+            mintedIds.push(parsed.args.tokenId.toString());
           }
+        } catch(e) {}
+      });
 
-          // Fallback cho ERC721A (Nếu chỉ trả về 1 Log gộp)
-          if (mintedTokenIds.length === 1 && totalQty > 1) {
-            const startId = BigInt(mintedTokenIds[0]);
-            for (let k = 1; k < totalQty; k++) {
-              mintedTokenIds.push((startId + BigInt(k)).toString());
-            }
-          }
+      // --- LƯU DB BACKEND ---
+      // Map ngược lại: Vé đầu tiên trong DB ứng với ID đầu tiên trong mảng mintedIds
+      let idCounter = 0;
+      const savePromises = [];
 
-          // Lưu DB Backend
-          const savePromises = mintedTokenIds.map((tokenId, idx) => 
-            createBlockTicket({
-                ticket_unique_id: `${eventId}_${orderId}_${tokenId}`,
+      for (const item of cart) {
+        for (let k = 0; k < item.quantity; k++) {
+          if (idCounter < mintedIds.length) {
+            const tokenId = mintedIds[idCounter];
+            savePromises.push(createBlockTicket({
+                ticket_unique_id: `${item.id}_${orderId}_${tokenId}`,
                 token_id: tokenId,
                 order_id: orderId,
-                ticket_id: eventId,
+                ticket_id: item.id, // Event ID lưu ở DB
                 quantity: 1,
-                unit_price: item.price, // Lưu giá gốc VND vào DB để đối soát
+                unit_price: item.price,
                 tx_hash: tx.hash,
                 wallet_address: account,
-                
-            })
-          );
-          
-          await Promise.all(savePromises);
-          successCount++;
-          console.log(`✅ Xong ID ${eventId}`);
-
-        } catch (subError) {
-          console.error(`Lỗi Mint ID ${eventId}`, subError);
-          // Hỏi user có muốn tiếp tục không, hoặc tự động skip
-          const cont = window.confirm(`Lỗi khi mua vé "${name}". Bạn có muốn thử tiếp các vé còn lại không?`);
-          if (!cont) break; 
+            }));
+            idCounter++;
+          }
         }
       }
 
-      // Kết thúc vòng lặp
-      if (successCount === queue.length) {
-        setStatus("🎉 Đã thanh toán xong toàn bộ giỏ hàng!");
-        // localStorage.removeItem("ticketsInCart"); // Mở dòng này nếu muốn xóa giỏ
-        fetchBalance(account, provider); // Cập nhật số dư hiển thị
-      } else {
-        setStatus(`⚠️ Hoàn tất ${successCount}/${queue.length} loại vé.`);
-      }
+      await Promise.all(savePromises);
+      setStatus("🎉 Mua vé thành công! Đã lưu vào DB.");
+      fetchBalance(account, provider);
+      // localStorage.removeItem("ticketsInCart"); // Xóa giỏ nếu muốn
 
     } catch (err) {
       console.error(err);
-      setStatus("❌ Lỗi hệ thống: " + err.message);
+      // Nếu lỗi do thiếu tiền (revert từ contract)
+      if (err.message.includes("Khong du tien")) {
+        setStatus("❌ Lỗi: Bạn gửi thiếu tiền ETH rồi!");
+      } else {
+        setStatus("❌ Lỗi Mint: " + (err.reason || err.message));
+      }
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // --- 3. CHUYỂN NHƯỢNG ---
-  const handleTransfer = async () => {
-    if (!signer) return alert("Chưa kết nối ví");
-    if (!transferTokenId || !transferTo) return alert("Thiếu thông tin");
+  // --- 3. CHECK-IN (DÀNH CHO GATEKEEPER) ---
+  const handleCheckIn = async () => {
+    if (!checkInTokenId) return alert("Nhập ID vé cần soát");
+    if (!isGatekeeper && !isAdmin) return alert("Bạn không có quyền soát vé!");
 
     try {
-      setStatus(`🚀 Đang chuyển Token #${transferTokenId}...`);
+      setIsProcessing(true);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      const tx = await contract["safeTransferFrom(address,address,uint256)"](
-        account, transferTo, transferTokenId, { gasLimit: 200000 }
-      );
+      
+      setStatus(`🔍 Đang soát vé #${checkInTokenId}...`);
+      const tx = await contract.checkIn(checkInTokenId);
+      
+      setStatus("⏳ Đang ghi nhận Check-in...");
       await tx.wait();
-      setStatus(`✅ Chuyển thành công #${transferTokenId}!`);
-      fetchBalance(account, provider); // Trừ số dư
+      
+      setStatus(`✅ Check-in THÀNH CÔNG vé #${checkInTokenId}. Mời khách vào!`);
+      setCheckInTokenId("");
     } catch (err) {
-      setStatus("❌ Lỗi chuyển: " + (err.reason || err.message));
+      console.error(err);
+      if (err.message.includes("Ve nay da duoc su dung")) {
+        setStatus("⛔ CẢNH BÁO: Vé này đã dùng rồi! Đuổi về ngay.");
+      } else if (err.message.includes("AccessControl")) {
+        setStatus("⛔ Lỗi: Ví này không có quyền soát vé.");
+      } else {
+        setStatus("❌ Lỗi: " + (err.reason || "Không xác định"));
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  // --- 4. CHECK OWNER ---
-  const handleCheckOwner = async () => {
+  // --- 4. ADMIN: RÚT TIỀN ---
+  const handleWithdraw = async () => {
+    try {
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      const tx = await contract.withdraw();
+      setStatus("⏳ Đang rút tiền về ví...");
+      await tx.wait();
+      setStatus("💰 Rút tiền thành công!");
+    } catch (err) {
+      setStatus("❌ Lỗi rút tiền: " + err.reason);
+    }
+  };
+
+  // --- 5. ADMIN: CẤP QUYỀN NHÂN VIÊN ---
+  const handleGrantRole = async () => {
+    if (!staffAddress) return;
+    try {
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+      const tx = await contract.grantRole(GATEKEEPER_ROLE, staffAddress);
+      setStatus("⏳ Đang cấp quyền...");
+      await tx.wait();
+      setStatus(`👮 Đã cấp quyền Soát vé cho ${staffAddress}`);
+    } catch (err) {
+      setStatus("❌ Lỗi cấp quyền: " + err.reason);
+    }
+  };
+
+  // --- 6. KIỂM TRA TRẠNG THÁI VÉ (PUBLIC) ---
+  const handleCheckStatus = async () => {
     if (!checkTokenId) return;
     try {
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-      setStatus(`🔍 Đang check #${checkTokenId}...`);
       const owner = await contract.ownerOf(checkTokenId);
-      setStatus(`👤 Chủ sở hữu #${checkTokenId}: ${owner}`);
+      const isUsed = await contract.isTicketUsed(checkTokenId);
+      
+      setCheckStatusRes({ owner, isUsed });
+      setStatus("Đã lấy thông tin vé.");
     } catch (err) {
-      setStatus("❌ Token không tồn tại hoặc lỗi mạng.");
+      setCheckStatusRes(null);
+      setStatus("❌ Vé không tồn tại.");
     }
   };
 
-  // --- GIAO DIỆN ---
+  // --- UI RENDER ---
   return (
     <div className="page-container">
-      <h1 className="page-title">Cổng Thanh Toán Vé NFT</h1>
+      <h1 className="page-title">Hệ Thống Vé Blockchain Demo</h1>
 
-      {/* INFO BOX */}
+      {/* WALLET INFO */}
       <div className="wallet-box">
         {!account ? (
-          <button onClick={() => connectWallet(false)} className="btn-primary">Kết Nối MetaMask</button>
+          <button onClick={connectWallet} className="btn-primary">Kết Nối Ví Admin/User</button>
         ) : (
-          <div style={{ textAlign: "left", paddingLeft: 20 }}>
-            <div style={{ color: "green", fontWeight: "bold" }}>● Online: {account.slice(0,6)}...{account.slice(-4)}</div>
-            <div style={{ fontSize: "1.4rem", marginTop: 5 }}>
-              🎫 Số dư vé của bạn: <strong>{myBalance}</strong>
-            </div>
+          <div style={{textAlign:'left', paddingLeft: 20}}>
+            <p><strong>Ví:</strong> {account} {isAdmin && "👑 ADMIN"} {isGatekeeper && "👮 STAFF"}</p>
+            <p><strong>Số dư vé của tôi:</strong> {myBalance} ticket</p>
           </div>
         )}
       </div>
 
-      {/* MAIN ACTIONS */}
-      <div className="grid-layout" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+      <div className="grid-layout" style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:20}}>
         
-        {/* CỘT TRÁI: MINT CART */}
+        {/* CỘT 1: KHÁCH HÀNG MUA VÉ */}
         <section className="section-box">
-          <h2 className="section-title">1. Thanh Toán Giỏ Hàng</h2>
-          <div style={{ marginBottom: 15, padding: 10, background: "#f0f8ff", borderRadius: 8 }}>
-            ℹ️ Phí cố định: <strong>{FIXED_PRICE_ETH} ETH / vé</strong>
+          <h2 className="section-title">🛒 Khách Hàng: Thanh Toán</h2>
+          
+          <div style={{marginBottom:10}}>
+             <label>Giá vé (ETH) - Chỉnh để test:</label>
+             <input 
+               className="input" 
+               type="number" 
+               step="0.0001"
+               value={customEthPrice}
+               onChange={e => setCustomEthPrice(e.target.value)}
+             />
+             <small style={{display:'block', color:'#666'}}>Giá gốc trong contract là 0.001. Thử chỉnh thấp hơn xem có lỗi không?</small>
           </div>
+
           <button 
             onClick={handleMintCart} 
-            disabled={!account || isProcessing}
-            className={`btn-success ${isProcessing ? "disabled" : ""}`}
-            style={{ width: "100%", padding: "15px", fontSize: "1.1rem" }}
+            disabled={isProcessing || !account}
+            className="btn-success" 
+            style={{width:'100%', padding:15}}
           >
-            {isProcessing ? "⏳ Đang xử lý giao dịch..." : "🚀 Mua Toàn Bộ Giỏ Hàng"}
+            {isProcessing ? "⏳ Đang xử lý..." : "🚀 Mua Giỏ Hàng"}
           </button>
         </section>
 
-        {/* CỘT PHẢI: TRANSFER */}
+        {/* CỘT 2: KIỂM TRA VÉ (PUBLIC) */}
         <section className="section-box">
-          <h2 className="section-title">2. Chuyển Vé (Tặng)</h2>
-          <input 
-            className="input" type="number" placeholder="Token ID (VD: 105)"
-            value={transferTokenId} onChange={(e) => setTransferTokenId(e.target.value)}
-          />
-          <input 
-            className="input" placeholder="Địa chỉ người nhận (0x...)"
-            value={transferTo} onChange={(e) => setTransferTo(e.target.value)}
-            style={{ marginTop: 10 }}
-          />
-          <button onClick={handleTransfer} className="btn-warning" style={{ marginTop: 10, width: "100%" }}>
-            Gửi Vé
-          </button>
+          <h2 className="section-title">🔍 Kiểm tra Vé</h2>
+          <div style={{display:'flex', gap:10}}>
+            <input 
+              className="input" 
+              placeholder="ID Vé (VD: 1)" 
+              value={checkTokenId}
+              onChange={e => setCheckTokenId(e.target.value)}
+            />
+            <button onClick={handleCheckStatus} className="btn-secondary">Check</button>
+          </div>
+          
+          {checkStatusRes && (
+            <div style={{marginTop:10, padding:10, background:'#eee', borderRadius:5}}>
+              <p><strong>Chủ sở hữu:</strong> {checkStatusRes.owner.slice(0,10)}...</p>
+              <p>
+                <strong>Trạng thái: </strong> 
+                {checkStatusRes.isUsed ? (
+                  <span style={{color:'red', fontWeight:'bold'}}>ĐÃ SỬ DỤNG (USED)</span>
+                ) : (
+                  <span style={{color:'green', fontWeight:'bold'}}>CÓ HIỆU LỰC (ACTIVE)</span>
+                )}
+              </p>
+            </div>
+          )}
         </section>
+
       </div>
 
-      {/* CHECK OWNER SECTION */}
-      <section className="section-box" style={{ marginTop: 20 }}>
-        <h2 className="section-title">3. Kiểm Tra Vé</h2>
-        <div style={{ display: "flex", gap: 10 }}>
-          <input 
-            className="input" type="number" placeholder="Nhập Token ID để kiểm tra"
-            value={checkTokenId} onChange={(e) => setCheckTokenId(e.target.value)}
-            style={{ flex: 1 }}
-          />
-          <button onClick={handleCheckOwner} className="btn-secondary">Kiểm tra</button>
-        </div>
-      </section>
+      {/* KHU VỰC NHÂN VIÊN SOÁT VÉ (Ẩn nếu không có quyền) */}
+      {(isGatekeeper || isAdmin) && (
+        <section className="section-box" style={{marginTop:20, border:'2px solid #e67e22'}}>
+          <h2 className="section-title" style={{color:'#e67e22'}}>👮 Khu Vực Soát Vé (Gatekeeper)</h2>
+          <p>Chức năng này chỉ hiện lên nếu ví của bạn có quyền Gatekeeper.</p>
+          
+          <div style={{display:'flex', gap:10}}>
+            <input 
+              className="input" 
+              placeholder="Nhập Token ID cần soát (Quét QR)" 
+              value={checkInTokenId}
+              onChange={e => setCheckInTokenId(e.target.value)}
+            />
+            <button onClick={handleCheckIn} className="btn-warning" disabled={isProcessing}>
+              CHECK-IN (Bấm lỗ)
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* KHU VỰC ADMIN (Ẩn nếu không phải Admin) */}
+      {isAdmin && (
+        <section className="section-box" style={{marginTop:20, border:'2px solid #c0392b'}}>
+          <h2 className="section-title" style={{color:'#c0392b'}}>👑 Khu Vực Admin</h2>
+          
+          <div style={{display:'flex', gap:20, alignItems:'flex-start'}}>
+            <div style={{flex:1}}>
+              <h3>Thêm Nhân Viên Soát Vé</h3>
+              <input 
+                className="input" 
+                placeholder="Địa chỉ ví nhân viên (0x...)" 
+                value={staffAddress}
+                onChange={e => setStaffAddress(e.target.value)}
+              />
+              <button onClick={handleGrantRole} className="btn-secondary" style={{marginTop:5}}>
+                Cấp Quyền
+              </button>
+            </div>
+            
+            <div style={{flex:1, borderLeft:'1px solid #ccc', paddingLeft:20}}>
+              <h3>Doanh Thu</h3>
+              <p>Tiền đang nằm trong Smart Contract.</p>
+              <button onClick={handleWithdraw} className="btn-primary">
+                💰 Rút Toàn Bộ Về Ví Này
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* STATUS BAR */}
-      <div className="status-box">
-        <strong>Trạng thái hệ thống:</strong>
-        <p style={{ margin: "5px 0 0 0", color: isProcessing ? "#e67e22" : "#333" }}>
-          {status || "Sẵn sàng."}
-        </p>
+      <div className="status-box" style={{marginTop:20, padding:15, background:'#333', color:'#fff', borderRadius:5}}>
+        <strong>Thông báo hệ thống:</strong> {status}
       </div>
+
     </div>
   );
 }

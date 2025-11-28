@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { login } from "../../api/auth";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../redux/authSlice";
 import "./Login.css";
+
+const dispatch = useDispatch();
 
 function Login() {
 
@@ -22,6 +26,12 @@ function Login() {
       }, 3000);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      dispatch(
+        loginSuccess({
+          user: data.user,
+          token: data.token,
+        })
+      );
       navigate("/home"); 
     } catch (err) {
       setError(err.response?.data?.message || "Sai thông tin đăng nhập");

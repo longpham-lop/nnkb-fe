@@ -2,6 +2,10 @@ import React, { useState, useRef } from 'react';
 import {BrowserRouter, Routes, Route, useLocation, useNavigate,} from "react-router-dom";
 import { AnimatePresence, motion as Motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
+import ProtectedRoute from './routes/ProtectedRoute';
+
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Home from "./pages/Home/Home";
@@ -30,6 +34,8 @@ import Payments from './pages/Admin/payment';
 import { searchEvents } from "./api/event";
 import MintAndTransferTicket from './pages/PayTicket/Blockchain';
 import PaymentSelection from './pages/PaymentSelection/PaymentSelection';
+import MyWallet from './pages/tranfer/MyWallet';
+
 
 import "./App.css";
 // Import ảnh icon mạng xã hội
@@ -88,15 +94,16 @@ function AnimatedRoutes() {
         />
         <Route
           path="/home"
-          element={
+          element={<ProtectedRoute>
             <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
+              
               <Home />
-            </Motion.div>
+            </Motion.div></ProtectedRoute>
           }
         />
         <Route
@@ -213,6 +220,19 @@ function AnimatedRoutes() {
               transition={{ duration: 0.5 }}
             >
               <MyTickets />
+            </Motion.div>
+          }
+        />
+        <Route
+          path="/mywal"
+          element={
+            <Motion.div
+              initial={{ opacity: 0 }}  
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <MyWallet />
             </Motion.div>
           }
         />
@@ -381,7 +401,7 @@ function Layout() {
                 Tài khoản
               </button>
             </div>
-            <button className='btn-logout'onClick={() => navigate("/")}>
+            <button className='btn-logout'onClick={() => logout()}>
               Đăng xuất
             </button>
           </header>
@@ -507,9 +527,10 @@ function Layout() {
 
 function App() {
   return (
+      <Provider store={store}>
     <BrowserRouter>
       <Layout />
-    </BrowserRouter>
+    </BrowserRouter></Provider>
   );
 }
 

@@ -1,0 +1,13 @@
+.ticket-card {
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.ticket-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.ticket-card.selected {
+  background-color: #e3f2fd !important; /* Màu xanh nhạt khi chọn */
+}
