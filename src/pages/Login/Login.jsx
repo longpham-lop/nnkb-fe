@@ -6,10 +6,10 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../redux/authSlice";
 import "./Login.css";
 
-const dispatch = useDispatch();
+
 
 function Login() {
-
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
