@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import "./MintAndTransferTicket.css"; // Giữ nguyên file CSS cũ của bạn
+import "./MintAndTransferTicket.css"; // Nhớ import file CSS mới
 import { createBlockTicket } from "../../api/blockTicket"; 
 
 // --- CẤU HÌNH ---
-// ⚠️ Thay địa chỉ Contract MỚI NHẤT của bạn vào đây
 const CONTRACT_ADDRESS = "0x6830550Aaf8484c64E0bb6B51247bAc1Bfda7a17"; 
 
-// ABI MỚI (Khớp với Smart Contract SophiaEventTicket đã sửa)
 const CONTRACT_ABI = [
   "function mintTicket(uint256 quantity) payable",
   "function checkIn(uint256 tokenId)",
@@ -22,7 +20,6 @@ const CONTRACT_ABI = [
   "event TicketCheckedIn(uint256 indexed tokenId, address indexed checkedBy, uint256 timestamp)"
 ];
 
-// Mã Hash của Role (Tính sẵn để đỡ phải tính lại)
 const GATEKEEPER_ROLE = ethers.id("GATEKEEPER_ROLE");
 const DEFAULT_ADMIN_ROLE = "0x0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -42,17 +39,15 @@ export default function TicketSystem() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Inputs
-  const [customEthPrice, setCustomEthPrice] = useState("0.001"); // Để test chỉnh giá
+  const [customEthPrice, setCustomEthPrice] = useState("0.001");
   const [checkInTokenId, setCheckInTokenId] = useState("");
-  const [staffAddress, setStaffAddress] = useState(""); // Để cấp quyền
-  const [transferTokenId, setTransferTokenId] = useState("");
-  const [transferTo, setTransferTo] = useState("");
+  const [staffAddress, setStaffAddress] = useState("");
   const [checkTokenId, setCheckTokenId] = useState("");
   const [checkStatusRes, setCheckStatusRes] = useState(null);
 
-  // --- 1. KẾT NỐI VÍ ---
+
   const connectWallet = async () => {
-    if (!window.ethereum) return alert("Cài MetaMask đi bạn ơi!");
+    if (!window.ethereum) return alert("Vui lòng cài đặt MetaMask!");
     
     try {
       const _provider = new ethers.BrowserProvider(window.ethereum);
@@ -63,11 +58,10 @@ export default function TicketSystem() {
       setSigner(_signer);
       setAccount(_account);
 
-      // Check quyền hạn & Số dư
       checkRoles(_account, _provider);
       fetchBalance(_account, _provider);
 
-      setStatus(`✅ Đã kết nối: ${_account.slice(0,6)}...`);
+      setStatus(`✅ Đã kết nối: ${_account.slice(0,6)}...${_account.slice(-4)}`);
     } catch (err) {
       console.error(err);
       setStatus("Lỗi kết nối: " + err.message);
@@ -83,7 +77,7 @@ export default function TicketSystem() {
       setIsGatekeeper(_isGatekeeper);
       setIsAdmin(_isAdmin);
     } catch (e) {
-      console.log("Không check được role (có thể do sai mạng)");
+      console.log("Không check được role");
     }
   };
 
@@ -95,41 +89,34 @@ export default function TicketSystem() {
 
   useEffect(() => { connectWallet(); }, []);
 
-
-  // --- 2. MINT VÉ (THANH TOÁN) ---
+  // --- 2. MINT VÉ ---
   const handleMintCart = async () => {
-    if (!signer) return alert("Kết nối ví trước!");
+    if (!signer) return alert("Vui lòng kết nối ví trước!");
     
-    // Lấy giỏ hàng từ LocalStorage
     const cartRaw = localStorage.getItem("ticketsInCart");
     const cart = cartRaw ? JSON.parse(cartRaw) : [];
-    if (cart.length === 0) return setStatus("⚠️ Giỏ hàng trống!");
+    if (cart.length === 0) return setStatus("⚠️ Giỏ hàng đang trống!");
 
     setIsProcessing(true);
     const orderId = localStorage.getItem("oderid") || `ORD-${Date.now()}`;
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-    // Tính tổng số lượng vé trong giỏ
     const totalQuantity = cart.reduce((sum, item) => sum + parseInt(item.quantity), 0);
-    
-    setStatus(`💸 Đang mua tổng ${totalQuantity} vé...`);
+    setStatus(`💸 Đang xử lý mua ${totalQuantity} vé...`);
 
     try {
-      // Tính tiền: (Giá nhập từ Client để test) * Tổng số lượng
       const pricePerTicket = ethers.parseEther(customEthPrice); 
       const totalValue = pricePerTicket * BigInt(totalQuantity);
 
-      // GỌI SMART CONTRACT (Chỉ truyền quantity, contract mới đã bỏ eventId)
       const tx = await contract.mintTicket(totalQuantity, {
-        value: totalValue, // Gửi ETH theo
+        value: totalValue,
         gasLimit: 500000
       });
 
       setStatus("⏳ Đang xác nhận trên Blockchain...");
       const receipt = await tx.wait();
 
-      // --- XỬ LÝ LOG ĐỂ LẤY TOKEN ID ---
-      // Logic: Lấy tất cả Token ID vừa được mint ra từ event Transfer
+      // Xử lý Logs
       const iface = new ethers.Interface(CONTRACT_ABI);
       const mintedIds = [];
       
@@ -139,11 +126,10 @@ export default function TicketSystem() {
           if (parsed.name === "Transfer" && parsed.args.to === account) {
             mintedIds.push(parsed.args.tokenId.toString());
           }
-        } catch(e) {}
+        } catch(e) {/**/ }
       });
 
-      // --- LƯU DB BACKEND ---
-      // Map ngược lại: Vé đầu tiên trong DB ứng với ID đầu tiên trong mảng mintedIds
+      // Lưu DB
       let idCounter = 0;
       const savePromises = [];
 
@@ -155,7 +141,7 @@ export default function TicketSystem() {
                 ticket_unique_id: `${item.id}_${orderId}_${tokenId}`,
                 token_id: tokenId,
                 order_id: orderId,
-                ticket_id: item.id, // Event ID lưu ở DB
+                ticket_id: item.id,
                 quantity: 1,
                 unit_price: item.price,
                 tx_hash: tx.hash,
@@ -167,60 +153,55 @@ export default function TicketSystem() {
       }
 
       await Promise.all(savePromises);
-      setStatus("🎉 Mua vé thành công! Đã lưu vào DB.");
+      setStatus("🎉 Mua vé thành công! Đã lưu vé.");
       fetchBalance(account, provider);
-      // localStorage.removeItem("ticketsInCart"); // Xóa giỏ nếu muốn
 
     } catch (err) {
       console.error(err);
-      // Nếu lỗi do thiếu tiền (revert từ contract)
-      if (err.message.includes("Khong du tien")) {
-        setStatus("❌ Lỗi: Bạn gửi thiếu tiền ETH rồi!");
+      if (err.message && err.message.includes("Khong du tien")) {
+        setStatus("❌ Lỗi: Không đủ ETH để thanh toán!");
       } else {
-        setStatus("❌ Lỗi Mint: " + (err.reason || err.message));
+        setStatus("❌ Lỗi Mint: " + (err.reason || "Đã có lỗi xảy ra"));
       }
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // --- 3. CHECK-IN (DÀNH CHO GATEKEEPER) ---
+  // --- 3. CHECK-IN ---
   const handleCheckIn = async () => {
-    if (!checkInTokenId) return alert("Nhập ID vé cần soát");
-    if (!isGatekeeper && !isAdmin) return alert("Bạn không có quyền soát vé!");
+    if (!checkInTokenId) return alert("Vui lòng nhập Token ID");
+    if (!isGatekeeper && !isAdmin) return alert("Không có quyền!");
 
     try {
       setIsProcessing(true);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       
-      setStatus(`🔍 Đang soát vé #${checkInTokenId}...`);
+      setStatus(`🔍 Đang kiểm tra vé #${checkInTokenId}...`);
       const tx = await contract.checkIn(checkInTokenId);
       
-      setStatus("⏳ Đang ghi nhận Check-in...");
+      setStatus("⏳ Đang ghi nhận...");
       await tx.wait();
       
-      setStatus(`✅ Check-in THÀNH CÔNG vé #${checkInTokenId}. Mời khách vào!`);
+      setStatus(`✅ Check-in THÀNH CÔNG vé #${checkInTokenId}.`);
       setCheckInTokenId("");
     } catch (err) {
-      console.error(err);
       if (err.message.includes("Ve nay da duoc su dung")) {
-        setStatus("⛔ CẢNH BÁO: Vé này đã dùng rồi! Đuổi về ngay.");
-      } else if (err.message.includes("AccessControl")) {
-        setStatus("⛔ Lỗi: Ví này không có quyền soát vé.");
+        setStatus("⛔ CẢNH BÁO: Vé đã được sử dụng!");
       } else {
-        setStatus("❌ Lỗi: " + (err.reason || "Không xác định"));
+        setStatus("❌ Lỗi Check-in: " + (err.reason || "Lỗi không xác định"));
       }
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // --- 4. ADMIN: RÚT TIỀN ---
+  // --- 4. ADMIN ACTIONS ---
   const handleWithdraw = async () => {
     try {
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       const tx = await contract.withdraw();
-      setStatus("⏳ Đang rút tiền về ví...");
+      setStatus("⏳ Đang rút tiền...");
       await tx.wait();
       setStatus("💰 Rút tiền thành công!");
     } catch (err) {
@@ -228,7 +209,6 @@ export default function TicketSystem() {
     }
   };
 
-  // --- 5. ADMIN: CẤP QUYỀN NHÂN VIÊN ---
   const handleGrantRole = async () => {
     if (!staffAddress) return;
     try {
@@ -236,13 +216,13 @@ export default function TicketSystem() {
       const tx = await contract.grantRole(GATEKEEPER_ROLE, staffAddress);
       setStatus("⏳ Đang cấp quyền...");
       await tx.wait();
-      setStatus(`👮 Đã cấp quyền Soát vé cho ${staffAddress}`);
+      setStatus(`👮 Đã cấp quyền Gatekeeper cho ví ${staffAddress.slice(0,6)}...`);
     } catch (err) {
       setStatus("❌ Lỗi cấp quyền: " + err.reason);
     }
   };
 
-  // --- 6. KIỂM TRA TRẠNG THÁI VÉ (PUBLIC) ---
+  // --- 5. CHECK STATUS (PUBLIC) ---
   const handleCheckStatus = async () => {
     if (!checkTokenId) return;
     try {
@@ -251,80 +231,100 @@ export default function TicketSystem() {
       const isUsed = await contract.isTicketUsed(checkTokenId);
       
       setCheckStatusRes({ owner, isUsed });
-      setStatus("Đã lấy thông tin vé.");
+      setStatus("Thông tin vé đã được tải.");
     } catch (err) {
       setCheckStatusRes(null);
-      setStatus("❌ Vé không tồn tại.");
+      setStatus("❌ Vé không tồn tại hoặc lỗi mạng.");
     }
   };
 
-  // --- UI RENDER ---
   return (
     <div className="page-container">
-      <h1 className="page-title">Hệ Thống Vé Blockchain Demo</h1>
+      <header className="page-header">
+        <h1 className="page-title">HỆ THỐNG BLOCKCHAIN</h1>
+        <p className="page-subtitle">Hệ thống quản lý và xác thực vé phi tập trung</p>
+      </header>
 
-      {/* WALLET INFO */}
+      {/* WALLET SECTION */}
       <div className="wallet-box">
-        {!account ? (
-          <button onClick={connectWallet} className="btn-primary">Kết Nối Ví Admin/User</button>
-        ) : (
-          <div style={{textAlign:'left', paddingLeft: 20}}>
-            <p><strong>Ví:</strong> {account} {isAdmin && "👑 ADMIN"} {isGatekeeper && "👮 STAFF"}</p>
-            <p><strong>Số dư vé của tôi:</strong> {myBalance} ticket</p>
-          </div>
+        <div className="wallet-info">
+          <h3>Trạng Thái Kết Nối</h3>
+          {!account ? (
+            <p>Chưa kết nối ví</p>
+          ) : (
+            <div>
+              <p>
+                <strong>Address:</strong> {account.slice(0, 6)}...{account.slice(-4)}
+                {isAdmin && <span className="role-badge admin">Admin</span>}
+                {isGatekeeper && <span className="role-badge gatekeeper">Staff</span>}
+              </p>
+              <p style={{marginTop: 4}}><strong>Vé sở hữu:</strong> {myBalance}</p>
+            </div>
+          )}
+        </div>
+        {!account && (
+          <button onClick={connectWallet} className="btn btn-primary">
+            Kết Nối MetaMask
+          </button>
         )}
       </div>
 
-      <div className="grid-layout" style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:20}}>
+      <div className="dashboard-grid">
         
-        {/* CỘT 1: KHÁCH HÀNG MUA VÉ */}
-        <section className="section-box">
-          <h2 className="section-title">🛒 Khách Hàng: Thanh Toán</h2>
+        {/* SECTION 1: MINTING */}
+        <section className="card">
+          <div className="card-header">
+            <h2 className="card-title">🛒 Thanh Toán Vé</h2>
+          </div>
           
-          <div style={{marginBottom:10}}>
-             <label>Giá vé (ETH) - Chỉnh để test:</label>
-             <input 
-               className="input" 
-               type="number" 
-               step="0.0001"
-               value={customEthPrice}
-               onChange={e => setCustomEthPrice(e.target.value)}
-             />
-             <small style={{display:'block', color:'#666'}}>Giá gốc trong contract là 0.001. Thử chỉnh thấp hơn xem có lỗi không?</small>
+          <div className="form-group">
+            <label className="label">Giá vé test (ETH):</label>
+            <input 
+              className="input" 
+              type="number" 
+              step="0.0001"
+              value={customEthPrice}
+              onChange={e => setCustomEthPrice(e.target.value)}
+            />
+            <small className="input-helper">Giá gốc SC: 0.001 ETH</small>
           </div>
 
           <button 
             onClick={handleMintCart} 
             disabled={isProcessing || !account}
-            className="btn-success" 
-            style={{width:'100%', padding:15}}
+            className="btn btn-success btn-block" 
           >
-            {isProcessing ? "⏳ Đang xử lý..." : "🚀 Mua Giỏ Hàng"}
+            {isProcessing ? "⏳ Đang xử lý..." : "🚀 Thanh Toán Giỏ Hàng"}
           </button>
         </section>
 
-        {/* CỘT 2: KIỂM TRA VÉ (PUBLIC) */}
-        <section className="section-box">
-          <h2 className="section-title">🔍 Kiểm tra Vé</h2>
-          <div style={{display:'flex', gap:10}}>
+        {/* SECTION 2: CHECK PUBLIC STATUS */}
+        <section className="card">
+          <div className="card-header">
+            <h2 className="card-title">🔍 Tra Cứu Vé</h2>
+          </div>
+          
+          <div className="form-group" style={{display: 'flex', gap: '10px'}}>
             <input 
               className="input" 
-              placeholder="ID Vé (VD: 1)" 
+              placeholder="Nhập ID vé (VD: 1)" 
               value={checkTokenId}
               onChange={e => setCheckTokenId(e.target.value)}
             />
-            <button onClick={handleCheckStatus} className="btn-secondary">Check</button>
+            <button onClick={handleCheckStatus} className="btn btn-secondary">
+              Check
+            </button>
           </div>
           
           {checkStatusRes && (
-            <div style={{marginTop:10, padding:10, background:'#eee', borderRadius:5}}>
-              <p><strong>Chủ sở hữu:</strong> {checkStatusRes.owner.slice(0,10)}...</p>
+            <div className="result-box">
+              <p><strong>Chủ sở hữu:</strong> {checkStatusRes.owner.slice(0, 10)}...</p>
               <p>
                 <strong>Trạng thái: </strong> 
                 {checkStatusRes.isUsed ? (
-                  <span style={{color:'red', fontWeight:'bold'}}>ĐÃ SỬ DỤNG (USED)</span>
+                  <span className="status-tag used">ĐÃ DÙNG</span>
                 ) : (
-                  <span style={{color:'green', fontWeight:'bold'}}>CÓ HIỆU LỰC (ACTIVE)</span>
+                  <span className="status-tag active">HỢP LỆ</span>
                 )}
               </p>
             </div>
@@ -333,60 +333,67 @@ export default function TicketSystem() {
 
       </div>
 
-      {/* KHU VỰC NHÂN VIÊN SOÁT VÉ (Ẩn nếu không có quyền) */}
+      {/* STAFF ZONE */}
       {(isGatekeeper || isAdmin) && (
-        <section className="section-box" style={{marginTop:20, border:'2px solid #e67e22'}}>
-          <h2 className="section-title" style={{color:'#e67e22'}}>👮 Khu Vực Soát Vé (Gatekeeper)</h2>
-          <p>Chức năng này chỉ hiện lên nếu ví của bạn có quyền Gatekeeper.</p>
-          
-          <div style={{display:'flex', gap:10}}>
+        <section className="card special-zone gatekeeper">
+          <div className="card-header">
+            <h2 className="card-title">👮 Khu Vực Soát Vé (Check-in)</h2>
+          </div>
+          <div style={{display: 'flex', gap: '10px'}}>
             <input 
               className="input" 
-              placeholder="Nhập Token ID cần soát (Quét QR)" 
+              placeholder="Token ID cần soát..." 
               value={checkInTokenId}
               onChange={e => setCheckInTokenId(e.target.value)}
             />
-            <button onClick={handleCheckIn} className="btn-warning" disabled={isProcessing}>
-              CHECK-IN (Bấm lỗ)
+            <button onClick={handleCheckIn} className="btn btn-warning" disabled={isProcessing}>
+              Bấm Lỗ Vé
             </button>
           </div>
         </section>
       )}
 
-      {/* KHU VỰC ADMIN (Ẩn nếu không phải Admin) */}
+      {/* ADMIN ZONE */}
       {isAdmin && (
-        <section className="section-box" style={{marginTop:20, border:'2px solid #c0392b'}}>
-          <h2 className="section-title" style={{color:'#c0392b'}}>👑 Khu Vực Admin</h2>
+        <section className="card special-zone admin">
+          <div className="card-header">
+            <h2 className="card-title">👑 Quản Trị Hệ Thống</h2>
+          </div>
           
-          <div style={{display:'flex', gap:20, alignItems:'flex-start'}}>
-            <div style={{flex:1}}>
-              <h3>Thêm Nhân Viên Soát Vé</h3>
-              <input 
-                className="input" 
-                placeholder="Địa chỉ ví nhân viên (0x...)" 
-                value={staffAddress}
-                onChange={e => setStaffAddress(e.target.value)}
-              />
-              <button onClick={handleGrantRole} className="btn-secondary" style={{marginTop:5}}>
-                Cấp Quyền
-              </button>
+          <div className="admin-controls">
+            <div className="control-column">
+              <label className="label">Thêm Nhân Viên (Gatekeeper)</label>
+              <div style={{display: 'flex', gap: '10px'}}>
+                <input 
+                  className="input" 
+                  placeholder="Ví nhân viên (0x...)" 
+                  value={staffAddress}
+                  onChange={e => setStaffAddress(e.target.value)}
+                />
+                <button onClick={handleGrantRole} className="btn btn-primary">
+                  Thêm
+                </button>
+              </div>
             </div>
             
-            <div style={{flex:1, borderLeft:'1px solid #ccc', paddingLeft:20}}>
-              <h3>Doanh Thu</h3>
-              <p>Tiền đang nằm trong Smart Contract.</p>
-              <button onClick={handleWithdraw} className="btn-primary">
-                💰 Rút Toàn Bộ Về Ví Này
+            <div className="control-column" style={{borderLeft: '1px solid #e5e7eb', paddingLeft: '20px'}}>
+              <label className="label">Quản Lý Doanh Thu</label>
+              <p className="input-helper">Rút toàn bộ ETH trong contract về ví này.</p>
+              <button onClick={handleWithdraw} className="btn btn-danger">
+                💰 Rút Tiền Về Ví
               </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* STATUS BAR */}
-      <div className="status-box" style={{marginTop:20, padding:15, background:'#333', color:'#fff', borderRadius:5}}>
-        <strong>Thông báo hệ thống:</strong> {status}
-      </div>
+      {/* STATUS BAR (Notification) */}
+      {status && (
+        <div className="status-bar">
+          <span style={{fontSize: '1.2rem'}}>🔔</span>
+          <span>{status}</span>
+        </div>
+      )}
 
     </div>
   );

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import "./MintAndTransferTicket.css"; // Tận dụng file CSS cũ
+import "./MintAndTransferTicket.css"; // Sử dụng chung file CSS với trang Mint
 
-const CONTRACT_ADDRESS = "0x6830550Aaf8484c64E0bb6B51247bAc1Bfda7a17"; // ⚠️ ĐIỀN ĐỊA CHỈ CONTRACT CỦA BẠN
+// ⚠️ ĐIỀN ĐỊA CHỈ CONTRACT CỦA BẠN
+const CONTRACT_ADDRESS = "0x6830550Aaf8484c64E0bb6B51247bAc1Bfda7a17"; 
 
-// ABI chỉ lấy những hàm cần thiết cho trang này
 const CONTRACT_ABI = [
   "function safeTransferFrom(address from, address to, uint256 tokenId)",
   "function ownerOf(uint256 tokenId) view returns (address)",
@@ -29,7 +29,7 @@ export default function MyWallet() {
 
   // 1. KẾT NỐI VÍ
   const connectWallet = async () => {
-    if (!window.ethereum) return alert("Cài MetaMask đi!");
+    if (!window.ethereum) return alert("Vui lòng cài đặt MetaMask!");
     const _provider = new ethers.BrowserProvider(window.ethereum);
     const _signer = await _provider.getSigner();
     const _account = await _signer.getAddress();
@@ -41,33 +41,31 @@ export default function MyWallet() {
   };
 
   // 2. LẤY DANH SÁCH VÉ CỦA TÔI
-  // Lưu ý: Vì ERC721 chuẩn không có hàm lấy list ID, ta quét thủ công 50 ID đầu để demo
-  // Thực tế nên dùng TheGraph hoặc lưu DB Backend để lấy list ID nhanh hơn.
   const fetchMyTickets = async (userAddress, prov) => {
     setLoading(true);
-    setStatus("Đang quét blockchain để tìm vé của bạn...");
+    setStatus("⏳ Đang quét blockchain để tìm vé...");
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, prov);
     const tickets = [];
 
     try {
-      // Demo: Quét thử 20 ID đầu tiên xem cái nào là của mình
-      // (Nếu bạn mint nhiều hơn 20 vé thì tăng số này lên)
-      for (let i = 1; i <= 20; i++) {
+      // Demo: Quét 50 ID đầu tiên. (Thực tế nên dùng TheGraph hoặc API Backend)
+      for (let i = 1; i <= 50; i++) {
         try {
+          // Gọi song song để nhanh hơn một chút nếu cần, nhưng for loop an toàn hơn cho demo
           const owner = await contract.ownerOf(i);
           if (owner.toLowerCase() === userAddress.toLowerCase()) {
-            // Nếu là của mình -> Check xem dùng chưa
             const isUsed = await contract.isTicketUsed(i);
             tickets.push({ id: i, isUsed: isUsed });
           }
         } catch (e) {
-          // Lỗi thường do Token chưa mint -> Bỏ qua
+          // Bỏ qua lỗi (thường do token ID chưa được mint)
         }
       }
       setMyTickets(tickets);
-      setStatus(`Tìm thấy ${tickets.length} vé.`);
+      setStatus(tickets.length > 0 ? "✅ Đã tải xong danh sách vé." : "⚠️ Không tìm thấy vé nào (trong 50 ID đầu).");
     } catch (err) {
       console.error(err);
+      setStatus("❌ Lỗi khi tải vé.");
     } finally {
       setLoading(false);
     }
@@ -75,17 +73,16 @@ export default function MyWallet() {
 
   // 3. HÀM CHUYỂN VÉ
   const handleTransfer = async () => {
-    if (!selectedTokenId || !transferTo) return alert("Vui lòng chọn vé và điền ví nhận!");
-    if (!ethers.isAddress(transferTo)) return alert("Địa chỉ ví nhận không hợp lệ!");
+    if (!selectedTokenId) return alert("Vui lòng chọn vé cần chuyển!");
+    if (!transferTo || !ethers.isAddress(transferTo)) return alert("Địa chỉ ví nhận không hợp lệ!");
 
     try {
       setLoading(true);
-      setStatus("⏳ Đang thực hiện chuyển nhượng...");
+      setStatus("⏳ Đang xử lý chuyển nhượng trên Blockchain...");
 
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 
-      // Cú pháp đặc biệt của Ethers.js khi gọi hàm Overloaded
-      // safeTransferFrom có 2 phiên bản, ta phải chỉ định rõ phiên bản có data
+      // Gọi hàm safeTransferFrom (Cú pháp ethers v6 cho overloaded function)
       const tx = await contract["safeTransferFrom(address,address,uint256)"](
         account, 
         transferTo, 
@@ -93,19 +90,19 @@ export default function MyWallet() {
       );
 
       await tx.wait();
-      setStatus("✅ Chuyển vé thành công!");
+      setStatus(`✅ Chuyển vé #${selectedTokenId} thành công!`);
       
-      // Làm mới danh sách
-      fetchMyTickets(account, provider);
+      // Reset và load lại
       setTransferTo("");
       setSelectedTokenId(null);
+      fetchMyTickets(account, provider);
 
     } catch (err) {
       console.error(err);
       if (err.message.includes("Ve da check-in")) {
-        setStatus("❌ Lỗi: Vé này đã check-in rồi, không thể bán lại!");
+        setStatus("⛔ Lỗi: Vé này đã Check-in, không thể chuyển!");
       } else {
-        setStatus("❌ Lỗi: " + (err.reason || err.message));
+        setStatus("❌ Lỗi: " + (err.reason || "Giao dịch thất bại"));
       }
     } finally {
       setLoading(false);
@@ -118,88 +115,126 @@ export default function MyWallet() {
 
   return (
     <div className="page-container">
-      <h1 className="page-title">Ví Vé Của Tôi (Transfer)</h1>
+      <header className="page-header">
+        <h1 className="page-title">Ví Vé Của Tôi</h1>
+        <p className="page-subtitle">Quản lý và chuyển nhượng vé NFT</p>
+      </header>
 
+      {/* WALLET INFO BOX */}
       <div className="wallet-box">
-        <p><strong>Ví đang kết nối:</strong> {account}</p>
-        <p><strong>Số lượng vé tìm thấy:</strong> {myTickets.length}</p>
+        <div className="wallet-info">
+          <h3>Thông Tin Ví</h3>
+          {!account ? (
+            <p>Đang kết nối...</p>
+          ) : (
+            <div>
+              <p><strong>Địa chỉ:</strong> {account}</p>
+              <p style={{marginTop: 5}}><strong>Số lượng vé:</strong> {myTickets.length} vé tìm thấy</p>
+            </div>
+          )}
+        </div>
+        <button 
+          onClick={() => fetchMyTickets(account, provider)} 
+          className="btn btn-secondary"
+          disabled={loading}
+        >
+          {loading ? "Đang tải..." : "🔄 Làm mới danh sách"}
+        </button>
       </div>
 
-      <div className="grid-layout" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
+      <div className="dashboard-grid" style={{ gridTemplateColumns: "2fr 1fr" }}> {/* Override grid để cột trái to hơn */}
         
         {/* CỘT TRÁI: DANH SÁCH VÉ */}
-        <div className="section-box">
-          <h2 className="section-title">🎫 Kho Vé Của Bạn</h2>
-          {loading && <p>Đang tải dữ liệu...</p>}
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
-            {myTickets.map((ticket) => (
-              <div 
-                key={ticket.id}
-                onClick={() => !ticket.isUsed && setSelectedTokenId(ticket.id)}
-                className={`ticket-card ${selectedTokenId === ticket.id ? 'selected' : ''}`}
-                style={{
-                  border: selectedTokenId === ticket.id ? '2px solid blue' : '1px solid #ddd',
-                  padding: 10,
-                  borderRadius: 8,
-                  cursor: ticket.isUsed ? 'not-allowed' : 'pointer',
-                  opacity: ticket.isUsed ? 0.6 : 1,
-                  background: ticket.isUsed ? '#f0f0f0' : '#fff'
-                }}
-              >
-                
-                <h3 style={{margin: '5px 0'}}>Vé #{ticket.id}</h3>
-                {ticket.isUsed ? (
-                  <span style={{ color: 'red', fontWeight: 'bold', fontSize: '0.8rem' }}>ĐÃ DÙNG (KHOÁ)</span>
-                ) : (
-                  <span style={{ color: 'green', fontWeight: 'bold', fontSize: '0.8rem' }}>CÓ THỂ CHUYỂN</span>
-                )}
-              </div>
-            ))}
+        <section className="card">
+          <div className="card-header">
+            <h2 className="card-title">🎫 Kho Vé Của Bạn</h2>
           </div>
-          
-          {myTickets.length === 0 && !loading && <p>Bạn chưa có vé nào (trong phạm vi 20 ID đầu).</p>}
-        </div>
+
+          {loading && myTickets.length === 0 ? (
+            <div style={{textAlign: 'center', padding: 20, color: '#666'}}>Đang quét dữ liệu...</div>
+          ) : (
+            <div className="ticket-grid">
+              {myTickets.map((ticket) => (
+                <div 
+                  key={ticket.id}
+                  onClick={() => !ticket.isUsed && setSelectedTokenId(ticket.id)}
+                  className={`ticket-item ${selectedTokenId === ticket.id ? 'selected' : ''} ${ticket.isUsed ? 'used' : ''}`}
+                >
+                  <span className="ticket-icon">🎟️</span>
+                  <span className="ticket-id">Vé #{ticket.id}</span>
+                  
+                  {ticket.isUsed ? (
+                    <span className="status-tag used">ĐÃ DÙNG</span>
+                  ) : (
+                    <span className="status-tag active">CÓ SẴN</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && myTickets.length === 0 && (
+             <div style={{textAlign: 'center', padding: 40, color: '#999'}}>
+                <p>Bạn chưa sở hữu vé nào (hoặc vé nằm ngoài phạm vi quét ID 1-50).</p>
+             </div>
+          )}
+        </section>
 
         {/* CỘT PHẢI: FORM CHUYỂN VÉ */}
-        <div className="section-box" style={{height: 'fit-content'}}>
-          <h2 className="section-title">🚀 Chuyển Nhượng</h2>
+        <section className="card" style={{ height: "fit-content" }}>
+          <div className="card-header">
+            <h2 className="card-title">🚀 Chuyển Nhượng</h2>
+          </div>
           
-          <div style={{marginBottom: 15}}>
-            <label>Vé đang chọn:</label>
-            <div style={{fontSize: '1.2rem', fontWeight: 'bold', color: '#3498db'}}>
-              {selectedTokenId ? `#${selectedTokenId}` : "Chưa chọn"}
+          <div className="form-group">
+            <label className="label">Vé đang chọn:</label>
+            <div style={{ 
+              padding: 10, 
+              background: selectedTokenId ? '#eef2ff' : '#f3f4f6', 
+              borderRadius: 8, 
+              textAlign: 'center',
+              fontWeight: 'bold',
+              color: selectedTokenId ? 'var(--primary-color)' : '#999',
+              border: selectedTokenId ? '1px solid var(--primary-color)' : '1px dashed #ccc'
+            }}>
+              {selectedTokenId ? `💎 Vé #${selectedTokenId}` : "Chưa chọn vé nào"}
             </div>
           </div>
 
-          <div style={{marginBottom: 15}}>
-            <label>Địa chỉ người nhận:</label>
+          <div className="form-group">
+            <label className="label">Địa chỉ ví người nhận:</label>
             <input 
               className="input" 
-              placeholder="0x..." 
+              placeholder="0x123..." 
               value={transferTo}
               onChange={(e) => setTransferTo(e.target.value)}
             />
+            <small className="input-helper">Hãy kiểm tra kỹ địa chỉ ví!</small>
           </div>
 
           <button 
             onClick={handleTransfer}
-            disabled={loading || !selectedTokenId}
-            className="btn-warning"
-            style={{width: '100%', padding: 10}}
+            disabled={loading || !selectedTokenId || !transferTo}
+            className="btn btn-warning btn-block"
           >
-            {loading ? "Đang xử lý..." : "Gửi Vé Ngay"}
+            {loading ? "⏳ Đang gửi..." : "🎁 Gửi Vé Ngay"}
           </button>
 
-          <p style={{marginTop: 15, fontSize: '0.9rem', color: '#666'}}>
-            ℹ️ Lưu ý: Vé đã Check-in sẽ bị khóa vĩnh viễn (Soulbound), không thể chuyển nhượng.
-          </p>
-        </div>
+          <div style={{ marginTop: 20, fontSize: '0.85rem', color: '#6b7280', background: '#fffbeb', padding: 10, borderRadius: 8 }}>
+            <strong>Lưu ý:</strong> <br/>
+            - Vé đã Check-in (Sử dụng) sẽ bị khoá và không thể chuyển nhượng.<br/>
+            - Giao dịch cần một lượng nhỏ phí Gas (ETH).
+          </div>
+        </section>
+
       </div>
 
-      <div className="status-box" style={{marginTop: 20}}>
-        Trạng thái: {status}
-      </div>
+      {/* STATUS BAR */}
+      {status && (
+        <div className="status-bar">
+          <span>🔔 {status}</span>
+        </div>
+      )}
     </div>
   );
 }

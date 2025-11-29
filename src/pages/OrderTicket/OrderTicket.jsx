@@ -169,7 +169,7 @@ function OrderTicketPage() {
             <button className="back-btn" onClick={() => navigate(-1)}>
               ← Trở về
             </button>
-            <h2 className="main-title">Chọn vé</h2>
+           
           </div>
 
           <div className="ticket-list">
