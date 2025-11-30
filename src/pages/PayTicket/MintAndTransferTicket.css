@@ -125,7 +125,6 @@ body {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-main);
 }
 
 /* --- Form Elements --- */
@@ -231,6 +230,7 @@ body {
   border-radius: 8px;
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
+  color: black;
 }
 
 .status-tag {
