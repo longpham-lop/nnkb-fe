@@ -20,32 +20,9 @@ function Register() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [cccdImage, setCccdImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // Thêm upload CCCD
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setCccdImage(file);
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
-  // Gửi OCR (FE) — tạm thời mock data
-  const handleOcr = () => {
-    if (!cccdImage) return;
-    // Mô phỏng kết quả OCR
-    alert("OCR chưa kết nối backend — FE đã sẵn sàng!");
-    setForm((prev) => ({
-      ...prev,
-      firstName: "Nguyễn",
-      lastName: "Văn A",
-      birthday: "01/01/2000",
-      birthplace: "Hà Nội",
-      gender: "Nam",
-    }));
-  };
+ 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -84,18 +61,7 @@ function Register() {
         {success && <p style={{ color: "green" }}>{success}</p>}
 
         {/* ===== OCR CCCD Section ===== */}
-        <div className="ocr-section">
-          <label>Upload ảnh CCCD:</label>
-          <input type="file" accept="image/*" onChange={handleImageUpload} />
-          {preview && (
-            <div className="image-preview">
-              <img src={preview} alt="CCCD Preview" />
-            </div>
-          )}
-          <button className="btn-ocr" onClick={handleOcr} disabled={!cccdImage}>
-            🔍 Quét OCR
-          </button>
-        </div>
+        
 
         {/* ===== Form đăng ký ===== */}
         <form className="register-form" onSubmit={(e) => e.preventDefault()}>

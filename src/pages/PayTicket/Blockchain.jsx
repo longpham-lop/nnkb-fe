@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import "./MintAndTransferTicket.css"; // Nhớ import file CSS mới
+import "./MintAndTransferTicket.css"; 
 import { createBlockTicket } from "../../api/blockTicket"; 
 
 // --- CẤU HÌNH ---
@@ -88,8 +88,8 @@ export default function TicketSystem() {
   };
 
   useEffect(() => { connectWallet(); }, []);
-
-  // --- 2. MINT VÉ ---
+  
+  // ---  MINT VÉ ---
   const handleMintCart = async () => {
     if (!signer) return alert("Vui lòng kết nối ví trước!");
     

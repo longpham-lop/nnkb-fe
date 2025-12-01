@@ -13,12 +13,16 @@ import Vitrikhac from "../../assets/vitrikhac.png";
 import Topticket from "../../assets/topticket.png";
 
 const Home = () => {
-  const [events, setEvents] = useState([]);
-  const [locations, setLocations] = useState([]);
+  const [specialEvents, setSpecialEvents] = useState([]);
+  const [trendEvents, setTrendEvents] = useState([]);
+  const [weekendEvents, setWeekendEvents] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- Lấy dữ liệu ---
+  // ========================= RANDOM FUNCTION =========================
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+  // ========================= FETCH DATA =========================
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,14 +32,14 @@ const Home = () => {
           getAllLocations(),
           getAllTickets(),
         ]);
-        const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
 
-        setEvents(shuffleArray(eventRes.data || []));
-        setLocations(locationRes.data || []);
-        setTickets(ticketRes.data || []);
-    
-        setEvents(eventRes.data || []);
-        setLocations(locationRes.data || []);
+        const eventsData = eventRes.data || [];
+
+        // Random 3 danh sách khác nhau
+        setSpecialEvents(shuffle(eventsData).slice(0, 6)); // đặc sắc
+        setTrendEvents(shuffle(eventsData).slice(0, 5)); // xu hướng
+        setWeekendEvents(shuffle(eventsData).slice(0, 6)); // cuối tuần
+
         setTickets(ticketRes.data || []);
       } catch (err) {
         console.error("Lỗi load dữ liệu:", err);
@@ -46,12 +50,14 @@ const Home = () => {
     fetchData();
   }, []);
 
-  // --- Tìm giá vé thấp nhất ---
+  // ========================= MIN PRICE FUNCTION =========================
   const getMinTicketPrice = (eventId) => {
     const eventTickets = tickets.filter((t) => t.event_id === eventId);
     if (eventTickets.length === 0) return null;
     return Math.min(...eventTickets.map((t) => Number(t.price)));
   };
+
+  // ========================= SCROLL LEFT / RIGHT =========================
   const scrollLeft = (id) => {
     const el = document.getElementById(id);
     el.scrollBy({ left: -400, behavior: "smooth" });
@@ -62,7 +68,7 @@ const Home = () => {
     el.scrollBy({ left: 400, behavior: "smooth" });
   };
 
-  // --- Slider Drag & Drop ---
+  // ========================= DRAG SCROLL =========================
   useEffect(() => {
     const sliders = document.querySelectorAll(".event-list");
     sliders.forEach((slider) => {
@@ -91,7 +97,7 @@ const Home = () => {
         if (!isDown) return;
         e.preventDefault();
         const x = e.pageX - slider.offsetLeft;
-        const walk = (x - startX) * 2; // tốc độ scroll
+        const walk = (x - startX) * 2;
         slider.scrollLeft = scrollLeft - walk;
       };
 
@@ -100,7 +106,6 @@ const Home = () => {
       slider.addEventListener("mouseup", mouseUp);
       slider.addEventListener("mousemove", mouseMove);
 
-      // Cleanup
       return () => {
         slider.removeEventListener("mousedown", mouseDown);
         slider.removeEventListener("mouseleave", mouseLeave);
@@ -108,21 +113,26 @@ const Home = () => {
         slider.removeEventListener("mousemove", mouseMove);
       };
     });
-  }, [events]);
+  }, [specialEvents, trendEvents, weekendEvents]);
 
   if (loading) return <p>Đang tải dữ liệu...</p>;
 
+  // ========================= RETURN HTML =========================
   return (
     <div className="home-container">
       <main>
+
         {/* ============================= MARQUEE ============================= */}
         <section className="marquee-slider">
           <div className="marquee-track">
-            {events.slice(0, 5).concat(events.slice(0, 5)).map((event, idx) => (
-              <div key={event.id + "-" + idx} className="marquee-item">
-                <img src={event.cover_image} alt={event.name} />
-              </div>
-            ))}
+            {specialEvents
+              .slice(0, 5)
+              .concat(specialEvents.slice(0, 5))
+              .map((event, idx) => (
+                <div key={event.id + "-" + idx} className="marquee-item">
+                  <img src={event.cover_image} alt={event.name} />
+                </div>
+              ))}
           </div>
         </section>
 
@@ -131,16 +141,14 @@ const Home = () => {
           <h2>🔥 Sự kiện đặc sắc</h2>
 
           <div className="event-wrapper">
-            <button className="arrow left" onClick={() => scrollLeft("special")}>
-              ❮
-            </button>
+            <button className="arrow left" onClick={() => scrollLeft("special")}>❮</button>
 
             <div className="event-list" id="special">
-              {events.slice(0, 6).map((event) => (
+              {specialEvents.map((event) => (
                 <div
                   key={event.id}
                   className="event-card-large"
-                  onDoubleClick={() => window.location.href = `/detail/${event.id}`}
+                  onClick={() => (window.location.href = `/detail/${event.id}`)}
                 >
                   <img src={event.cover_image} alt={event.name} />
                   <h3>{event.name}</h3>
@@ -151,48 +159,42 @@ const Home = () => {
                       ? `Từ ${getMinTicketPrice(event.id).toLocaleString("vi-VN")}₫`
                       : "Liên hệ"}
                   </p>
-                  <p className="date">
-                    {new Date(event.start_date).toLocaleDateString("vi-VN")}
+                </div>
+              ))}
+            </div>
+
+            <button className="arrow right" onClick={() => scrollRight("special")}>❯</button>
+          </div>
+        </section>
+
+        {/* ============================= SỰ KIỆN XU HƯỚNG ============================= */}
+        <section className="event-section">
+          <h2>🔥 Sự kiện xu hướng</h2>
+
+          <div className="event-wrapper">
+            <button className="arrow left" onClick={() => scrollLeft("trend")}>❮</button>
+
+            <div className="event-list" id="trend">
+              {trendEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="event-card"
+                  onClick={() => (window.location.href = `/detail/${event.id}`)}
+                >
+                  <img src={event.cover_image} alt={event.name} />
+                  <h3>{event.name}</h3>
+                  <p className="price">
+                    {getMinTicketPrice(event.id) === 0
+                      ? "Miễn phí"
+                      : getMinTicketPrice(event.id)
+                      ? `Từ ${getMinTicketPrice(event.id).toLocaleString("vi-VN")}₫`
+                      : "Liên hệ"}
                   </p>
                 </div>
               ))}
             </div>
 
-            <button className="arrow right" onClick={() => scrollRight("special")}>
-              ❯
-            </button>
-          </div>
-        </section>
-
-
-        {/* ============================= SỰ KIỆN XU HƯỚNG ============================= */}
-        <section className="event-section">
-          <h2>🔥 Sự kiện xu hướng</h2>
-          <div className="event-wrapper">
-            <button className="arrow left" onClick={() => scrollLeft("specials")}>
-              ❮
-            </button>
-          <div className="event-list" id ="specials">
-            {events.slice(0, 5).map((event) => (
-              <div key={event.id} className="event-card">
-                <img src={event.cover_image} alt={event.name} />
-                <h3>{event.name}</h3>
-                <p className="price">
-                  {getMinTicketPrice(event.id) === 0
-                    ? "Miễn phí"
-                    : getMinTicketPrice(event.id)
-                    ? `Từ ${getMinTicketPrice(event.id).toLocaleString("vi-VN")}₫`
-                    : "Liên hệ"}
-                </p>
-                <p className="date">
-                  {new Date(event.start_date).toLocaleDateString("vi-VN")}
-                </p>
-              </div>
-            ))}
-          </div>
-           <button className="arrow right" onClick={() => scrollRight("specials")}>
-              ❯
-            </button>
+            <button className="arrow right" onClick={() => scrollRight("trend")}>❯</button>
           </div>
         </section>
 
@@ -206,37 +208,38 @@ const Home = () => {
           <h2>
             Cuối tuần này <a href="/filter" className="see-more">Xem thêm &gt;</a>
           </h2>
+
           <div className="event-wrapper">
-            <button className="arrow left" onClick={() => scrollLeft("specialss")}>
-              ❮
-            </button>
-          <div className="event-list" id ="specialss">
-            {events.slice(0, 6).map((event) => (
-              <div key={event.id} className="event-card-small">
-                <img src={event.cover_image} alt={event.name} />
-                <h3>{event.name}</h3>
-                <p className="price">
-                  {getMinTicketPrice(event.id) === 0
-                    ? "Miễn phí"
-                    : getMinTicketPrice(event.id)
-                    ? `Từ ${getMinTicketPrice(event.id).toLocaleString("vi-VN")}₫`
-                    : "Liên hệ"}
-                </p>
-                <p className="date">
-                  {new Date(event.start_date).toLocaleDateString("vi-VN")}
-                </p>
-              </div>
-            ))}
-          </div>
-          <button className="arrow right" onClick={() => scrollRight("specialss")}>
-              ❯
-            </button>
+            <button className="arrow left" onClick={() => scrollLeft("weekend")}>❮</button>
+
+            <div className="event-list" id="weekend">
+              {weekendEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="event-card-small"
+                  onClick={() => (window.location.href = `/detail/${event.id}`)}
+                >
+                  <img src={event.cover_image} alt={event.name} />
+                  <h3>{event.name}</h3>
+                  <p className="price">
+                    {getMinTicketPrice(event.id) === 0
+                      ? "Miễn phí"
+                      : getMinTicketPrice(event.id)
+                      ? `Từ ${getMinTicketPrice(event.id).toLocaleString("vi-VN")}₫`
+                      : "Liên hệ"}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <button className="arrow right" onClick={() => scrollRight("weekend")}>❯</button>
           </div>
         </section>
 
-        {/* ============================= ĐIỂM ĐẾN PHỔ BIẾN ============================= */}
+        {/* ============================= ĐIỂM ĐẾN ============================= */}
         <section className="destination-section">
           <h2>Điểm đến phổ biến</h2>
+
           <div className="destination-list">
             {[HoChiMinhcity, Hanoi, DaLat, Vitrikhac].map((img, idx) => {
               const names = ["Tp. Hồ Chí Minh", "Hà Nội", "Đà Lạt", "Vị trí khác"];
