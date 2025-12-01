@@ -77,6 +77,12 @@ const Admin = () => {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/admin/b-t" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                <List size={20} />
+                <span>Chi tiết đơn blockticket</span>
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/admin/transaction" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
                 <CreditCard size={20} />
                 <span>Giao dịch</span>

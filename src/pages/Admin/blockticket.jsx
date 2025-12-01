@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./order_item.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import {
-  getAllOrderItems,
-  updateOrderItem,
-  deleteOrderItem,
-} from "../../api/orderitem";
+import { getAllBlockTickets,deleteBlockTicket, updateCheckIn } from "../../api/blockTicket";
 import { 
   List, Edit, Trash2, Save, X, 
   Search, CheckCircle, XCircle, QrCode, Ticket 
 } from "lucide-react";
 
-const OrderItems = () => {
+const Blockticket = () => {
   const [items, setItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [checkedInForm, setCheckedInForm] = useState(false);
@@ -23,7 +19,7 @@ const OrderItems = () => {
 
   const loadItems = async () => {
     try {
-      const res = await getAllOrderItems();
+      const res = await getAllBlockTickets();
       setItems(res.data);
     } catch (err) {
       console.error("Lỗi lấy danh sách chi tiết đơn hàng:", err);
@@ -43,7 +39,7 @@ const OrderItems = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await updateOrderItem(editingId, { checked_in: checkedInForm });
+      await updateCheckIn(editingId, { checked_in: checkedInForm });
       setItems(
         items.map((i) =>
           i.id === editingId ? { ...i, checked_in: checkedInForm } : i
@@ -59,7 +55,7 @@ const OrderItems = () => {
   const handleDelete = async (id) => {
     if (!confirm("Bạn chắc chắn muốn xóa chi tiết đơn hàng này?")) return;
     try {
-      await deleteOrderItem(id);
+      await deleteBlockTicket(id);
       setItems(items.filter((i) => i.id !== id));
     } catch (err) {
       console.error("Lỗi xóa chi tiết đơn hàng:", err);
@@ -159,7 +155,7 @@ const OrderItems = () => {
               )}
               {filteredItems.map((i) => (
                 <tr key={i.id}>
-                  <td><span className="id-badge">#{i.id}</span></td>
+                  <td><span className="id-badge">#{i.ticket_unique_id}</span></td>
                   <td><span className="order-badge">Order #{i.order_id}</span></td>
                   <td>
                     <div className="ticket-info">
@@ -167,15 +163,9 @@ const OrderItems = () => {
                     </div>
                   </td>
                   <td>x{i.quantity}</td>
-                  <td className="price-text">{formatCurrency(i.unit_price)}</td>
+                  <td className="price-text">{i.unit_price}</td>
                   <td>
-                    {i.qr_code ? (
-                      <a href={i.qr_code} target="_blank" rel="noreferrer" className="qr-link">
-                        <QrCode size={16} /> Check QR
-                      </a>
-                    ) : (
-                      <span className="text-muted">—</span>
-                    )}
+                    {i.token_id}
                   </td>
                   <td>
                     {i.checked_in ? (
@@ -190,12 +180,14 @@ const OrderItems = () => {
                       onClick={() => handleEdit(i)}
                       title="Cập nhật Check-in"
                     ><i className="bi bi-pencil-square"></i>
+                      
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(i.id)}
                       title="Xóa"
                     ><i className="bi bi-trash"></i>
+                     
                     </button>
                   </td>
                 </tr>
@@ -208,4 +200,4 @@ const OrderItems = () => {
   );
 };
 
-export default OrderItems;
+export default Blockticket;

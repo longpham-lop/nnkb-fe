@@ -36,6 +36,7 @@ import { searchEvents } from "./api/event";
 import MintAndTransferTicket from './pages/PayTicket/Blockchain';
 import PaymentSelection from './pages/PaymentSelection/PaymentSelection';
 import MyWallet from './pages/tranfer/MyWallet';
+import Blockticket from './pages/Admin/blockticket';
 
 
 import "./App.css";
@@ -287,6 +288,7 @@ function AnimatedRoutes() {
           <Route path="orderitem" element={<OrderItems />} />
           <Route path="transaction" element={<Transactions />} />
           <Route path="payment" element={<Payments />} />
+          <Route path="b-t" element={<Blockticket />} />
         </Route>
         </Routes>
     </AnimatePresence>
