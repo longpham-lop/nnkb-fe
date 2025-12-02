@@ -5,6 +5,7 @@ import { createPayment } from "../../api/payment";
 
 import { useNavigate } from 'react-router-dom';
 import { createOrderItem } from '../../api/orderitem';
+import { ti } from '../../api/ticket';
 
 const PaymentSelection = () => {
   const navigate = useNavigate();
@@ -29,8 +30,14 @@ const PaymentSelection = () => {
         paid_at: null,
         total_paid: totalPrice,
       };
+      
 
       const res = await createPayment(paymentData);
+
+      const createPromises = ticketsInCart.map((ticket) => {
+          return ti({ ticket_id: ticket.id, quantity: ticket.quantity });
+        });
+        await Promise.all(createPromises);
 
       if (type === "traditional") {
         alert("Vé sẽ được gửi vào mail hoặc trong vé đã mua");
