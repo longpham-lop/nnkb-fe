@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import "./MyTickets.css";
 import emptyTicketIcon from "../../assets/longavt.png";
 import { Link } from "react-router-dom";
-import { getAllOrders, getOrderById, createOrder, updateOrder, deleteOrder } from "../../api/order";
+import { getAllOrders, getwhoOrderItems,getOrderById, createOrder, updateOrder, deleteOrder } from "../../api/order";
 import { getAllOrderItems, getOrderItemById, createOrderItem, updateOrderItem, deleteOrderItem } from "../../api/orderitem";
 import { useNavigate } from "react-router-dom";
 
 export default function MyTickets() {
   const [regularTickets, setRegularTickets] = useState([]);
   const [nftTickets, setNftTickets] = useState([]);
+  const [bill, setbill] = useState([]);
   const [activeCategory, setActiveCategory] = useState("Vé Thường"); 
   const navigate = useNavigate();
   const [activeStatusTab, setActiveStatusTab] = useState("Tất cả"); 
@@ -26,18 +27,20 @@ export default function MyTickets() {
 
   const loadRegularTickets = async () => {
     try {
-      const orderRes = await getAllOrders();
-      let orders = orderRes.data || [];
-
-      orders = orders.filter((o) => String(o.user_id) === String(userId));
+      const orderRes = await getwhoOrderItems();
+      const orders =orderRes.data.data || [];
+      setbill(orders);
 
       const orderItemsRes = await getAllOrderItems();
-      const allItems = orderItemsRes.data || [];
+      const allItems = Array.isArray(orderItemsRes.data)
+        ? orderItemsRes.data
+        : [];
 
       const userTickets = allItems
-        .filter((item) => orders.some((o) => o.id === item.order_id))
-        .map((item) => {
-          const order = orders.find((o) => o.id === item.order_id);
+        .filter(item => orders.some(o => o.id === item.order_id))
+        .map(item => {
+          const order = orders.find(o => o.id === item.order_id);
+
           return {
             order_id: order.id,
             event_id: order.event_id,
@@ -46,11 +49,12 @@ export default function MyTickets() {
             qr_code: item.qr_code,
             checked_in: item.checked_in,
             status: order.status,
-            event: item.event || {},
+            event: order.Event, 
           };
         });
 
       setRegularTickets(userTickets);
+
     } catch (err) {
       console.error("Lỗi tải vé thường:", err);
     }
@@ -69,7 +73,7 @@ export default function MyTickets() {
 
       {/* Tab chọn loại vé */}
       <div className="category-tabs">
-        {["Vé Thường", "Vé Blockchain (NFT)"].map((cat) => (
+        {["Vé Thường", "Vé Blockchain (NFT)" ,"Hóa đơn của tôi "].map((cat) => (
           <button
             key={cat}
             className={`tab ${activeCategory === cat ? "active" : ""}`}
@@ -127,7 +131,7 @@ export default function MyTickets() {
             {nftTickets.length === 0 ? (
               <div className="empty-tickets">
                 <img src={emptyTicketIcon} alt="Empty tickets" />
-                <p>Chưa có vé NFT nào</p>
+                <p>Click để xem thêm chức năng vé blockchain</p>
                 <button className="buy-now-btn">
                   <Link to="/mywal">chi tiết</Link>
                 </button>
@@ -150,6 +154,31 @@ export default function MyTickets() {
             )}
           </div>
         )}
+        {activeCategory === "Hóa đơn của tôi " && (
+          <div className="ticket-status-section">
+            {bill.length === 0 ? (
+              <div className="empty-tickets">
+                <img src={emptyTicketIcon} alt="Empty tickets" />
+                <p>Chưa có hóa đơn nào</p>
+                <button className="buy-now-btn">
+                  <Link to="/home">chi tiết</Link>
+                </button>
+              </div>
+            ) : (
+              <div className="tickets-grid">
+                {bill.map((b, i) => (
+                  <div className="ticket-card" key={i}>
+                    <h3>{b.event_id}</h3>
+                    <p>Tổng: {b.total_amount}</p>
+                    <p>Tổng: {b.status}</p>
+{/* //id (PK), user_id, event_id, total_amount, status, created_at, payment_id */}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        
       </div>
     </div>
   );

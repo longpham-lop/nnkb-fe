@@ -1,6 +1,7 @@
 .mytickets-container {
   padding: 40px;
   max-width: 1480px;
+  color:black;
 }
 .category-tabs {
   display: flex;
