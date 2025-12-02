@@ -1,395 +1,319 @@
-/* --- Account Page Container --- */
-.account-page-container {
+:root {
+    --primary: #ee4d2d; /* Màu cam giống Shopee hoặc đổi thành mã màu thương hiệu của bạn */
+    --primary-hover: #d73211;
+    --text: #333;
+    --text-light: #555;
+    --bg-gray: #f5f5f5;
+    --border: #e0e0e0;
+    --white: #ffffff;
+}
+
+body {
+    background-color: black;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.account-page {
+    padding: 20px 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
     display: flex;
-    gap: 50px;
-    max-width: 1100px;
-    margin: 40px auto; /* Căn giữa và tạo khoảng cách trên dưới */
-    padding: 0 20px;
-    color: #e0e0e0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    gap: 20px;
+    align-items: flex-start;
 }
 
-/* --- Sidebar (Left Column) --- */
-.account-sidebar {
-    flex: 0 0 220px; /* Không co giãn, chiều rộng cố định 220px */
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 250px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-.user-profile {
+.profile-summary {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 30px;
-}
-
-.user-avatar-small {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover; /* Đảm bảo ảnh không bị méo */
-}
-
-.user-name {
-    font-weight: 600;
-    color: #fff;
-}
-
-/* --- Sidebar Navigation (UPDATED) --- */
-.account-nav .nav-item {
-    display: block;
-    color: #b3b3b3;
-    text-decoration: none;
-    padding: 12px 0;
-    font-size: 14px;
-    transition: color 0.2s;
-    cursor: pointer; /* Biến con trỏ thành hình bàn tay */
-}
-
-.account-nav .nav-item:hover {
-    color: #fff;
-}
-
-.account-nav .nav-item.active {
-    color: #1DB954; /* Màu xanh lá cho mục đang được chọn */
-    font-weight: bold;
-}
-
-/* --- Main Content (Right Column) --- */
-.account-content {
-    flex-grow: 1; /* Chiếm hết không gian còn lại */
-    min-width: 0; /* Sửa lỗi tràn layout flexbox */
-}
-
-.account-content h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 5px 0;
-}
-
-.divider {
-    border: none;
-    height: 1px;
-    background-color: #3a3a40;
-    margin: 20px 0;
-}
-
-/* --- Account Info View Specific Styles --- */
-.profile-picture-section {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.avatar-large-wrapper {
-    position: relative;
-    display: inline-block;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
     margin-bottom: 15px;
 }
 
-.user-avatar-large {
-    width: 100px;
-    height: 100px;
+.profile-summary img {
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    margin-right: 15px;
+    border: 1px solid var(--border);
     object-fit: cover;
 }
 
-.edit-icon {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background-color: #3a3a40;
-    color: #fff;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.profile-summary strong {
+    display: block;
     font-size: 14px;
-    cursor: pointer;
-    border: 2px solid #121212;
-}
-
-.profile-picture-section p {
-    max-width: 400px;
-    margin: 0 auto;
-    font-size: 14px;
-    color: #b3b3b3;
-    line-height: 1.6;
-}
-
-/* --- Form Styling --- */
-.account-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #b3b3b3;
-}
-
-.form-group input, .country-code {
-    background-color: #2a2a2a;
-    border: 1px solid #555;
-    color: #e0e0e0;
-    padding: 12px 15px;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.form-group input:focus, .country-code:focus {
-    outline: none;
-    border-color: #1DB954;
-}
-
-/* Phone input group */
-.phone-input-group {
-    display: flex;
-}
-
-.country-code {
-    border-right: none;
-    border-radius: 6px 0 0 6px;
-}
-
-.phone-input-group input {
-    flex-grow: 1;
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-}
-
-.clear-btn {
-    background-color: #2a2a2a;
-    border: 1px solid #555;
-    border-left: none;
-    color: #b3b3b3;
-    padding: 0 15px;
-    border-radius: 0 6px 6px 0;
-    cursor: pointer;
-}
-
-/* Email input with icon */
-.input-with-icon {
-    position: relative;
-}
-.input-with-icon input {
-    width: 100%;
-    box-sizing: border-box; 
-    background-color: #191919; 
-}
-.verified-icon {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #1DB954;
-    font-weight: bold;
-}
-
-/* Gender radio buttons */
-.gender-options {
-    display: flex;
-    gap: 25px;
-}
-.gender-options label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-.gender-options input[type="radio"] {
-    display: none;
-}
-.gender-options span::before {
-    content: '';
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid #555;
-    margin-right: 8px;
-    transition: border-color 0.2s;
-}
-.gender-options input[type="radio"]:checked + span::before {
-    border-color: #1DB954;
-    background-color: #1DB954;
-    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><circle cx="4" cy="4" r="2" fill="white"/></svg>');
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-/* Save button */
-.save-button {
-    background-color: #1DB954;
-    color: #fff;
-    border: none;
-    padding: 14px;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 20px;
-    max-width: 150px;
-}
-.save-button:hover {
-    background-color: #1ed760;
-}
-
-
-/* --- CSS cho giao diện "Vé của tôi" (NEW & REFINED) --- */
-.ticket-tabs {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #3a3a40;
-}
-.ticket-tabs .tab {
-    background: none;
-    border: none;
-    color: #b3b3b3;
-    padding: 10px 5px;
-    font-size: 14px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-bottom-color 0.2s;
-}
-.ticket-tabs .tab:hover {
-    color: #fff;
-}
-.ticket-tabs .tab.active {
-    color: #1DB954;
-    border-bottom-color: #1DB954;
-    font-weight: bold;
-}
-.ticket-status-section {
-    margin-bottom: 40px;
-}
-.ticket-status-section h2 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 20px;
-}
-.empty-tickets {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 50px 0;
-    text-align: center;
-}
-.empty-tickets img {
-    width: 120px; /* Chỉnh kích thước icon cho phù hợp */
-    height: auto;
-    margin-bottom: 20px;
-}
-.empty-tickets p {
-    color: #fff;
-    font-size: 16px;
-    margin-bottom: 25px;
-}
-.buy-now-btn {
-    background-color: #1DB954;
-    color: #fff;
-    border: none;
-    padding: 12px 40px;
-    border-radius: 50px; 
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.buy-now-btn:hover {
-    background-color: #1ed760;
-}
-.recommendations h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #fff;
-    margin-top: 50px;
-    border-top: 1px solid #3a3a40;
-    padding-top: 30px;
-}
-
-/* --- CSS cho Phần Gợi ý Sự kiện --- */
-.recommendation-grid {
-    display: grid;
-    /* Tạo lưới 4 cột, tự động xuống hàng khi màn hình nhỏ */
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.reco-card {
-    background-color: transparent;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-}
-
-.reco-card:hover {
-    transform: translateY(-5px); 
-}
-
-.reco-card img {
-    width: 100%;
-    border-radius: 8px; 
-    margin-bottom: 10px;
-    aspect-ratio: 16 / 9; 
-    object-fit: cover;
-}
-
-.reco-card h4 {
-    color: #fff;
-    font-size: 15px;
-    font-weight: 500;
-    margin: 0 0 8px 0;
-    
+    color: white;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 150px;
 }
 
-.reco-card p {
-    font-size: 13px;
-    color: #b3b3b3;
+.profile-summary p {
+    font-size: 12px;
+    color: #888;
+    margin: 4px 0 0;
+}
+
+.menu button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 0;
+    font-size: 15px;
+    color: var(--text);
+    cursor: pointer;
+    transition: color 0.2s;
+    text-align: left;
+}
+
+.menu button svg {
+    margin-right: 10px;
+    color: #888;
+    font-size: 18px;
+}
+
+.menu button:hover, .menu button.active {
+    color: rgb(192, 232, 196);
+}
+
+.menu button.active svg {
+    color: var(--primary);
+}
+
+/* --- MAIN CONTENT --- */
+.main-content {
+    flex: 1;
+    background: var(--white);
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.13);
+    border-radius: 2px;
+    padding: 30px;
+    min-height: 500px;
+}
+
+.info-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 18px;
+    margin-bottom: 30px;
+}
+
+.info-header h2 {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 5px;
+    color: black;
+}
+
+.info-header p {
+    font-size: 14px;
+    color: black;
     margin: 0;
 }
 
-.reco-card .reco-price {
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 4px;
+/* --- FORM LAYOUT --- */
+.info-body-layout {
+    display: flex;
+    gap: 50px;
 }
 
-/* --- CSS cho Nút "Xem thêm sự kiện" --- */
-.see-more-container {
-    text-align: center; 
-    margin-top: 40px;
-    padding-bottom: 20px;
+.info-inputs {
+    flex: 1;
 }
 
-.see-more-btn {
-    display: inline-block; 
-    background-color: transparent;
-    color: #fff;
-    border: 1px solid #fff; 
-    padding: 12px 30px;
-    border-radius: 50px; 
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: black;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px dashed var(--border);
+    margin: 30px 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+.form-group label {
+    display: block;
     font-size: 14px;
-    font-weight: bold;
-    text-decoration: none; 
-    transition: background-color 0.2s, color 0.2s;
+    color: #555;
+    margin-bottom: 8px;
 }
 
-.see-more-btn:hover {
-    background-color: #1DB954;
-    color: #121212; 
+.form-control {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid rgba(0,0,0,.14);
+    border-radius: 2px;
+    font-size: 14px;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 4px rgba(238, 77, 45, 0.2);
+}
+
+/* Input có icon bên trong */
+.input-with-icon {
+    position: relative;
+}
+
+.input-icon-left {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.form-control.pl-40 {
+    padding-left: 35px;
+}
+
+/* --- PASSWORD SECTION --- */
+.password-wrapper {
+    position: relative;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    padding: 5px;
+}
+
+.eye-icon:hover {
+    color: var(--text);
+}
+
+/* --- BUTTON --- */
+.save-btn {
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.09);
+    transition: background 0.2s;
+}
+
+.save-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+/* --- AVATAR RIGHT COLUMN --- */
+.info-avatar {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-left: 1px solid var(--border);
+    padding-left: 50px;
+    justify-content: flex-start;
+    padding-top: 20px;
+}
+
+.avatar-preview {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e8e8e8;
+}
+
+.upload-trigger {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #555;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+.upload-trigger:hover {
+    background: var(--bg-gray);
+}
+
+.avatar-desc {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .info-body-layout {
+        flex-direction: column-reverse;
+        gap: 30px;
+    }
+    .info-avatar {
+        width: 100%;
+        border-left: none;
+        padding-left: 0;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 20px;
+    }
 }
