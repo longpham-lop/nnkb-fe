@@ -1,4 +1,5 @@
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 const API = import.meta.env.VITE_API_URL || process.env.REACT_APP_API_URL;
 
@@ -18,6 +19,14 @@ export const logout = () => {
 
 export const refresh = () => {
   return axios.post(`${API}/api/users/refresh`, {}, { withCredentials: true });
+};
+
+export const ref= (data) => {
+  return axiosInstance.put(`${API}/api/me`,data , { withCredentials: true });
+};
+
+export const chang= (data) => {
+  return axiosInstance.put(`${API}/api/change-password`,data , { withCredentials: true });
 };
 
 

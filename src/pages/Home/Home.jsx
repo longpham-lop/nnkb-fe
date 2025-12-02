@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import "./Home.css";
 
 import { getAllEvents } from "../../api/event";
@@ -18,6 +19,8 @@ const Home = () => {
   const [weekendEvents, setWeekendEvents] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  
 
   // ========================= RANDOM FUNCTION =========================
   const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
@@ -67,6 +70,12 @@ const Home = () => {
     const el = document.getElementById(id);
     el.scrollBy({ left: 400, behavior: "smooth" });
   };
+
+  const navto = (e) =>{
+    localStorage.setItem("eventid", e);
+    navigate("/ticketdetail");
+
+  }
 
   // ========================= DRAG SCROLL =========================
   useEffect(() => {
@@ -148,7 +157,7 @@ const Home = () => {
                 <div
                   key={event.id}
                   className="event-card-large"
-                  onClick={() => (window.location.href = `/detail/${event.id}`)}
+                  onClick={() => navto(event.id)}
                 >
                   <img src={event.cover_image} alt={event.name} />
                   <h3>{event.name}</h3>
@@ -179,7 +188,7 @@ const Home = () => {
                 <div
                   key={event.id}
                   className="event-card"
-                  onClick={() => (window.location.href = `/detail/${event.id}`)}
+                  onClick={() => navto(event.id)}
                 >
                   <img src={event.cover_image} alt={event.name} />
                   <h3>{event.name}</h3>
@@ -217,7 +226,7 @@ const Home = () => {
                 <div
                   key={event.id}
                   className="event-card-small"
-                  onClick={() => (window.location.href = `/detail/${event.id}`)}
+                  onClick={() => navto(event.id)}
                 >
                   <img src={event.cover_image} alt={event.name} />
                   <h3>{event.name}</h3>

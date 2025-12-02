@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Account.css';
 import { uploadImage } from '../../api/upload';
-import { updateUser } from '../../api/auth';
+import { updateUser ,ref,chang} from '../../api/auth';
 import { FaCamera, FaEye, FaEyeSlash, FaUser, FaLock, FaCalendarAlt, FaMapMarkerAlt } from 'react-icons/fa';
 
 // --- COMPONENT CON: THÔNG TIN TÀI KHOẢN ---
@@ -13,7 +13,7 @@ const AccountInfo = ({ userData, refreshUser }) => {
     name: userData.name || "",
     phone: userData.phone || "",
     dob: userData.dob || "",
-    address: userData.address || "", 
+    countryside: userData.countryside || "", 
   });
 
   const [passData, setPassData] = useState({
@@ -34,7 +34,7 @@ const AccountInfo = ({ userData, refreshUser }) => {
       name: userData.name || "",
       phone: userData.phone || "",
       dob: userData.dob || "",
-      address: userData.address || ""
+      countryside: userData.countryside || ""
     });
   }, [userData]);
 
@@ -72,44 +72,56 @@ const AccountInfo = ({ userData, refreshUser }) => {
   // Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (passData.newPassword || passData.currentPassword) {
-        if (passData.newPassword !== passData.confirmPassword) {
-            alert("Mật khẩu mới và xác nhận mật khẩu không khớp!");
-            return;
-        }
-        if (!passData.currentPassword) {
-            alert("Vui lòng nhập mật khẩu hiện tại để xác nhận thay đổi!");
-            return;
-        }
-    }
 
     try {
-      const dataToUpdate = { 
-          ...formData, 
-          avata,
-          ...(passData.newPassword ? { 
-              password: passData.newPassword, 
-              currentPassword: passData.currentPassword 
-          } : {})
-      };
+        // 1 — Update thông tin chung
+        const updateInfo = {
+          name: formData.name,
+          phone: formData.phone,
+          countryside: formData.countryside,
+          avatar_url :avata
+        };
 
-      await updateUser(userData.id, dataToUpdate);
+        await ref(updateInfo);
 
-  
-      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-      const newUser = { ...currentUser, ...formData, avata };
-      localStorage.setItem("user", JSON.stringify(newUser));
-      
-      refreshUser();
-      
-      // Reset form mật khẩu
-      setPassData({ currentPassword: "", newPassword: "", confirmPassword: "" });
-      alert("Cập nhật hồ sơ thành công!");
-      
+        // 2 — Nếu có nhập mật khẩu → gọi API đổi mật khẩu
+        if (passData.newPassword || passData.currentPassword) {
+
+            if (!passData.currentPassword) {
+                alert("Vui lòng nhập mật khẩu hiện tại!");
+                return;
+            }
+
+            if (passData.newPassword !== passData.confirmPassword) {
+                alert("Mật khẩu mới không khớp!");
+                return;
+            }
+
+            await chang({
+                old_password: passData.currentPassword,
+                new_password: passData.newPassword
+            });
+
+            // Reset mật khẩu UI
+            setPassData({
+              currentPassword: "",
+              newPassword: "",
+              confirmPassword: ""
+            });
+        }
+
+        // Lưu localStorage
+        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+        const newUser = { ...currentUser, ...updateInfo };
+
+        localStorage.setItem("user", JSON.stringify(newUser));
+        refreshUser();
+
+        alert("Cập nhật thành công!");
+
     } catch (err) {
-      console.error(err);
-      alert("Cập nhật thất bại. Vui lòng kiểm tra lại thông tin (hoặc mật khẩu cũ).");
+        console.error(err);
+        alert("Lỗi khi cập nhật. Vui lòng kiểm tra thông tin.");
     }
   };
 
@@ -140,14 +152,14 @@ const AccountInfo = ({ userData, refreshUser }) => {
             </div>
 
             <div className="form-group">
-                <label htmlFor="address">Quê quán / Địa chỉ</label>
+                <label htmlFor="countryside">Quê quán / Địa chỉ</label>
                 <div className="input-with-icon">
                     <FaMapMarkerAlt className="input-icon-left" />
                     <input 
                         type="text" 
-                        id="address" 
+                        id="countryside" 
                         className="form-control pl-40" 
-                        value={formData.address} 
+                        value={formData.countryside} 
                         onChange={handleChange} 
                         placeholder="Ví dụ: Hoàn Kiếm, Hà Nội"
                     />
