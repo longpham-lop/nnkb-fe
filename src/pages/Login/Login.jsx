@@ -15,14 +15,16 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault(); 
+
     try {
       console.log("Sending:", { email, password });
       const { data } = await login({ email, password });
       await login({ email, password }); 
       setTimeout(() => {
         console.log("Chạy sau 3 giây");
-      }, 3000);
+      }, 1000);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       dispatch(
@@ -43,10 +45,13 @@ function Login() {
         <h2>Đăng nhập</h2>
 
         {error && <p style={{ color: "red" }}>{error}</p>}
-
+        <form onSubmit={handleLogin}>
         <div className="input-group">
           <FaEnvelope className="icon" />
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Nhập địa chỉ email" />
+          <input type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                 placeholder="Nhập địa chỉ email" />
         </div>
 
         <div className="input-group">
@@ -75,7 +80,7 @@ function Login() {
         <button className="btn-login" onClick={handleLogin}>
           Đăng nhập
         </button>
-
+        </form>
         <div className="divider">
           <span>Hoặc đăng nhập với</span>
         </div>

@@ -73,7 +73,7 @@ body {
 
 /* --- TICKET LIST --- */
 .ticket-list {
-  background: var(--bg-card);
+  background: rgb(80, 176, 86);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);

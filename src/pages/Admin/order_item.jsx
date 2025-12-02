@@ -17,6 +17,10 @@ const OrderItems = () => {
   const [checkedInForm, setCheckedInForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // --- PHÂN TRANG ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(8);
+
   useEffect(() => {
     loadItems();
   }, []);
@@ -66,7 +70,6 @@ const OrderItems = () => {
     }
   };
 
-  // Format tiền tệ
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
@@ -78,13 +81,19 @@ const OrderItems = () => {
     i.id.toString().includes(searchTerm)
   );
 
+  // --- PHÂN TRANG DỮ LIỆU ---
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
   return (
     <div className="dashboard-wrapper">
       <div className="page-header">
         <h2><List className="header-icon"/> Chi tiết Đơn hàng & Soát vé</h2>
       </div>
 
-      {/* --- FORM EDIT CHECK-IN (Chỉ hiện khi Edit) --- */}
+      {/* --- FORM EDIT CHECK-IN --- */}
       {editingId && (
         <div className="card form-card slide-down">
             <div className="card-header">
@@ -154,10 +163,10 @@ const OrderItems = () => {
             </thead>
 
             <tbody>
-              {filteredItems.length === 0 && (
+              {currentItems.length === 0 && (
                  <tr><td colSpan="8" className="text-center">Không tìm thấy dữ liệu</td></tr>
               )}
-              {filteredItems.map((i) => (
+              {currentItems.map((i) => (
                 <tr key={i.id}>
                   <td><span className="id-badge">#{i.id}</span></td>
                   <td><span className="order-badge">Order #{i.order_id}</span></td>
@@ -189,13 +198,15 @@ const OrderItems = () => {
                       className="btn-icon edit"
                       onClick={() => handleEdit(i)}
                       title="Cập nhật Check-in"
-                    ><i className="bi bi-pencil-square"></i>
+                    >
+                      <Edit size={16}/>
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(i.id)}
                       title="Xóa"
-                    ><i className="bi bi-trash"></i>
+                    >
+                      <Trash2 size={16}/>
                     </button>
                   </td>
                 </tr>
@@ -203,6 +214,35 @@ const OrderItems = () => {
             </tbody>
           </table>
         </div>
+
+        {/* --- PAGINATION --- */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+                className={currentPage === i + 1 ? "active" : ""}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

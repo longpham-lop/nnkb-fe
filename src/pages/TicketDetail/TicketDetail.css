@@ -12,7 +12,7 @@
 
 /* Phần thân – nền sáng */
 .ticket-body {
-  background: #f3f5fb;
+  background: #a4a8b4;
   padding: 32px 0 64px;
 }
 
@@ -25,7 +25,7 @@
   margin: 0 auto;
   padding: 0 20px;
   color: #e0e0e0;
-  background: transparent; /* bỏ nền xám cũ */
+  background: transparent; 
 }
 
 .main-detail-content {
@@ -36,6 +36,7 @@
 .sidebar-ads {
   flex: 0 0 250px;
   display: none;
+  margin-top: -30px;
 }
 
 @media (min-width: 1024px) {
@@ -53,12 +54,12 @@
 
 /* ========== PHẦN CARD VÉ Ở TRÊN ========== */
 
-/* Card đầu trang – giống hình mẫu */
+
 .event-main-header {
   display: flex;
-  background: #333438;         /* nền xám đậm của card */
+  background: #333438;         
   border-radius: 32px;
-  overflow: visible;           /* để thấy nửa vòng tròn thò ra ngoài */
+  overflow: visible;           
   position: relative;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }

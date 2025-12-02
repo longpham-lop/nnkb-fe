@@ -21,10 +21,14 @@ const Locations = () => {
     map_link: "",
   });
 
+  // --- PHÂN TRANG ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [locationsPerPage] = useState(5);
+
   useEffect(() => {
     loadLocations();
   }, []);
-
+  
   const loadLocations = async () => {
     try {
       const res = await getAllLocations();
@@ -44,7 +48,6 @@ const Locations = () => {
       capacity: loc.capacity,
       map_link: loc.map_link,
     });
-    // Scroll lên đầu trang để sửa cho dễ
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -87,6 +90,12 @@ const Locations = () => {
       console.error("Lỗi lưu địa điểm:", err);
     }
   };
+
+  // --- PHÂN TRANG DỮ LIỆU ---
+  const indexOfLastLocation = currentPage * locationsPerPage;
+  const indexOfFirstLocation = indexOfLastLocation - locationsPerPage;
+  const currentLocations = locations.slice(indexOfFirstLocation, indexOfLastLocation);
+  const totalPages = Math.ceil(locations.length / locationsPerPage);
 
   return (
     <div className="dashboard-wrapper">
@@ -196,10 +205,10 @@ const Locations = () => {
             </thead>
 
             <tbody>
-                {locations.length === 0 && (
+                {currentLocations.length === 0 && (
                     <tr><td colSpan="7" className="text-center">Chưa có dữ liệu</td></tr>
                 )}
-                {locations.map((loc) => (
+                {currentLocations.map((loc) => (
                 <tr key={loc.id}>
                     <td>#{loc.id}</td>
                     <td className="highlight-text">{loc.name}</td>
@@ -221,7 +230,6 @@ const Locations = () => {
                         onClick={() => handleEdit(loc)}
                         title="Sửa"
                     >
-                      {/* <i className="bi bi-pencil-square"></i> */}
                         <Edit size={16} />
                     </button>
                     <button
@@ -229,7 +237,6 @@ const Locations = () => {
                         onClick={() => handleDelete(loc.id)}
                         title="Xóa"
                     >
-                      {/* <i className="bi bi-trash"></i> */}
                         <Trash2 size={16} />
                     </button>
                     </td>
@@ -238,6 +245,35 @@ const Locations = () => {
             </tbody>
             </table>
         </div>
+
+        {/* --- PAGINATION --- */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+                className={currentPage === i + 1 ? "active" : ""}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

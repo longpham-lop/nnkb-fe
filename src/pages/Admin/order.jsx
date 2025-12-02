@@ -8,7 +8,7 @@ import {
 } from "../../api/order";
 import { 
   ShoppingCart, Edit, Trash2, Save, X, 
-  Search, Filter, CheckCircle, Clock, XCircle, CreditCard 
+  Search, CheckCircle, Clock, XCircle, CreditCard 
 } from "lucide-react";
 
 const Orders = () => {
@@ -16,6 +16,10 @@ const Orders = () => {
   const [editingId, setEditingId] = useState(null);
   const [statusForm, setStatusForm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // --- PHÂN TRANG ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(6);
 
   useEffect(() => {
     loadOrders();
@@ -67,12 +71,10 @@ const Orders = () => {
     }
   };
 
-  // Helper format tiền tệ
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  // Helper render trạng thái badge
   const renderStatusBadge = (status) => {
     switch (status) {
       case 'paid':
@@ -86,11 +88,17 @@ const Orders = () => {
     }
   };
 
-  // Filter logic đơn giản
+  // Filter theo search term
   const filteredOrders = orders.filter(o => 
     o.id.toString().includes(searchTerm) || 
     o.user_id.toString().includes(searchTerm)
   );
+
+  // --- PHÂN TRANG DỮ LIỆU ---
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
   return (
     <div className="dashboard-wrapper">
@@ -98,7 +106,7 @@ const Orders = () => {
         <h2><ShoppingCart className="header-icon"/> Quản lý Đơn hàng</h2>
       </div>
 
-      {/* --- FORM CẬP NHẬT TRẠNG THÁI (Chỉ hiện khi Edit) --- */}
+      {/* --- FORM CẬP NHẬT TRẠNG THÁI --- */}
       {editingId && (
         <div className="card form-card slide-down">
             <div className="card-header">
@@ -143,11 +151,6 @@ const Orders = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
         </div>
-        <div className="filter-group">
-            <button className="filter-btn active">Tất cả</button>
-            <button className="filter-btn">Đã thanh toán</button>
-            <button className="filter-btn">Chờ xử lý</button>
-        </div>
       </div>
 
       {/* --- TABLE --- */}
@@ -168,18 +171,14 @@ const Orders = () => {
             </thead>
 
             <tbody>
-              {filteredOrders.length === 0 && (
+              {currentOrders.length === 0 && (
                  <tr><td colSpan="8" className="text-center">Không tìm thấy đơn hàng nào</td></tr>
               )}
-              {filteredOrders.map((o) => (
+              {currentOrders.map((o) => (
                 <tr key={o.id}>
                   <td><span className="id-badge">#{o.id}</span></td>
                   <td><span className="user-badge">User {o.user_id}</span></td>
-                  <td>
-                    <div className="event-info-cell">
-                        Event #{o.event_id}
-                    </div>
-                  </td>
+                  <td>Event #{o.event_id}</td>
                   <td className="price-cell">{formatCurrency(o.total_amount)}</td>
                   <td>{renderStatusBadge(o.status)}</td>
                   <td className="date-cell">
@@ -200,15 +199,15 @@ const Orders = () => {
                       className="btn-icon edit"
                       onClick={() => handleEdit(o)}
                       title="Cập nhật trạng thái"
-                    ><i className="bi bi-pencil-square"></i>
-                     
+                    >
+                      <Edit size={16}/>
                     </button>
                     <button
                       className="btn-icon delete"
                       onClick={() => handleDelete(o.id)}
                       title="Xóa đơn hàng"
-                    ><i className="bi bi-trash"></i>
-                      
+                    >
+                      <Trash2 size={16}/>
                     </button>
                   </td>
                 </tr>
@@ -216,6 +215,35 @@ const Orders = () => {
             </tbody>
           </table>
         </div>
+
+        {/* --- PAGINATION --- */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+                className={currentPage === i + 1 ? "active" : ""}
+              >
+                {i + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

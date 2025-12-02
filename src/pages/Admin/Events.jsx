@@ -19,6 +19,10 @@ const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // --- PHÂN TRANG ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [eventsPerPage] = useState(5); // số sự kiện mỗi trang
+
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -74,7 +78,7 @@ const Events = () => {
     }
   };
 
-  // Helper format ngày
+  // Format ngày
   const formatDate = (dateString) => {
     if (!dateString) return "—";
     return new Date(dateString).toLocaleString('vi-VN', {
@@ -83,7 +87,7 @@ const Events = () => {
     });
   };
 
-  // Helper render trạng thái
+  // Render trạng thái
   const renderStatus = (status) => {
     const s = status?.toLowerCase();
     if (s === 'active' || s === 'published') {
@@ -103,6 +107,12 @@ const Events = () => {
     e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     e.id.toString().includes(searchTerm)
   );
+
+  // --- PHÂN TRANG ---
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
   return (
     <div className="dashboard-wrapper">
@@ -125,7 +135,10 @@ const Events = () => {
                 type="text" 
                 placeholder="Tìm kiếm theo tên sự kiện hoặc ID..." 
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // reset về trang 1 khi tìm kiếm
+                }}
             />
         </div>
         <div className="filter-btn">
@@ -151,10 +164,10 @@ const Events = () => {
             </thead>
 
             <tbody>
-              {filteredEvents.length === 0 && (
+              {currentEvents.length === 0 && (
                  <tr><td colSpan="8" className="text-center">Không tìm thấy sự kiện nào</td></tr>
               )}
-              {filteredEvents.map((event) => (
+              {currentEvents.map((event) => (
                 <tr key={event.id}>
                   <td><span className="id-badge">#{event.id}</span></td>
                   <td>
@@ -190,7 +203,6 @@ const Events = () => {
                       onClick={() => handleEdit(event)}
                       title="Sửa"
                     >
-                      {/* <i className="bi bi-pencil-square"></i> */}
                       <Edit size={16} />
                     </button>
                     <button
@@ -198,7 +210,6 @@ const Events = () => {
                       onClick={() => handleDelete(event.id)}
                       title="Xóa"
                     >
-                      {/* <i className="bi bi-trash"></i> */}
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -208,6 +219,35 @@ const Events = () => {
           </table>
         </div>
       </div>
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => setCurrentPage(i + 1)}
+              className={currentPage === i + 1 ? "active" : ""}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* MODAL THÊM / SỬA */}
       {isModalOpen && (

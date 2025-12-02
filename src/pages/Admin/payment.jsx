@@ -17,6 +17,11 @@ const Payments = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const [form, setForm] = useState({
     order_id: "",
@@ -97,7 +102,7 @@ const Payments = () => {
     setCurrentId(null);
   };
 
-  // Helper: Render trạng thái
+  // Render badge trạng thái
   const renderStatus = (status) => {
     const s = status?.toUpperCase();
     if (s === "SUCCESS" || s === "COMPLETED") {
@@ -112,16 +117,24 @@ const Payments = () => {
     return <span className="status-badge default">{status}</span>;
   };
 
-  // Helper: Format tiền
   const formatMoney = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
 
-  // Filter
-  const filteredPayments = payments.filter(p => 
-    p.order_id.toString().includes(searchTerm) ||
-    p.transaction_code?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter + search
+  const filteredPayments = payments.filter(p => {
+    const searchMatch =
+      p.order_id.toString().includes(searchTerm) ||
+      p.transaction_code?.toLowerCase().includes(searchTerm.toLowerCase());
+    const statusMatch = statusFilter ? p.status?.toUpperCase() === statusFilter.toUpperCase() : true;
+    return searchMatch && statusMatch;
+  });
+
+  // Phân trang
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredPayments.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
 
   return (
     <div className="dashboard-wrapper">
@@ -231,7 +244,7 @@ const Payments = () => {
         </form>
       </div>
 
-      {/* SEARCH BAR */}
+      {/* TOOLBAR */}
       <div className="toolbar-section">
         <div className="search-bar">
             <Search className="search-icon" size={18} />
@@ -241,6 +254,12 @@ const Payments = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
+        </div>
+        <div className="filter-group">
+          <button className={`filter-btn ${statusFilter === "" ? "active" : ""}`} onClick={() => setStatusFilter("")}>Tất cả</button>
+          <button className={`filter-btn ${statusFilter === "SUCCESS" ? "active" : ""}`} onClick={() => setStatusFilter("SUCCESS")}>Thành công</button>
+          <button className={`filter-btn ${statusFilter === "PENDING" ? "active" : ""}`} onClick={() => setStatusFilter("PENDING")}>Đang chờ</button>
+          <button className={`filter-btn ${statusFilter === "FAILED" ? "active" : ""}`} onClick={() => setStatusFilter("FAILED")}>Thất bại</button>
         </div>
       </div>
 
@@ -262,38 +281,23 @@ const Payments = () => {
             </thead>
 
             <tbody>
-              {filteredPayments.length === 0 && (
+              {currentItems.length === 0 && (
                  <tr><td colSpan="8" className="text-center">Không tìm thấy dữ liệu</td></tr>
               )}
-              {filteredPayments.map((p) => (
+              {currentItems.map((p) => (
                 <tr key={p.id}>
                   <td><span className="id-badge">#{p.id}</span></td>
                   <td><span className="order-badge">Order #{p.order_id}</span></td>
                   <td className="method-cell">{p.method}</td>
                   <td className="amount-cell">{formatMoney(p.total_paid)}</td>
                   <td>{renderStatus(p.status)}</td>
+                  <td>{p.transaction_code || <span className="text-muted">—</span>}</td>
+                  <td>{p.paid_at ? new Date(p.paid_at).toLocaleString('vi-VN') : '—'}</td>
                   <td>
-                    {p.transaction_code ? (
-                        <span className="code-text">{p.transaction_code}</span>
-                    ) : <span className="text-muted">—</span>}
-                  </td>
-                  <td >
-                    {p.paid_at ? new Date(p.paid_at).toLocaleString('vi-VN') : '—'}
-                  </td>
-                  
-                  <td>
-                    <button
-                      className="btn-icon edit"
-                      onClick={() => handleEdit(p)}
-                      title="Sửa"
-                    ><i className="bi bi-pencil-square"></i>
+                    <button className="btn-icon edit" onClick={() => handleEdit(p)} title="Sửa">
                       <Edit size={16} />
                     </button>
-                    <button
-                      className="btn-icon delete"
-                      onClick={() => handleDelete(p.id)}
-                      title="Xoá"
-                    ><i className="bi bi-trash"></i>
+                    <button className="btn-icon delete" onClick={() => handleDelete(p.id)} title="Xoá">
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -301,6 +305,31 @@ const Payments = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >Prev</button>
+
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={currentPage === i + 1 ? "active" : ""}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >Next</button>
+            </div>
+          )}
         </div>
       </div>
     </div>

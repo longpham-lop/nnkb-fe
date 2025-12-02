@@ -150,7 +150,11 @@ const TicketDetail = () => {
                   📍 {currentLocation?.address}, {currentLocation?.city}
                 </p>
                 <button className="price-box" onClick={handleBuyTicket}>
-                  <span>Giá từ 499.000 ₫</span>
+                  <span> Giá từ{" "}
+                  {tickets.length > 0
+                    ? Number(Math.min(...tickets.map(t => t.price))).toLocaleString("vi-VN")
+                    : 0}{" "}
+                  ₫</span>
                 </button>
               </div>
 
@@ -170,7 +174,6 @@ const TicketDetail = () => {
         <div className="ticket-detail-container">
           <main className="main-detail-content">
             <section className="event-bottom-half">
-              {/* --- Giới thiệu --- */}
               <section className="event-description">
                 <h3>Giới thiệu</h3>
                 <img

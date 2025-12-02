@@ -184,7 +184,7 @@ export default function MyTickets() {
                          {renderStatus(b.status)}
                       </div>
                       <div className="card-body">
-                        <div className="info-row">
+                        <div className="info-rows">
                             <span>Sự kiện ID:</span> <strong>{b.event_id}</strong>
                         </div>
                         <div className="info-row">

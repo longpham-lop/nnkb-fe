@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './OrderTicket.css';
 
 const availableTickets = JSON.parse(localStorage.getItem("availableTickets") || "[]");
@@ -16,6 +16,7 @@ const formatDate = (dateString) => {
     year: "numeric"
   });
 };
+
 
 const formatCurrency = (amount) =>
   new Intl.NumberFormat('vi-VN', {
