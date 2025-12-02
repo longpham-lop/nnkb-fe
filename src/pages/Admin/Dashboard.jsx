@@ -9,9 +9,12 @@ import { getAllEvents } from '../../api/event';
 import { getAllLog } from '../../api/logreq';
 import { getAllipblock,blocknow } from '../../api/blockip';
 import { Input } from 'postcss';
+import { io } from "socket.io-client";
+import socket from '../../components/socket';
+
 
 const Dashboard = () => {
-
+  const [online, setOnline] = useState(0);
   const [pay, setpay] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [thunhap , setthunhap]= useState();
@@ -38,6 +41,16 @@ const Dashboard = () => {
     fetchLog();
     fetchblock();
   }, []);
+
+  useEffect(() => {
+    const handleOnline = (count) => setOnline(count);
+
+    socket.on("online_count", handleOnline);
+
+    return () => {
+      socket.off("online_count", handleOnline);
+    };
+      }, []);
 
   const getMonthlyRevenue = (payments) => {
     const now = new Date();
@@ -209,8 +222,8 @@ const Dashboard = () => {
             </div>
             <div className="stat-item">
                 <div className="stat-icon yellow"><ShoppingCart size={20}/></div>
-                <span className="stat-value">24</span>
-                <span className="stat-label">Đơn hàng mới</span>
+                <span className="stat-value">{online}</span>
+                <span className="stat-label">Số người online</span>
             </div>
             <div className="stat-item">
                 <div className="stat-icon pink"><Package size={20}/></div>

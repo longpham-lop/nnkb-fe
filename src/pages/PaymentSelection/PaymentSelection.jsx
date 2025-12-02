@@ -55,7 +55,7 @@ const PaymentSelection = () => {
 
         await Promise.all(createPromises);
 
-        navigate("/success");
+        navigate("/home");
       } 
       
       else {

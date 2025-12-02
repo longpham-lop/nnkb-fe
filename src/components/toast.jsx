@@ -3,10 +3,8 @@ import { useEffect } from 'react';
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import socket from './socket';
 
-const socket = io("https://nnkb-vpk7.onrender.com", {
-  transports: ["websocket", "polling"],
-});
 
 function TicketNotifier() {
   useEffect(() => {
