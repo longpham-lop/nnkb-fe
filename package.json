@@ -17,6 +17,7 @@
     "buffer": "^6.0.3",
     "emailjs-com": "^3.2.0",
     "ethers": "^6.15.0",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.23.24",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.553.0",
@@ -31,7 +32,8 @@
     "react-toastify": "^11.0.5",
     "recharts": "^3.4.1",
     "slick-carousel": "^1.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",

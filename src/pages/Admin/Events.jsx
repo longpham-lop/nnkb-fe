@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import EventFormModal from "./EventFormModal";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "./Events.css";
+// 1. Import thư viện xlsx
+import * as XLSX from 'xlsx'; 
+
 import {
   getAllEvents,
   createEvent,
@@ -10,7 +13,8 @@ import {
 } from "../../api/event";
 import { 
   Calendar, MapPin, Edit, Trash2, Plus, 
-  Search, Filter, Image as ImageIcon, CheckCircle, XCircle
+  Search, Filter, Image as ImageIcon, CheckCircle, XCircle,
+  Download // 2. Import icon Download
 } from "lucide-react";
 
 const Events = () => {
@@ -21,7 +25,7 @@ const Events = () => {
 
   // --- PHÂN TRANG ---
   const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage] = useState(5); // số sự kiện mỗi trang
+  const [eventsPerPage] = useState(5); 
 
   useEffect(() => {
     fetchEvents();
@@ -36,6 +40,54 @@ const Events = () => {
     }
   };
 
+  // Format ngày (Tách ra để dùng chung cho cả render và export)
+  const formatDate = (dateString) => {
+    if (!dateString) return "—";
+    return new Date(dateString).toLocaleString('vi-VN', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  };
+
+  // --- 3. HÀM XỬ LÝ XUẤT EXCEL ---
+  const handleExportExcel = () => {
+    // Tạo dữ liệu để xuất (Lấy từ filteredEvents để xuất đúng những gì đang tìm kiếm)
+    // Nếu muốn xuất TOÀN BỘ thì đổi filteredEvents thành events
+    const dataToExport = filteredEvents.map(event => ({
+      "ID": event.id,
+      "Tên sự kiện": event.name,
+      "Ban tổ chức (ID)": event.organizer_id,
+      "Thời gian bắt đầu": formatDate(event.start_date),
+      "Thời gian kết thúc": formatDate(event.end_date),
+      "Địa điểm (ID)": event.location_id,
+      "Thể loại (ID)": event.category_id,
+      "Trạng thái": event.status
+    }));
+
+    // Tạo worksheet từ dữ liệu JSON
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // Tự động điều chỉnh độ rộng cột (Optional - làm đẹp file excel)
+    const columnWidths = [
+      { wch: 5 },  // ID
+      { wch: 30 }, // Tên
+      { wch: 15 }, // BTC
+      { wch: 20 }, // Bắt đầu
+      { wch: 20 }, // Kết thúc
+      { wch: 15 }, // Địa điểm
+      { wch: 15 }, // Thể loại
+      { wch: 15 }  // Trạng thái
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    // Tạo workbook mới
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Danh Sách Sự Kiện");
+
+    // Xuất file
+    XLSX.writeFile(workbook, "Danh_Sach_Su_Kien.xlsx");
+  };
+
   const handleOpenModal = () => {
     setSelectedEvent(null);
     setIsModalOpen(true);
@@ -48,7 +100,6 @@ const Events = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa sự kiện này?")) return;
-
     try {
       await apiDeleteEvent(id);
       setEvents(events.filter((e) => e.id !== id));
@@ -62,11 +113,9 @@ const Events = () => {
     try {
       let newData;
       if (data.id) {
-        // UPDATE
         await updateEvent(data.id, data);
         newData = events.map((e) => (e.id === data.id ? data : e));
       } else {
-        // CREATE
         const res = await createEvent(data);
         newData = [res.data, ...events];
       }
@@ -78,16 +127,6 @@ const Events = () => {
     }
   };
 
-  // Format ngày
-  const formatDate = (dateString) => {
-    if (!dateString) return "—";
-    return new Date(dateString).toLocaleString('vi-VN', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  };
-
-  // Render trạng thái
   const renderStatus = (status) => {
     const s = status?.toLowerCase();
     if (s === 'active' || s === 'published') {
@@ -104,8 +143,8 @@ const Events = () => {
 
   // Filter search
   const filteredEvents = events.filter(e => 
-    e.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    e.id.toString().includes(searchTerm)
+    e.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    e.id?.toString().includes(searchTerm)
   );
 
   // --- PHÂN TRANG ---
@@ -122,9 +161,16 @@ const Events = () => {
           <p className="sub-text">Quản lý tất cả các sự kiện đang hoạt động trên hệ thống</p>
         </div>
         
-        <button onClick={handleOpenModal} className="btn-primary-action">
-          <Plus size={18} /> Thêm Sự kiện
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+            {/* 4. Nút Xuất Excel */}
+            <button onClick={handleExportExcel} className="btn-secondary-action" style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 16px', border: '1px solid #ccc', borderRadius: '6px', background: '#fff', cursor: 'pointer' }}>
+                <Download size={18} /> Xuất Excel
+            </button>
+
+            <button onClick={handleOpenModal} className="btn-primary-action">
+                <Plus size={18} /> Thêm Sự kiện
+            </button>
+        </div>
       </div>
 
       {/* SEARCH BAR & FILTERS */}
@@ -137,7 +183,7 @@ const Events = () => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setCurrentPage(1); // reset về trang 1 khi tìm kiếm
+                  setCurrentPage(1); 
                 }}
             />
         </div>
@@ -249,7 +295,6 @@ const Events = () => {
         </div>
       )}
 
-      {/* MODAL THÊM / SỬA */}
       {isModalOpen && (
         <EventFormModal
           event={selectedEvent}

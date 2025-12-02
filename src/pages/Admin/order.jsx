@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./order.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import * as XLSX from 'xlsx';
 import {
   getAllOrders,
   updateOrder,
@@ -8,7 +9,8 @@ import {
 } from "../../api/order";
 import { 
   ShoppingCart, Edit, Trash2, Save, X, 
-  Search, CheckCircle, Clock, XCircle, CreditCard 
+  Search, CheckCircle, Clock, XCircle, CreditCard,
+  Download
 } from "lucide-react";
 
 const Orders = () => {
@@ -16,19 +18,41 @@ const Orders = () => {
   const [editingId, setEditingId] = useState(null);
   const [statusForm, setStatusForm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const tableRef = useRef(null); // Ref để cuộn trang
 
-  // --- PHÂN TRANG ---
+  // --- CẤU HÌNH PHÂN TRANG ---
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(6);
+  const [ordersPerPage] = useState(6); // Giữ cố định 6 dòng mỗi trang để bảng không bị dài ngắn thất thường
 
   useEffect(() => {
     loadOrders();
   }, []);
 
+  // Khi chuyển trang, tự động cuộn lên đầu bảng
+  useEffect(() => {
+    if (tableRef.current) {
+        tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [currentPage]);
+
   const loadOrders = async () => {
     try {
       const res = await getAllOrders();
-      setOrders(res.data);
+      const rawData = Array.isArray(res.data) ? res.data : [];
+
+      const uniqueOrders = Object.values(
+        rawData.reduce((acc, curr) => {
+          if (!acc[curr.id]) {
+            acc[curr.id] = curr;
+          }
+          return acc;
+        }, {})
+      );
+
+      // Sắp xếp đơn mới nhất lên đầu (nếu cần)
+      uniqueOrders.sort((a, b) => b.id - a.id);
+
+      setOrders(uniqueOrders);
     } catch (err) {
       console.error("Lỗi lấy danh sách đơn hàng:", err);
     }
@@ -37,7 +61,6 @@ const Orders = () => {
   const handleEdit = (order) => {
     setEditingId(order.id);
     setStatusForm(order.status);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCancelEdit = () => {
@@ -49,25 +72,21 @@ const Orders = () => {
     e.preventDefault();
     try {
       await updateOrder(editingId, { status: statusForm });
-      setOrders(
-        orders.map((o) =>
-          o.id === editingId ? { ...o, status: statusForm } : o
-        )
-      );
+      setOrders(orders.map((o) => o.id === editingId ? { ...o, status: statusForm } : o));
       handleCancelEdit();
     } catch (err) {
-      console.error("Lỗi cập nhật trạng thái:", err);
+      console.error("Lỗi cập nhật:", err);
       alert("Cập nhật thất bại");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Bạn chắc chắn muốn xóa đơn hàng này? Hành động này không thể hoàn tác.")) return;
+    if (!window.confirm("Bạn chắc chắn muốn xóa?")) return;
     try {
       await deleteOrder(id);
       setOrders(orders.filter((o) => o.id !== id));
     } catch (err) {
-      console.error("Lỗi xóa đơn hàng:", err);
+      console.error("Lỗi xóa:", err);
     }
   };
 
@@ -77,91 +96,94 @@ const Orders = () => {
 
   const renderStatusBadge = (status) => {
     switch (status) {
-      case 'paid':
-        return <span className="status-badge success"><CheckCircle size={12}/> Đã thanh toán</span>;
-      case 'pending':
-        return <span className="status-badge warning"><Clock size={12}/> Chờ xử lý</span>;
-      case 'cancelled':
-        return <span className="status-badge danger"><XCircle size={12}/> Đã hủy</span>;
-      default:
-        return <span className="status-badge default">{status}</span>;
+      case 'paid': return <span className="status-badge success"><CheckCircle size={12}/> Đã thanh toán</span>;
+      case 'pending': return <span className="status-badge warning"><Clock size={12}/> Chờ xử lý</span>;
+      case 'cancelled': return <span className="status-badge danger"><XCircle size={12}/> Đã hủy</span>;
+      default: return <span className="status-badge default">{status}</span>;
     }
   };
 
-  // Filter theo search term
+  // 1. Filter
   const filteredOrders = orders.filter(o => 
-    o.id.toString().includes(searchTerm) || 
-    o.user_id.toString().includes(searchTerm)
+    o.id?.toString().includes(searchTerm) || 
+    o.user_id?.toString().includes(searchTerm)
   );
 
-  // --- PHÂN TRANG DỮ LIỆU ---
+  // 2. Pagination Calculation (Quan trọng)
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  
+  // 3. CẮT MẢNG: Chỉ lấy 6 phần tử cho trang hiện tại
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+
+  const handleExportExcel = () => {
+    const dataToExport = filteredOrders.map(order => ({
+        "Mã Đơn": order.id,
+        "User ID": order.user_id,
+        "Tổng tiền": order.total_amount,
+        "Trạng thái": order.status,
+        "Ngày tạo": new Date(order.created_at).toLocaleString('vi-VN')
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DonHang");
+    XLSX.writeFile(workbook, "Danh_Sach_Don_Hang.xlsx");
+  };
 
   return (
     <div className="dashboard-wrapper">
-      <div className="page-header">
+      <div className="page-header" ref={tableRef}> {/* Gắn ref vào đây để cuộn lên */}
         <h2><ShoppingCart className="header-icon"/> Quản lý Đơn hàng</h2>
+        <button onClick={handleExportExcel} className="btn-secondary-action" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: '#fff', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer' }}>
+            <Download size={18} /> Xuất Excel
+        </button>
       </div>
 
-      {/* --- FORM CẬP NHẬT TRẠNG THÁI --- */}
+      {/* Form Sửa (Giữ nguyên) */}
       {editingId && (
-        <div className="card form-card slide-down">
-            <div className="card-header">
-                <h3>Cập nhật trạng thái đơn hàng #{editingId}</h3>
-            </div>
+        <div className="card form-card slide-down" style={{ marginBottom: '20px' }}>
+            <div className="card-header"><h3>Cập nhật trạng thái #{editingId}</h3></div>
             <form className="order-status-form" onSubmit={handleUpdateStatus}>
                 <div className="form-group">
                     <label>Trạng thái mới:</label>
-                    <div className="select-wrapper">
-                        <select
-                            value={statusForm}
-                            onChange={(e) => setStatusForm(e.target.value)}
-                            className={`status-select ${statusForm}`}
-                        >
-                            <option value="pending">⏳ Chờ xử lý</option>
-                            <option value="paid">✅ Đã thanh toán</option>
-                            <option value="cancelled">❌ Hủy đơn</option>
-                        </select>
-                    </div>
+                    <select value={statusForm} onChange={(e) => setStatusForm(e.target.value)} className={`status-select ${statusForm}`}>
+                        <option value="pending">⏳ Chờ xử lý</option>
+                        <option value="paid">✅ Đã thanh toán</option>
+                        <option value="cancelled">❌ Hủy đơn</option>
+                    </select>
                 </div>
-                
                 <div className="form-actions">
-                    <button type="button" className="btn-cancel" onClick={handleCancelEdit}>
-                        <X size={18} /> Hủy bỏ
-                    </button>
-                    <button type="submit" className="btn-primary-action">
-                        <Save size={18} /> Lưu trạng thái
-                    </button>
+                    <button type="button" className="btn-cancel" onClick={handleCancelEdit}><X size={18} /> Hủy</button>
+                    <button type="submit" className="btn-primary-action"><Save size={18} /> Lưu</button>
                 </div>
             </form>
         </div>
       )}
 
-      {/* --- TOOLBAR --- */}
+      {/* Toolbar Tìm kiếm */}
       <div className="toolbar-section">
         <div className="search-bar">
             <Search className="search-icon" size={18} />
             <input 
                 type="text" 
-                placeholder="Tìm kiếm theo ID đơn hàng hoặc User ID..." 
+                placeholder="Tìm ID đơn hàng..." 
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
             />
         </div>
       </div>
 
-      {/* --- TABLE --- */}
+      {/* Bảng Dữ Liệu */}
       <div className="card table-card">
-        <div className="table-responsive">
+        <div className="table-responsive" style={{ minHeight: '400px' }}> {/* Đặt min-height để bảng không bị giật */}
           <table className="admin-table order-table">
             <thead>
               <tr>
                 <th>MÃ ĐƠN</th>
-                <th>KHÁCH HÀNG (ID)</th>
-                <th>SỰ KIỆN (ID)</th>
+                <th>KHÁCH HÀNG</th>
+                <th>SỰ KIỆN</th>
                 <th>TỔNG TIỀN</th>
                 <th>TRẠNG THÁI</th>
                 <th>NGÀY TẠO</th>
@@ -169,46 +191,26 @@ const Orders = () => {
                 <th className="text-center">HÀNH ĐỘNG</th>
               </tr>
             </thead>
-
+            
             <tbody>
+              {/* QUAN TRỌNG: Phải map currentOrders (đã cắt), KHÔNG map orders */}
               {currentOrders.length === 0 && (
                  <tr><td colSpan="8" className="text-center">Không tìm thấy đơn hàng nào</td></tr>
               )}
               {currentOrders.map((o) => (
                 <tr key={o.id}>
                   <td><span className="id-badge">#{o.id}</span></td>
-                  <td><span className="user-badge">User {o.user_id}</span></td>
-                  <td>Event #{o.event_id}</td>
+                  <td>User {o.user_id}</td>
+                  <td>Event {o.event_id}</td>
                   <td className="price-cell">{formatCurrency(o.total_amount)}</td>
                   <td>{renderStatusBadge(o.status)}</td>
-                  <td className="date-cell">
-                    {o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '—'}
-                    <span className="time-sub">
-                        {o.created_at ? new Date(o.created_at).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}) : ''}
-                    </span>
+                  <td className="date-cell">{o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '—'}</td>
+                  <td>
+                    {o.payment_id ? <div className="payment-badge"><CreditCard size={12}/> ...{o.payment_id.slice(-4)}</div> : '—'}
                   </td>
                   <td>
-                    {o.payment_id ? (
-                        <div className="payment-badge" title={o.payment_id}>
-                            <CreditCard size={12}/> ID: ...{o.payment_id.slice(-4)}
-                        </div>
-                    ) : <span className="text-muted">—</span>}
-                  </td>
-                  <td>
-                    <button
-                      className="btn-icon edit"
-                      onClick={() => handleEdit(o)}
-                      title="Cập nhật trạng thái"
-                    >
-                      <Edit size={16}/>
-                    </button>
-                    <button
-                      className="btn-icon delete"
-                      onClick={() => handleDelete(o.id)}
-                      title="Xóa đơn hàng"
-                    >
-                      <Trash2 size={16}/>
-                    </button>
+                    <button className="btn-icon edit" onClick={() => handleEdit(o)}><Edit size={16}/></button>
+                    <button className="btn-icon delete" onClick={() => handleDelete(o.id)}><Trash2 size={16}/></button>
                   </td>
                 </tr>
               ))}
@@ -216,16 +218,17 @@ const Orders = () => {
           </table>
         </div>
 
-        {/* --- PAGINATION --- */}
+        {/* Thanh Phân Trang */}
         {totalPages > 1 && (
           <div className="pagination">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
+            <button 
+                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} 
+                disabled={currentPage === 1}
             >
-              Prev
+                Prev
             </button>
 
+            {/* Chỉ hiển thị số trang hợp lý */}
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i + 1}
@@ -236,11 +239,11 @@ const Orders = () => {
               </button>
             ))}
 
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
+            <button 
+                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} 
+                disabled={currentPage === totalPages}
             >
-              Next
+                Next
             </button>
           </div>
         )}
