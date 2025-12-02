@@ -31,12 +31,12 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    // loadPayments();
-    // loadItems();
-    // fetchUsers();
-    // fetchEvents();
-    // fetchLog();
-    // fetchblock();
+    loadPayments();
+    loadItems();
+    fetchUsers();
+    fetchEvents();
+    fetchLog();
+    fetchblock();
   }, []);
 
   const getMonthlyRevenue = (payments) => {
