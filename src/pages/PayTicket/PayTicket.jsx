@@ -81,7 +81,6 @@ function PaymentPage() {
     if (!summary || !formData) navigate("/");
   }, [summary, formData, navigate]);
 
-  /* --- Detect account/network change (Giữ lại để hiển thị địa chỉ ví nếu đã connect từ trước) --- */
   useEffect(() => {
     if (!window.ethereum) return;
 
@@ -90,7 +89,6 @@ function PaymentPage() {
       else setWalletAddress(null);
     };
 
-  
     window.ethereum.request({ method: 'eth_accounts' }).then(handleAccountsChanged).catch(console.error);
 
     try {
@@ -215,7 +213,7 @@ function PaymentPage() {
         <main className="main-payment-content">
           <h3>THANH TOÁN</h3>
 
-          <div className="info-section">
+          <div className="info">
             <h4>Thông tin nhận vé</h4>
             <p>
               Vé điện tử sẽ được gửi đến email: <strong>{user.email}</strong>
@@ -275,11 +273,25 @@ function PaymentPage() {
                 <input
                   type="radio"
                   name="payment"
+                  value="card"
+                  checked={paymentMethod === "card"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                <span>Mã QR </span>
+                <div className="logos">
+                  <img src={Card} alt="Card" />
+                </div>
+              </label>
+
+              <label className="payment-option">
+                <input
+                  type="radio"
+                  name="payment"
                   value="shopeepay"
                   checked={paymentMethod === "shopeepay"}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
-                <span>ShopeePay</span>
+                <span>ShopeePay (Sẽ sớm cập nhật)</span>
                 <div className="logos">
                   <img src={ShopeePay} alt="ShopeePay" />
                 </div>
@@ -293,25 +305,13 @@ function PaymentPage() {
                   checked={paymentMethod === "zalopay"}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
-                <span>ZaloPay</span>
+                <span>ZaloPay (Sẽ sớm cập nhật)</span>
                 <div className="logos">
                   <img src={ZaloPay} alt="ZaloPay" />
                 </div>
               </label>
 
-              <label className="payment-option">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="card"
-                  checked={paymentMethod === "card"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
-                <span>Thẻ ghi nợ/Thẻ tín dụng</span>
-                <div className="logos">
-                  <img src={Card} alt="Card" />
-                </div>
-              </label>
+              
             </div>
           </div>
         </main>

@@ -3,7 +3,7 @@ import './TicketDetail.css';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import eventPoster from '../../assets/banner1.png';
-import ticketGa from '../../assets/banner2.png';
+import ticketGa from '../../assets/ve.png';
 import ticketFanZone from '../../assets/banner3.png';
 import Vpbanks from '../../assets/vpbanks.png';
 import Banner1 from '../../assets/banner1.png';
@@ -218,7 +218,7 @@ const TicketDetail = () => {
                   >
                     <div className="info-block">
                       <h4>Thông tin vé</h4>
-                      <p>15:00 - 22:00 | 23 Tháng 11, 2025</p>
+                      
                     </div>
                     <span
                       className="arrow-icon"

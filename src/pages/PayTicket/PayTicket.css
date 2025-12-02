@@ -112,7 +112,8 @@ body {
 
 /* --- Cột bên trái (Main Content) --- */
 .main-payment-content {
-  flex: 1; /* Chiếm phần lớn diện tích */
+  flex: 1;
+   
 }
 
 .main-payment-content h3 {
@@ -122,12 +123,19 @@ body {
   font-size: 1.2rem;
   text-transform: uppercase;
 }
+.info{
+   background: var(--bg-card);
+  padding: 25px;
+  border-radius: 12px;
+  margin-top: -50px
+}
 
 .info-section {
   background: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
-  margin-bottom: 20px;
+  margin-bottom: -25px;
+
 }
 
 .info-section h4 {
@@ -261,7 +269,8 @@ body {
 
 /* --- Cột bên phải (Sidebar - Summary) --- */
 .payment-sidebar {
-  flex: 0 0 380px; /* Chiều rộng cố định */
+  flex: 0 0 380px; 
+  margin-top: 60px;
 }
 
 /* Card tổng tiền màu trắng */

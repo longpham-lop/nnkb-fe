@@ -185,7 +185,7 @@ function OrderFormPage() {
                 onChange={(e) => setAgreed(e.target.checked)}
               />
               <label htmlFor="agree">
-                Tôi đồng ý ticketbox & BTC sử dụng thông tin đặt vé nhằm mục đích
+                Tôi đồng ý với TOPTICKET & BTC sử dụng thông tin đặt vé nhằm mục đích
                 vận hành sự kiện và xuất hóa đơn.
               </label>
             </div>

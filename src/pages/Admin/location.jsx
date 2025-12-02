@@ -220,14 +220,16 @@ const Locations = () => {
                         className="btn-icon edit"
                         onClick={() => handleEdit(loc)}
                         title="Sửa"
-                    ><i className="bi bi-pencil-square"></i>
+                    >
+                      {/* <i className="bi bi-pencil-square"></i> */}
                         <Edit size={16} />
                     </button>
                     <button
                         className="btn-icon delete"
                         onClick={() => handleDelete(loc.id)}
                         title="Xóa"
-                    ><i className="bi bi-trash"></i>
+                    >
+                      {/* <i className="bi bi-trash"></i> */}
                         <Trash2 size={16} />
                     </button>
                     </td>

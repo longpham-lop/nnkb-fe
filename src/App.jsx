@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute';
+import ScrollToTop from "./Scroll";
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -532,8 +533,10 @@ function App() {
   return (
       <Provider store={store}>
     <BrowserRouter>
+      <ScrollToTop /> 
       <Layout />
-    </BrowserRouter></Provider>
+    </BrowserRouter>
+    </Provider>
   );
 }
 

@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import "./MyTickets.css";
-import emptyTicketIcon from "../../assets/longavt.png";
-import { Link } from "react-router-dom";
-import { getAllOrders, getwhoOrderItems,getOrderById, createOrder, updateOrder, deleteOrder } from "../../api/order";
-import { getAllOrderItems, getOrderItemById, createOrderItem, updateOrderItem, deleteOrderItem } from "../../api/orderitem";
-import { useNavigate } from "react-router-dom";
+import emptyTicketIcon from "../../assets/amongus.png";  
+import { Link, useNavigate } from "react-router-dom"
+import { getwhoOrderItems, getAllOrders } from "../../api/order"; 
+
 
 export default function MyTickets() {
   const [regularTickets, setRegularTickets] = useState([]);
   const [nftTickets, setNftTickets] = useState([]);
-  const [bill, setbill] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("Vé Thường"); 
-  const navigate = useNavigate();
-  const [activeStatusTab, setActiveStatusTab] = useState("Tất cả"); 
-  const userId = localStorage.getItem("userid");
+  const [bill, setBill] = useState([]); 
+  const [activeCategory, setActiveCategory] = useState("Vé Thường");
+  
+  // const navigate = useNavigate(); // Chưa dùng thì comment lại
+  const [activeStatusTab, setActiveStatusTab] = useState("Tất cả");
 
   useEffect(() => {
     loadBlockchainTickets();
@@ -28,19 +27,16 @@ export default function MyTickets() {
   const loadRegularTickets = async () => {
     try {
       const orderRes = await getwhoOrderItems();
-      const orders =orderRes.data.data || [];
-      setbill(orders);
+      const orders = orderRes.data.data || [];
+      setBill(orders);
 
-      const orderItemsRes = await getAllOrderItems();
-      const allItems = Array.isArray(orderItemsRes.data)
-        ? orderItemsRes.data
-        : [];
+      const orderItemsRes = await getAllOrders();
+      const allItems = Array.isArray(orderItemsRes.data) ? orderItemsRes.data : [];
 
       const userTickets = allItems
-        .filter(item => orders.some(o => o.id === item.order_id))
-        .map(item => {
-          const order = orders.find(o => o.id === item.order_id);
-
+        .filter((item) => orders.some((o) => o.id === item.order_id))
+        .map((item) => {
+          const order = orders.find((o) => o.id === item.order_id);
           return {
             order_id: order.id,
             event_id: order.event_id,
@@ -49,137 +45,172 @@ export default function MyTickets() {
             qr_code: item.qr_code,
             checked_in: item.checked_in,
             status: order.status,
-            event: order.Event, 
+            event: order.Event,
           };
         });
 
       setRegularTickets(userTickets);
-
     } catch (err) {
       console.error("Lỗi tải vé thường:", err);
     }
   };
 
-  // Filter vé thường theo trạng thái
   const filteredRegularTickets =
     activeStatusTab === "Tất cả"
       ? regularTickets
       : regularTickets.filter((t) => t.status === activeStatusTab);
 
+  // Helper để format giá tiền
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
+
+  // Helper render trạng thái có màu sắc
+  const renderStatus = (status) => {
+    let className = "status-badge pending";
+    if (status === "completed" || status === "paid" || status === "Thành công") className = "status-badge success";
+    if (status === "cancelled" || status === "failed") className = "status-badge error";
+    
+    return <span className={className}>{status}</span>;
+  };
+
   return (
-    <div className="mytickets-container">
-      <h1>Vé của tôi</h1>
-      <hr className="divider" />
-
-      {/* Tab chọn loại vé */}
-      <div className="category-tabs">
-        {["Vé Thường", "Vé Blockchain (NFT)" ,"Hóa đơn của tôi "].map((cat) => (
-          <button
-            key={cat}
-            className={`tab ${activeCategory === cat ? "active" : ""}`}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      <div className="ticket-list-container">
-        {activeCategory === "Vé Thường" && (
-          <div className="ticket-status-section">
-            
-            {filteredRegularTickets.length === 0 ? (
-              <div className="empty-tickets">
-                <img src={emptyTicketIcon} alt="Empty tickets" />
-                <p>Bạn chưa mua vé nào</p>
-                <button className="buy-now-btn">
-                  <Link to="/home">Mua vé ngay</Link>
-                </button>
-              </div>
-            ) : (
-              <div className="tickets-grid">
-                {filteredRegularTickets.map((t, index) => (
-                  <div className="ticket-card" key={index}>
-                    <h3>{t.event?.name || "Tên sự kiện"}</h3>
-                    <p>SL: {t.quantity}</p>
-                    <p>Giá: {t.unit_price.toLocaleString()}₫</p>
-                    <p>Trạng thái: {t.status}</p>
-
-                    {t.qr_code ? (
-                      <img src={t.qr_code} className="qr-img" alt="QR vé" />
-                    ) : (
-                      <p className="no-qr">Không có mã QR</p>
-                    )}
-
-                    <button
-                      className={`checkin-btn ${
-                        t.checked_in ? "checked" : ""
-                      }`}
-                    >
-                      {t.checked_in ? "Đã check-in" : "Chưa check-in"}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================== Vé Blockchain (NFT) ==================== */}
-        {activeCategory === "Vé Blockchain (NFT)" && (
-          <div className="ticket-status-section">
-            {nftTickets.length === 0 ? (
-              <div className="empty-tickets">
-                <img src={emptyTicketIcon} alt="Empty tickets" />
-                <p>Click để xem thêm chức năng vé blockchain</p>
-                <button className="buy-now-btn">
-                  <Link to="/mywal">chi tiết</Link>
-                </button>
-              </div>
-            ) : (
-              <div className="tickets-grid">
-                {nftTickets.map((nft, i) => (
-                  <div className="ticket-card" key={i}>
-                    <h3>{nft.eventName}</h3>
-                    <p>Mã NFT: {nft.tokenId}</p>
-
-                    {nft.qr && (
-                      <img className="qr-img" src={nft.qr} alt="nft qr" />
-                    )}
-
-                    <button className="checkin-btn nft-btn">NFT</button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        {activeCategory === "Hóa đơn của tôi " && (
-          <div className="ticket-status-section">
-            {bill.length === 0 ? (
-              <div className="empty-tickets">
-                <img src={emptyTicketIcon} alt="Empty tickets" />
-                <p>Chưa có hóa đơn nào</p>
-                <button className="buy-now-btn">
-                  <Link to="/home">chi tiết</Link>
-                </button>
-              </div>
-            ) : (
-              <div className="tickets-grid">
-                {bill.map((b, i) => (
-                  <div className="ticket-card" key={i}>
-                    <h3>{b.event_id}</h3>
-                    <p>Tổng: {b.total_amount}</p>
-                    <p>Tổng: {b.status}</p>
-{/* //id (PK), user_id, event_id, total_amount, status, created_at, payment_id */}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+    <div className="mytickets-wrapper">
+      <div className="mytickets-container">
+        <div className="header-section">
+            <h1>Kho Vé Của Tôi</h1>
+            <p>Quản lý vé tham dự sự kiện và lịch sử giao dịch</p>
+        </div>
         
+        {/* Tab chọn loại vé */}
+        <div className="category-tabs">
+          {["Vé Thường", "Vé Blockchain (NFT)", "Hóa đơn của tôi"].map((cat) => (
+            <button
+              key={cat}
+              className={`tab-btn ${activeCategory === cat ? "active" : ""}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div className="ticket-content-area">
+          {/* ==================== VÉ THƯỜNG ==================== */}
+          {activeCategory === "Vé Thường" && (
+            <>
+              {filteredRegularTickets.length === 0 ? (
+                <EmptyState message="Bạn chưa mua vé sự kiện nào" linkText="Mua vé ngay" linkTo="/home" />
+              ) : (
+                <div className="tickets-grid">
+                  {filteredRegularTickets.map((t, index) => (
+                    <div className="ticket-card" key={index}>
+                      <div className="card-header">
+                        <h3 className="event-name">{t.event?.name || "Sự kiện chưa cập nhật"}</h3>
+                        {renderStatus(t.status)}
+                      </div>
+                      
+                      <div className="card-body">
+                        <div className="info-row">
+                            <span>Số lượng:</span> <strong>{t.quantity}</strong>
+                        </div>
+                        <div className="info-row">
+                            <span>Đơn giá:</span> <strong>{formatCurrency(t.unit_price)}</strong>
+                        </div>
+                        
+                        <div className="qr-section">
+                            {t.qr_code ? (
+                            <img src={t.qr_code} className="qr-img" alt="QR Code" />
+                            ) : (
+                            <div className="no-qr">Chưa có mã QR</div>
+                            )}
+                        </div>
+                      </div>
+
+                      <div className="card-footer">
+                        <button className={`action-btn ${t.checked_in ? "disabled" : "primary"}`}>
+                          {t.checked_in ? "Đã Check-in" : "Mở vé Check-in"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ==================== VÉ NFT ==================== */}
+          {activeCategory === "Vé Blockchain (NFT)" && (
+            <>
+              {nftTickets.length === 0 ? (
+                <EmptyState message="Bạn chưa sở hữu vé NFT nào" linkText="Vào ví NFT" linkTo="/mywal" />
+              ) : (
+                <div className="tickets-grid">
+                  {nftTickets.map((nft, i) => (
+                    <div className="ticket-card nft-card" key={i}>
+                      <div className="card-header">
+                        <h3 className="event-name">{nft.eventName}</h3>
+                        <span className="nft-badge">NFT Asset</span>
+                      </div>
+                      <div className="card-body">
+                         <div className="info-row">
+                            <span>Token ID:</span> <span className="token-id">#{nft.tokenId}</span>
+                         </div>
+                         <div className="qr-section">
+                            {nft.qr && <img className="qr-img" src={nft.qr} alt="NFT QR" />}
+                         </div>
+                      </div>
+                      <div className="card-footer">
+                        <button className="action-btn nft-action">Xem trên Blockchain</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ==================== HÓA ĐƠN ==================== */}
+          {activeCategory === "Hóa đơn của tôi" && (
+            <>
+              {bill.length === 0 ? (
+                <EmptyState message="Chưa có lịch sử giao dịch" linkText="Khám phá sự kiện" linkTo="/home" />
+              ) : (
+                <div className="tickets-grid">
+                  {bill.map((b, i) => (
+                    <div className="ticket-card bill-card" key={i}>
+                      <div className="card-header">
+                         <span className="bill-id">Mã đơn: #{b.id}</span>
+                         {renderStatus(b.status)}
+                      </div>
+                      <div className="card-body">
+                        <div className="info-row">
+                            <span>Sự kiện ID:</span> <strong>{b.event_id}</strong>
+                        </div>
+                        <div className="info-row">
+                            <span>Ngày tạo:</span> <span>{new Date(b.created_at).toLocaleDateString('vi-VN')}</span>
+                        </div>
+                        <div className="bill-total">
+                            Tổng tiền: {formatCurrency(b.total_amount)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
+// Component phụ hiển thị lúc trống
+const EmptyState = ({ message, linkText, linkTo }) => (
+  <div className="empty-state">
+    <img src={emptyTicketIcon} alt="Empty" />
+    <p>{message}</p>
+    <Link to={linkTo} className="buy-now-btn">{linkText}</Link>
+  </div>
+);

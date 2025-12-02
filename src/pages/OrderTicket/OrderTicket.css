@@ -35,6 +35,7 @@ body {
 .order-page {
   min-height: 100vh;
   padding: 48px 20px;
+
 }
 
 .order-page-container {
@@ -42,7 +43,6 @@ body {
   grid-template-columns: 1fr 380px;
   gap: 12px;
   align-items: stretch;
-
 }
 
 /* --- HEADER MAIN --- */
