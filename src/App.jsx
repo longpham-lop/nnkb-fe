@@ -42,6 +42,7 @@ import MintAndTransferTicket from './pages/PayTicket/Blockchain';
 import PaymentSelection from './pages/PaymentSelection/PaymentSelection';
 import MyWallet from './pages/tranfer/MyWallet';
 import Blockticket from './pages/Admin/blockticket';
+import FeedbackForm from './pages/mail/mail';
 
 
 import "./App.css";
@@ -110,6 +111,20 @@ function AnimatedRoutes() {
             >
               
               <Home />
+            </Motion.div></ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mail"
+          element={<ProtectedRoute>
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              
+              <FeedbackForm />
             </Motion.div></ProtectedRoute>
           }
         />
@@ -348,6 +363,7 @@ function Layout() {
     || location.pathname === "/admin/order"
     || location.pathname === "/admin/orderitem"
     || location.pathname === "/admin/transaction"
+    || location.pathname === "/admin/b-t"
     || location.pathname === "/admin/payment";
   const currentUser = user.role;
 
@@ -458,7 +474,7 @@ function Layout() {
             <div className="footer-column">
               <h4>Dành cho nhà tổ chức</h4>
               <a href="/termspage">Hợp tác với chúng tôi</a>
-              <a href="/termspage">Câu hỏi thường gặp</a>
+              <a href="/mail">Câu hỏi thường gặp</a>
             </div>
           </div>
 
