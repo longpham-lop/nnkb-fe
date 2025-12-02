@@ -6,6 +6,10 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute';
+import TicketNotifier from './components/toast';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
@@ -353,6 +357,17 @@ function Layout() {
 
   return (
     <>
+      <TicketNotifier />
+      <ToastContainer position="top-right"
+              autoClose={2000}
+              hideProgressBar={false}
+              newestOnTop={true}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              style={{ zIndex: 9999 }}/>
       {!hideHeaderFooter && (
         <div className="home-container-app">
           <header className="header">
