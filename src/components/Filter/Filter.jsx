@@ -4,6 +4,7 @@ import { getAllEvents } from '../../api/event';
 import { getAllCategories } from '../../api/category';
 import { getAllLocations } from '../../api/location';
 import { getAllTickets } from '../../api/ticket';
+import { saveEventView } from '../../utils/behavior';
 import './Filter.css';
 
 // =================== HELPER FUNCTIONS ===================
@@ -23,11 +24,6 @@ const getUniqueBy = (arr, key) => {
     
     // Nếu không có giá trị thì bỏ qua
     if (!rawValue) return false;
-
-    // CHUẨN HÓA CHUỖI ĐỂ SO SÁNH:
-    // 1. trim(): Xóa khoảng trắng thừa đầu đuôi
-    // 2. toLowerCase(): Chuyển về chữ thường
-    // 3. normalize('NFC'): Đưa tiếng Việt về cùng 1 chuẩn Unicode
     const compareValue = rawValue.toString().trim().toLowerCase().normalize("NFC");
 
     if (seen.has(compareValue)) {
@@ -271,8 +267,20 @@ const FilterPage = () => {
     return Math.min(...eventTickets.map(t=>Number(t.price)));
   };
 
-  const goToDetail = (id) => {
-    localStorage.setItem("eventid", id);
+  const goToDetail = (event) => {
+
+    saveEventView({
+      id: event.id,
+      name: event.name,
+      cover_image: event.cover_image,
+      start_date: event.start_date,
+      location_id: event.location_id,
+      category_id: event.category_id,
+      artist: event.artist || "A",
+    });
+
+
+    localStorage.setItem("eventid", event.id);
     navigate("/ticketdetail");
   };
 
@@ -368,7 +376,7 @@ const FilterPage = () => {
         {filteredEvents.map(event=>{
           const minPrice = getMinTicketPrice(event.id);
           return (
-            <div className="event-card-filter" key={event.id} onClick={()=>goToDetail(event.id)}>
+            <div className="event-card-filter" key={event.id} onClick={()=>goToDetail(event)}>
               <div className="img-wrapper"><img src={event.cover_image} alt={event.name} /></div>
               <div className="card-content">
                 <h3 className="event-title">{event.name}</h3>

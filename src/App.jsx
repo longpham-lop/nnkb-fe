@@ -352,7 +352,9 @@ function Layout() {
   const currentUser = user.role;
 
   const logout =()=>{
+    const history = localStorage.getItem("view_history");
     localStorage.clear();
+    if(history) localStorage.setItem("view_history", history);
     navigate("/");
   }
 

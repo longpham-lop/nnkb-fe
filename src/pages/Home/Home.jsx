@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./Home.css";
 
+import { getUniqueValues,recommendEventsTF,eventToFeatures,buildModel } from "../../components/RecommendationsTF";
+import { getEventHistory } from '../../utils/behavior';
+
+
 import { getAllEvents } from "../../api/event";
 import { getAllCategories } from "../../api/category";
 import { getAllLocations } from "../../api/location";
@@ -20,8 +24,9 @@ const Home = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  
 
+  const [recommendedEvents, setRecommendedEvents] = useState([]);
+  
   // ========================= RANDOM FUNCTION =========================
   const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
@@ -42,6 +47,32 @@ const Home = () => {
         setSpecialEvents(shuffle(eventsData).slice(0, 6)); // đặc sắc
         setTrendEvents(shuffle(eventsData).slice(0, 5)); // xu hướng
         setWeekendEvents(shuffle(eventsData).slice(0, 6)); // cuối tuần
+
+        const flatEvents = eventsData.map(ev => {
+          const loc = locationRes.data.find(l => l.id === ev.location_id)?.name || "Khác";
+          const cat = categoryRes.data.find(c => c.id === ev.category_id)?.name || "Khác";
+          const price = ticketRes.data.filter(t => t.event_id === ev.id).map(t => Number(t.price));
+          return {
+            ...ev,
+            location: loc,
+            category: cat,
+            artist: ev.artist || "A", // nếu chưa có artist
+            price: price.length ? Math.min(...price) : 0,
+          };
+        });
+
+        // lấy unique values cho one-hot encoding
+        const uniques = getUniqueValues(flatEvents);
+
+        // lấy lịch sử xem user từ localStorage
+        const history = getEventHistory();
+        const featuresHistory = history.map(ev => eventToFeatures(ev, uniques));
+
+        if (featuresHistory.length > 0) {
+          const avgFeatures = buildModel(featuresHistory);
+          const recommended = recommendEventsTF(flatEvents, avgFeatures, uniques);
+          setRecommendedEvents(recommended);
+        }
 
         setTickets(ticketRes.data || []);
       } catch (err) {
@@ -144,6 +175,33 @@ const Home = () => {
               ))}
           </div>
         </section>
+
+        {recommendedEvents.length > 0 && (
+          <section className="event-section">
+            <h2>✨ Gợi ý cho bạn</h2>
+            <div className="event-wrapper">
+              <button className="arrow left" onClick={() => scrollLeft("recommended")}>❮</button>
+              <div className="event-list" id="recommended">
+                {recommendedEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="event-card"
+                    onClick={() => navto(event.id)}
+                  >
+                    <img src={event.cover_image} alt={event.name} />
+                    <h3>{event.name}</h3>
+                    <p className="price">
+                      {event.price === 0
+                        ? "Miễn phí"
+                        : `Từ ${event.price.toLocaleString("vi-VN")}₫`}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <button className="arrow right" onClick={() => scrollRight("recommended")}>❯</button>
+            </div>
+          </section>
+        )}
 
         {/* ============================= SỰ KIỆN ĐẶC SẮC ============================= */}
         <section className="event-section">
