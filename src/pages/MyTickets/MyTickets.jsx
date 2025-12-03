@@ -3,9 +3,11 @@ import "./MyTickets.css";
 import emptyTicketIcon from "../../assets/amongus.png";  
 import { Link, useNavigate } from "react-router-dom"
 import { getwhoOrderItems, getAllOrders } from "../../api/order"; 
+import { getAllOrderItems } from "../../api/orderitem";
 
 
 export default function MyTickets() {
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const [regularTickets, setRegularTickets] = useState([]);
   const [nftTickets, setNftTickets] = useState([]);
   const [bill, setBill] = useState([]); 
@@ -28,9 +30,12 @@ export default function MyTickets() {
     try {
       const orderRes = await getwhoOrderItems();
       const orders = orderRes.data.data || [];
+      console.log(orders);
       setBill(orders);
 
-      const orderItemsRes = await getAllOrders();
+      await delay(1000);
+
+      const orderItemsRes = await getAllOrderItems();
       const allItems = Array.isArray(orderItemsRes.data) ? orderItemsRes.data : [];
 
       const userTickets = allItems
