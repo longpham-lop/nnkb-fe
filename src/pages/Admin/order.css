@@ -120,25 +120,21 @@
     justify-content: center;
 }
 
-/* Thêm vào order.css */
-
-/* Giữ chiều cao tối thiểu cho body của bảng để tránh bảng bị co giãn mạnh khi ít dữ liệu */
 .table-responsive {
-    min-height: 450px; /* Điều chỉnh chiều cao này tùy màn hình */
+    min-height: 450px; 
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Đẩy pagination xuống đáy */
+    justify-content: space-between; 
 }
 
-/* Đảm bảo hàng không bị xuống dòng lung tung làm vỡ layout */
+
 .admin-table td {
     white-space: nowrap;
     vertical-align: middle;
 }
 
-/* Đẹp cho phân trang */
 .pagination {
-    margin-top: auto; /* Luôn nằm dưới cùng của container */
+    margin-top: auto; 
     padding-top: 20px;
     border-top: 1px solid #eee;
     display: flex;

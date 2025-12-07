@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import EventFormModal from "./EventFormModal";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "./Events.css";
-// 1. Import thư viện xlsx
 import * as XLSX from 'xlsx'; 
 
 import {
@@ -14,7 +13,7 @@ import {
 import { 
   Calendar, MapPin, Edit, Trash2, Plus, 
   Search, Filter, Image as ImageIcon, CheckCircle, XCircle,
-  Download // 2. Import icon Download
+  Download 
 } from "lucide-react";
 
 const Events = () => {
@@ -64,23 +63,23 @@ const Events = () => {
       "Trạng thái": event.status
     }));
 
-    // Tạo worksheet từ dữ liệu JSON
+   
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
 
-    // Tự động điều chỉnh độ rộng cột (Optional - làm đẹp file excel)
+  
     const columnWidths = [
-      { wch: 5 },  // ID
-      { wch: 30 }, // Tên
-      { wch: 15 }, // BTC
-      { wch: 20 }, // Bắt đầu
-      { wch: 20 }, // Kết thúc
-      { wch: 15 }, // Địa điểm
-      { wch: 15 }, // Thể loại
-      { wch: 15 }  // Trạng thái
+      { wch: 5 },  
+      { wch: 30 }, 
+      { wch: 15 }, 
+      { wch: 20 }, 
+      { wch: 20 }, 
+      { wch: 15 }, 
+      { wch: 15 }, 
+      { wch: 15 }  
     ];
     worksheet['!cols'] = columnWidths;
 
-    // Tạo workbook mới
+  
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Danh Sách Sự Kiện");
 
