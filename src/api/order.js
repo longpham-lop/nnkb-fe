@@ -19,3 +19,7 @@ export const deleteOrder = (id) =>
 
 export const getwhoOrderItems = () =>
   axiosInstance.get(`${API}/api/orders/who`);
+
+
+export const getitembyiduser = (id) =>
+  axiosInstance.get(`${API}/api/orders/unsafe/${id}`);

@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import "./MyTickets.css";
+import "./mytick.css";
 import emptyTicketIcon from "../../assets/amongus.png";  
 import { Link, useNavigate } from "react-router-dom"
-import { getwhoOrderItems, getAllOrders } from "../../api/order"; 
-import { getAllOrderItems } from "../../api/orderitem";
+import { getwhoOrderItems, getitembyiduser } from "../../api/order"; 
+import { getAllOrderItems  } from "../../api/orderitem";
 
 
-export default function MyTickets() {
+export default function MyTickets2() {
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const [regularTickets, setRegularTickets] = useState([]);
   const [nftTickets, setNftTickets] = useState([]);
   const [bill, setBill] = useState([]); 
   const [activeCategory, setActiveCategory] = useState("Vé Thường");
+  const user = JSON.parse(localStorage.getItem("user") );
   
   // const navigate = useNavigate(); // Chưa dùng thì comment lại
   const [activeStatusTab, setActiveStatusTab] = useState("Tất cả");
@@ -28,21 +29,28 @@ export default function MyTickets() {
 
   const loadRegularTickets = async () => {
     try {
-      const orderRes = await getwhoOrderItems();
-      const orders = orderRes.data.data || [];
-      console.log(orders);
-      setBill(orders);
+        const userId = user?.id;
+        if (!userId) {
+        console.error("Không tìm thấy user ID");
+        return;
+        }
 
-      await delay(1000);
+        // ❗ Gọi API dễ bị IDOR
+        const orderRes = await getitembyiduser(userId);
+        const orders = orderRes.data.data || [];
+        console.log(orders);
+        setBill(orders);
 
-      const orderItemsRes = await getAllOrderItems();
-      const allItems = Array.isArray(orderItemsRes.data) ? orderItemsRes.data : [];
+        await delay(1000);
 
-      const userTickets = allItems
+        const orderItemsRes = await getAllOrderItems();
+        const allItems = Array.isArray(orderItemsRes.data) ? orderItemsRes.data : [];
+
+        const userTickets = allItems
         .filter((item) => orders.some((o) => o.id === item.order_id))
         .map((item) => {
-          const order = orders.find((o) => o.id === item.order_id);
-          return {
+            const order = orders.find((o) => o.id === item.order_id);
+            return {
             order_id: order.id,
             event_id: order.event_id,
             quantity: item.quantity,
@@ -51,14 +59,14 @@ export default function MyTickets() {
             checked_in: item.checked_in,
             status: order.status,
             event: order.Event,
-          };
+            };
         });
 
-      setRegularTickets(userTickets);
+        setRegularTickets(userTickets);
     } catch (err) {
-      console.error("Lỗi tải vé thường:", err);
+        console.error("Lỗi tải vé thường:", err);
     }
-  };
+    };
 
   const filteredRegularTickets =
     activeStatusTab === "Tất cả"

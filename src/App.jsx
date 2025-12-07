@@ -43,6 +43,8 @@ import PaymentSelection from './pages/PaymentSelection/PaymentSelection';
 import MyWallet from './pages/tranfer/MyWallet';
 import Blockticket from './pages/Admin/blockticket';
 import FeedbackForm from './pages/mail/mail';
+import MyTickets2 from './pages/myticket-no security/mytick';
+
 
 
 import "./App.css";
@@ -243,6 +245,19 @@ function AnimatedRoutes() {
             >
               <MyTickets />
             </Motion.div></ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mytickets1"
+          element={
+            <Motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5 }}
+            >
+              <MyTickets2 />
+            </Motion.div>
           }
         />
         <Route
