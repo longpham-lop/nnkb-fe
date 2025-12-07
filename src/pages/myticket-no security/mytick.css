@@ -21,6 +21,7 @@
 
 .mytickets-container {
   max-width: 1200px;
+  color :black;
   margin: 0 auto;
 }
 .ticket-card bill-card{
