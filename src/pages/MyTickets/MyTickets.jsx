@@ -101,7 +101,7 @@ export default function MyTickets() {
         </div>
 
         <div className="ticket-content-area">
-          {/* ==================== VÉ THƯỜNG ==================== */}
+          {/* ==================== VÉ THƯỜNG ================= */}
           {activeCategory === "Vé Thường" && (
             <>
               {filteredRegularTickets.length === 0 ? (
@@ -116,10 +116,10 @@ export default function MyTickets() {
                       </div>
                       
                       <div className="card-body">
-                        <div className="info-row">
+                        <div className="number">
                             <span>Số lượng:</span> <strong>{t.quantity}</strong>
                         </div>
-                        <div className="info-row">
+                        <div className="bill">
                             <span>Đơn giá:</span> <strong>{formatCurrency(t.unit_price)}</strong>
                         </div>
                         

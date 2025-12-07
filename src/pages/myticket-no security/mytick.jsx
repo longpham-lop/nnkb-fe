@@ -124,10 +124,10 @@ export default function MyTickets2() {
                       </div>
                       
                       <div className="card-body">
-                        <div className="info-row">
+                        <div className="number">
                             <span>Số lượng:</span> <strong>{t.quantity}</strong>
                         </div>
-                        <div className="info-row">
+                        <div className="bill">
                             <span>Đơn giá:</span> <strong>{formatCurrency(t.unit_price)}</strong>
                         </div>
                         

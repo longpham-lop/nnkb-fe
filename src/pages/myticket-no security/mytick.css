@@ -118,7 +118,10 @@
   align-items: flex-start;
   margin-bottom: 16px;
   gap: 10px;
-
+  color: black;
+}
+.card-header h3{
+  color: black;
 }
 .date{
   color: white;
@@ -265,7 +268,7 @@
 .bill-id {
   font-family: monospace;
   font-weight: bold;
-  color: #ffffff;
+  color: #000000;
 }
 
 .bill-total {
